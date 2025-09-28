@@ -27,13 +27,38 @@
   width: 100%;
 }
 
-.details-image {
+.details-image-main {
   width: 100%;
   height: auto;
   max-height: 500px;
   object-fit: cover;
   border-radius: 8px;
   border: 1px solid #e9ecef;
+  margin-bottom: 1rem;
+}
+
+.details-thumbnails {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.thumbnail-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.thumbnail-image:hover {
+  border-color: #c4b5fd;
+}
+
+.thumbnail-image.active {
+  border-color: #7B2CBF;
 }
 
 .details-info-container {

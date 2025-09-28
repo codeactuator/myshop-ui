@@ -8,6 +8,7 @@ const ProductDetailsPage = () => {
   const { productId } = useParams();
   const { addToCart } = useCart();
   const [product, setProduct] = useState(null);
+  const [selectedImage, setSelectedImage] = useState('');
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -34,6 +35,9 @@ const ProductDetailsPage = () => {
 
         setProduct(productData);
         setReviews(reviewsData);
+        if (productData.imageUrls && productData.imageUrls.length > 0) {
+          setSelectedImage(productData.imageUrls[0]);
+        }
 
       } catch (err) {
         setError(err.message);
@@ -54,7 +58,18 @@ const ProductDetailsPage = () => {
       <Link to="/products" className="back-link">&larr; Back to all products</Link>
       <div className="details-content">
         <div className="details-image-container">
-          <img src={product.imageUrl} alt={product.name} className="details-image" />
+          <img src={selectedImage} alt={product.name} className="details-image-main" />
+          <div className="details-thumbnails">
+            {product.imageUrls.map((url, index) => (
+              <img
+                key={index}
+                src={url}
+                alt={`${product.name} thumbnail ${index + 1}`}
+                className={`thumbnail-image ${url === selectedImage ? 'active' : ''}`}
+                onClick={() => setSelectedImage(url)}
+              />
+            ))}
+          </div>
         </div>
         <div className="details-info-container">
           <h1 className="details-name">{product.name}</h1>

@@ -1,0 +1,20 @@
+.order-success-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  min-height: 60vh;
+}
+
+.order-success-content h2 {
+  font-size: 2.5rem;
+  color: #7B2CBF;
+  margin-bottom: 1rem;
+}
+
+.order-success-content p {
+  font-size: 1.2rem;
+  max-width: 500px;
+  margin: 0 auto 2rem;
+}

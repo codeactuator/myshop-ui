@@ -4,7 +4,7 @@ import './ProductCard.css';
 import { useCart } from '../context/CartContext';
 
 const ProductCard = ({ product }) => {
-  const { id, name, price, imageUrl, user } = product;
+  const { id, name, price, imageUrls, user } = product;
   const { addToCart } = useCart();
 
   const handleAddToCart = (e) => {
@@ -17,7 +17,7 @@ const ProductCard = ({ product }) => {
   return (
     <Link to={`/products/${id}`} className="product-card-link">
       <div className="product-card">
-        <img src={imageUrl} alt={name} className="product-image" />
+        <img src={imageUrls[0]} alt={name} className="product-image" />
         <div className="product-info">
           <h3 className="product-name">{name}</h3>
           <p className="product-price">${price.toFixed(2)}</p>

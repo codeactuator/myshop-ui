@@ -1,10 +1,11 @@
 import React from 'react';
 import { useCart } from '../context/CartContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './CartPage.css';
 
 const CartPage = () => {
   const { cartItems, removeFromCart, updateQuantity, cartTotal } = useCart();
+  const navigate = useNavigate();
 
   if (cartItems.length === 0) {
     return (
@@ -23,7 +24,7 @@ const CartPage = () => {
         <div className="cart-items">
           {cartItems.map(item => (
             <div key={item.id} className="cart-item">
-              <img src={item.imageUrl} alt={item.name} className="cart-item-image" />
+              <img src={item.imageUrls[0]} alt={item.name} className="cart-item-image" />
               <div className="cart-item-details">
                 <h3>{item.name}</h3>
                 <p>${item.price.toFixed(2)}</p>
@@ -57,7 +58,7 @@ const CartPage = () => {
             <span>Total</span>
             <span>${cartTotal.toFixed(2)}</span>
           </div>
-          <button className="btn btn-primary checkout-btn">Proceed to Checkout</button>
+          <button className="btn btn-primary checkout-btn" onClick={() => navigate('/checkout')}>Proceed to Checkout</button>
         </div>
       </div>
     </div>

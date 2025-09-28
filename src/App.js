@@ -7,7 +7,10 @@ import AppIntroScreen from './pages/AppIntroScreen';
 import ProductListingPage from './pages/ProductListingPage';
 import ProductDetailsPage from './pages/ProductDetailsPage';
 import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
+import OrderSuccessPage from './pages/OrderSuccessPage';
 import { CartProvider } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
 import MainLayout from './components/MainLayout';
 import { useNavigate } from 'react-router-dom';
 
@@ -30,23 +33,27 @@ function App() {
   const initialRoute = hasSeenIntro ? "/products" : "/welcome";
 
   return (
-    <CartProvider>
-      <Router>
-        <Routes>
-          {/* Routes without the main navbar */}
-          <Route path="/" element={<Navigate to={initialRoute} replace />} />
-          <Route path="/welcome" element={<WelcomeScreenWrapper />} />
-          <Route path="/intro" element={<AppIntroScreenWrapper />} />
+    <AuthProvider>
+      <CartProvider>
+        <Router>
+          <Routes>
+            {/* Routes without the main navbar */}
+            <Route path="/" element={<Navigate to={initialRoute} replace />} />
+            <Route path="/welcome" element={<WelcomeScreenWrapper />} />
+            <Route path="/intro" element={<AppIntroScreenWrapper />} />
 
-          {/* Routes with the main navbar */}
-          <Route element={<MainLayout />}>
-            <Route path="/products" element={<ProductListingPage />} />
-            <Route path="/products/:productId" element={<ProductDetailsPage />} />
-            <Route path="/cart" element={<CartPage />} />
-          </Route>
-        </Routes>
-      </Router>
-    </CartProvider>
+            {/* Routes with the main navbar */}
+            <Route element={<MainLayout />}>
+              <Route path="/products" element={<ProductListingPage />} />
+              <Route path="/products/:productId" element={<ProductDetailsPage />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/order-success" element={<OrderSuccessPage />} />
+            </Route>
+          </Routes>
+        </Router>
+      </CartProvider>
+    </AuthProvider>
   );
 }
 

@@ -1,42 +1,42 @@
 {
   "users": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Alice Johnson",
       "apartmentNumber": "A-101",
       "email": "alice@example.com",
       "phone": "123-456-7890"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Bob Williams",
       "apartmentNumber": "B-204",
       "email": "bob@example.com",
       "phone": "234-567-8901"
     },
     {
-      "id": 3,
+      "id": "3",
       "name": "Charlie Brown",
       "apartmentNumber": "C-302",
       "email": "charlie@example.com",
       "phone": "345-678-9012"
     },
     {
-      "id": 4,
+      "id": "4",
       "name": "Shekhar Kumar",
       "apartmentNumber": "H-602",
       "email": "shekhar@example.com",
       "phone": "826-448-1868"
     },
     {
-      "id": 5,
+      "id": "5",
       "name": "Priya Sharma",
       "apartmentNumber": "D-401",
       "email": "priya@example.com",
       "phone": "456-789-0123"
     },
     {
-      "id": 6,
+      "id": "6",
       "name": "Rohan Mehta",
       "apartmentNumber": "E-110",
       "email": "rohan@example.com",
@@ -45,177 +45,212 @@
   ],
   "products": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Vintage Wooden Chair",
       "description": "A beautifully crafted wooden chair, perfect for a study or living room. Minor wear and tear.",
       "price": 45,
       "category": "Furniture",
-      "imageUrl": "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?q=80&w=1887",
+      "imageUrls": [
+        "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?q=80&w=1887",
+        "https://images.unsplash.com/photo-1503602642458-232111445657?q=80&w=1887",
+        "https://images.unsplash.com/photo-1494903446931-37516c43ea15?q=80&w=1887"
+      ],
       "status": "available",
       "postedDate": "2023-10-26T10:00:00Z",
       "userId": 1
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Used 'The Great Gatsby' Book",
       "description": "Paperback copy of the classic novel. In good condition.",
       "price": 5.5,
       "category": "Books",
-      "imageUrl": "https://images.unsplash.com/photo-1589998059171-988d887df646?q=80&w=2070",
+      "imageUrls": [
+        "https://images.unsplash.com/photo-1589998059171-988d887df646?q=80&w=2070"
+      ],
       "status": "available",
       "postedDate": "2023-10-27T14:30:00Z",
       "userId": 2
     },
     {
-      "id": 3,
+      "id": "3",
       "name": "Modern Desk Lamp",
       "description": "Sleek and minimalist LED desk lamp. Barely used.",
       "price": 25,
       "category": "Electronics",
-      "imageUrl": "https://images.unsplash.com/photo-1622226696972-3a054526765c?q=80&w=1887",
+      "imageUrls": [
+        "https://images.unsplash.com/photo-1622226696972-3a054526765c?q=80&w=1887"
+      ],
       "status": "sold",
       "postedDate": "2023-10-25T09:00:00Z",
       "userId": 1
     },
     {
-      "id": 4,
+      "id": "4",
       "name": "Hand-painted Vase",
       "description": "A unique, hand-painted ceramic vase. Great for home decor.",
       "price": 30,
       "category": "Home Decor",
-      "imageUrl": "https://images.unsplash.com/photo-1576176632363-d7a85873570c?q=80&w=1887",
+      "imageUrls": [
+        "https://images.unsplash.com/photo-1576176632363-d7a85873570c?q=80&w=1887"
+      ],
       "status": "available",
       "postedDate": "2023-10-28T11:00:00Z",
       "userId": 3
     },
     {
-      "id": 5,
+      "id": "5",
       "name": "Stainless Steel Pan Set",
       "description": "Set of 3 non-stick stainless steel pans. Lightly used, great for a new kitchen.",
-      "price": 35.00,
+      "price": 35,
       "category": "Kitchenware",
-      "imageUrl": "https://images.unsplash.com/photo-1599056037722-b6a2161237a7?q=80&w=2070",
+      "imageUrls": [
+        "https://images.unsplash.com/photo-1599056037722-b6a2161237a7?q=80&w=2070"
+      ],
       "status": "available",
       "postedDate": "2023-10-29T10:00:00Z",
       "userId": 5
     },
     {
-      "id": 6,
+      "id": "6",
       "name": "Wooden Toy Train Set",
       "description": "Complete wooden train set with tracks and accessories. Perfect for kids aged 3-6.",
-      "price": 20.00,
+      "price": 20,
       "category": "Toys",
-      "imageUrl": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070",
+      "imageUrls": [
+        "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070"
+      ],
       "status": "available",
       "postedDate": "2023-10-29T11:30:00Z",
       "userId": 2
     },
     {
-      "id": 7,
+      "id": "7",
       "name": "High-Density Yoga Mat",
       "description": "Barely used, high-density foam yoga mat. Comes with a carrying strap. Color: Blue.",
-      "price": 15.00,
+      "price": 15,
       "category": "Sports",
-      "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=2120",
+      "imageUrls": [
+        "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=2120"
+      ],
       "status": "available",
       "postedDate": "2023-10-30T09:00:00Z",
       "userId": 1
     },
     {
-      "id": 8,
+      "id": "8",
       "name": "Cordless Drill Kit",
       "description": "18V cordless drill with two batteries, charger, and carrying case. In great working condition.",
-      "price": 50.00,
+      "price": 50,
       "category": "DIY Tools",
-      "imageUrl": "https://images.unsplash.com/photo-1504493399102-de9141e06f1d?q=80&w=2070",
+      "imageUrls": [
+        "https://images.unsplash.com/photo-1504493399102-de9141e06f1d?q=80&w=2070",
+        "https://images.unsplash.com/photo-1621484999594-4343318a1377?q=80&w=1932"
+      ],
       "status": "available",
       "postedDate": "2023-10-30T14:00:00Z",
       "userId": 6
     },
     {
-      "id": 9,
+      "id": "9",
       "name": "Men's Casual T-Shirt",
       "description": "Comfortable cotton t-shirt, size M. Brand new, never worn.",
-      "price": 12.00,
+      "price": 12,
       "category": "Clothing",
-      "imageUrl": "https://images.unsplash.com/photo-1622470953794-aa9c70b0fb9d?q=80&w=1964",
+      "imageUrls": [
+        "https://images.unsplash.com/photo-1622470953794-aa9c70b0fb9d?q=80&w=1964"
+      ],
       "status": "available",
       "postedDate": "2023-11-01T10:00:00Z",
       "userId": 4
     },
     {
-      "id": 10,
+      "id": "10",
       "name": "Durable Dog Leash",
       "description": "5-foot long nylon dog leash, suitable for medium-sized dogs. Red color.",
-      "price": 8.50,
+      "price": 8.5,
       "category": "Pet Supplies",
-      "imageUrl": "https://images.unsplash.com/photo-1599428628295-0c8148825455?q=80&w=1974",
+      "imageUrls": [
+        "https://images.unsplash.com/photo-1599428628295-0c8148825455?q=80&w=1974"
+      ],
       "status": "available",
       "postedDate": "2023-11-01T11:00:00Z",
       "userId": 5
     },
     {
-      "id": 11,
+      "id": "11",
       "name": "Set of 3 Small Succulents",
       "description": "Easy-to-care-for succulents in small ceramic pots. Perfect for a windowsill or desk.",
-      "price": 18.00,
+      "price": 18,
       "category": "Gardening",
-      "imageUrl": "https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?q=80&w=1974",
+      "imageUrls": [
+        "https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?q=80&w=1974"
+      ],
       "status": "available",
       "postedDate": "2023-11-02T09:30:00Z",
       "userId": 1
     },
     {
-      "id": 12,
+      "id": "12",
       "name": "Portable Bluetooth Speaker",
       "description": "Compact and portable bluetooth speaker with 8-hour battery life. Good sound quality.",
-      "price": 22.00,
+      "price": 22,
       "category": "Electronics",
-      "imageUrl": "https://images.unsplash.com/photo-1589996448606-178913ecea4e?q=80&w=1974",
+      "imageUrls": [
+        "https://images.unsplash.com/photo-1618384887924-33676b385932?q=80&w=1974"
+      ],
       "status": "available",
       "postedDate": "2023-11-02T12:00:00Z",
       "userId": 6
     },
     {
-      "id": 13,
+      "id": "13",
       "name": "Organic Pasta",
       "description": "500g pack of organic whole wheat pasta. Unopened.",
-      "price": 3.50,
+      "price": 3.5,
       "category": "Grocery",
-      "imageUrl": "https://images.unsplash.com/photo-1551183053-bf91a1d8c402?q=80&w=1974",
+      "imageUrls": [
+        "https://images.unsplash.com/photo-1551183053-bf91a1d8c402?q=80&w=1974"
+      ],
       "status": "available",
       "postedDate": "2023-11-03T10:00:00Z",
       "userId": 3
     },
     {
-      "id": 14,
+      "id": "14",
       "name": "Extra Virgin Olive Oil",
       "description": "500ml bottle of cold-pressed extra virgin olive oil. Sealed.",
-      "price": 9.00,
+      "price": 9,
       "category": "Grocery",
-      "imageUrl": "https://images.unsplash.com/photo-1626082626944-805f45317c69?q=80&w=1964",
+      "imageUrls": [
+        "https://images.unsplash.com/photo-1626082626944-805f45317c69?q=80&w=1964"
+      ],
       "status": "available",
       "postedDate": "2023-11-03T11:00:00Z",
       "userId": 4
     },
     {
-      "id": 15,
+      "id": "15",
       "name": "Fresh Milk (1L)",
       "description": "One liter carton of fresh, full-fat milk. Expires in 3 days.",
-      "price": 2.00,
+      "price": 2,
       "category": "Dairy",
-      "imageUrl": "https://images.unsplash.com/photo-1620189507195-68309c04c4d0?q=80&w=1964",
+      "imageUrls": [
+        "https://images.unsplash.com/photo-1620189507195-68309c04c4d0?q=80&w=1964"
+      ],
       "status": "available",
       "postedDate": "2023-11-04T09:00:00Z",
       "userId": 2
     },
     {
-      "id": 16,
+      "id": "16",
       "name": "Block of Cheddar Cheese",
       "description": "250g block of mature cheddar cheese. Great for cooking or sandwiches.",
-      "price": 4.50,
+      "price": 4.5,
       "category": "Dairy",
-      "imageUrl": "https://images.unsplash.com/photo-1618164436241-44792f0d8b5e?q=80&w=1964",
+      "imageUrls": [
+        "https://images.unsplash.com/photo-1618164436241-44792f0d8b5e?q=80&w=1964"
+      ],
       "status": "available",
       "postedDate": "2023-11-04T09:30:00Z",
       "userId": 1
@@ -223,16 +258,126 @@
   ],
   "orders": [
     {
-      "id": 1,
+      "id": "1",
       "productId": 3,
       "buyerId": 2,
       "orderDate": "2023-10-26T18:00:00Z",
       "totalAmount": 25
+    },
+    {
+      "id": "1d3c",
+      "buyerInfo": {
+        "name": "Alice Johnson",
+        "apartmentNumber": "A-101",
+        "phone": "123-456-7890"
+      },
+      "items": [
+        {
+          "id": "2",
+          "name": "Used 'The Great Gatsby' Book",
+          "description": "Paperback copy of the classic novel. In good condition.",
+          "price": 5.5,
+          "category": "Books",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1589998059171-988d887df646?q=80&w=2070"
+          ],
+          "status": "available",
+          "postedDate": "2023-10-27T14:30:00Z",
+          "userId": 2,
+          "quantity": 1
+        },
+        {
+          "id": "15",
+          "name": "Fresh Milk (1L)",
+          "description": "One liter carton of fresh, full-fat milk. Expires in 3 days.",
+          "price": 2,
+          "category": "Dairy",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1620189507195-68309c04c4d0?q=80&w=1964"
+          ],
+          "status": "available",
+          "postedDate": "2023-11-04T09:00:00Z",
+          "userId": 2,
+          "quantity": 5
+        }
+      ],
+      "totalAmount": 15.5,
+      "orderDate": "2025-09-28T18:59:10.731Z",
+      "status": "pending"
+    },
+    {
+      "id": "ba9f",
+      "buyerInfo": {
+        "name": "Alice Johnson",
+        "apartmentNumber": "A-101",
+        "phone": "123-456-7890"
+      },
+      "items": [
+        {
+          "id": "2",
+          "name": "Used 'The Great Gatsby' Book",
+          "description": "Paperback copy of the classic novel. In good condition.",
+          "price": 5.5,
+          "category": "Books",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1589998059171-988d887df646?q=80&w=2070"
+          ],
+          "status": "available",
+          "postedDate": "2023-10-27T14:30:00Z",
+          "userId": 2,
+          "quantity": 1
+        },
+        {
+          "id": "15",
+          "name": "Fresh Milk (1L)",
+          "description": "One liter carton of fresh, full-fat milk. Expires in 3 days.",
+          "price": 2,
+          "category": "Dairy",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1620189507195-68309c04c4d0?q=80&w=1964"
+          ],
+          "status": "available",
+          "postedDate": "2023-11-04T09:00:00Z",
+          "userId": 2,
+          "quantity": 5
+        }
+      ],
+      "totalAmount": 15.5,
+      "orderDate": "2025-09-28T18:59:49.492Z",
+      "status": "pending"
+    },
+    {
+      "id": "aa38",
+      "buyerInfo": {
+        "name": "Alice Johnson",
+        "apartmentNumber": "A-101",
+        "phone": "123-456-7890"
+      },
+      "fulfillmentMethod": "delivery",
+      "items": [
+        {
+          "id": "2",
+          "name": "Used 'The Great Gatsby' Book",
+          "description": "Paperback copy of the classic novel. In good condition.",
+          "price": 5.5,
+          "category": "Books",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1589998059171-988d887df646?q=80&w=2070"
+          ],
+          "status": "available",
+          "postedDate": "2023-10-27T14:30:00Z",
+          "userId": 2,
+          "quantity": 1
+        }
+      ],
+      "totalAmount": 5.5,
+      "orderDate": "2025-09-28T19:06:26.480Z",
+      "status": "pending"
     }
   ],
   "reviews": [
     {
-      "id": 1,
+      "id": "1",
       "productId": 1,
       "userId": 2,
       "rating": 4,
@@ -240,7 +385,7 @@
       "date": "2023-10-28T10:00:00Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "productId": 5,
       "userId": 1,
       "rating": 5,
@@ -248,7 +393,7 @@
       "date": "2023-10-30T14:20:00Z"
     },
     {
-      "id": 3,
+      "id": "3",
       "productId": 7,
       "userId": 5,
       "rating": 5,
@@ -256,7 +401,7 @@
       "date": "2023-11-01T18:00:00Z"
     },
     {
-      "id": 4,
+      "id": "4",
       "productId": 1,
       "userId": 3,
       "rating": 3,
