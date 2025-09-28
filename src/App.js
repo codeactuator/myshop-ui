@@ -1,25 +1,68 @@
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import './App.css';
+import SplashScreen from './pages/SplashScreen';
+import WelcomeScreen from './pages/WelcomeScreen';
+import AppIntroScreen from './pages/AppIntroScreen';
+import ProductListingPage from './pages/ProductListingPage';
+import ProductDetailsPage from './pages/ProductDetailsPage';
+import CartPage from './pages/CartPage';
+import { CartProvider } from './context/CartContext';
+import MainLayout from './components/MainLayout';
+import { useNavigate } from 'react-router-dom';
 
 function App() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 3000); // Splash screen timeout
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <SplashScreen />;
+  }
+
+  const hasSeenIntro = localStorage.getItem('hasSeenIntro');
+  const initialRoute = hasSeenIntro ? "/products" : "/welcome";
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <CartProvider>
+      <Router>
+        <Routes>
+          {/* Routes without the main navbar */}
+          <Route path="/" element={<Navigate to={initialRoute} replace />} />
+          <Route path="/welcome" element={<WelcomeScreenWrapper />} />
+          <Route path="/intro" element={<AppIntroScreenWrapper />} />
+
+          {/* Routes with the main navbar */}
+          <Route element={<MainLayout />}>
+            <Route path="/products" element={<ProductListingPage />} />
+            <Route path="/products/:productId" element={<ProductDetailsPage />} />
+            <Route path="/cart" element={<CartPage />} />
+          </Route>
+        </Routes>
+      </Router>
+    </CartProvider>
   );
 }
+
+// Helper components to handle navigation from older prop-based components
+const WelcomeScreenWrapper = () => {
+  const navigate = useNavigate();
+  return <WelcomeScreen onNavigate={(path) => navigate(path === 'intro' ? '/intro' : '/products')} />;
+};
+
+const AppIntroScreenWrapper = () => {
+  const navigate = useNavigate();
+  const handleDone = () => {
+    localStorage.setItem('hasSeenIntro', 'true');
+    navigate('/products');
+  };
+  return <AppIntroScreen onNavigate={handleDone} />;
+};
 
 export default App;

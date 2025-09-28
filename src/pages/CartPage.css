@@ -1,0 +1,147 @@
+.cart-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+}
+
+.cart-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.cart-empty h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.cart-empty p {
+  margin-bottom: 2rem;
+}
+
+.cart-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.cart-item-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.cart-item-details {
+  flex-grow: 1;
+}
+
+.cart-item-details h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.cart-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.quantity-selector {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+}
+
+.quantity-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px 12px;
+  font-size: 1.2rem;
+  color: #555555;
+}
+
+.quantity-display {
+  padding: 5px 10px;
+  min-width: 20px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.cart-summary {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  height: fit-content;
+}
+
+.cart-summary h2 {
+  margin-top: 0;
+  border-bottom: 1px solid #ced4da;
+  padding-bottom: 1rem;
+}
+
+.summary-row, .summary-total {
+  display: flex;
+  justify-content: space-between;
+  margin: 1rem 0;
+}
+
+.summary-total {
+  font-size: 1.2rem;
+  font-weight: 700;
+  border-top: 1px solid #ced4da;
+  padding-top: 1rem;
+}
+
+.checkout-btn {
+  width: 100%;
+  padding: 12px;
+}
+
+@media (max-width: 960px) {
+  .cart-content {
+    grid-template-columns: 1fr;
+  }
+  .cart-summary {
+    margin-top: 2rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .cart-container {
+    padding: 1rem;
+  }
+
+  .cart-item {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .cart-item-details {
+    flex-basis: calc(100% - 100px - 1rem); /* Full width minus image and gap */
+  }
+
+  .cart-item-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

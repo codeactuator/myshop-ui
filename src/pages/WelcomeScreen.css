@@ -1,0 +1,61 @@
+.welcome-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  padding: 20px;
+  background-color: #FFFFFF; /* A very light, clean background */
+}
+
+.welcome-content {
+  max-width: 500px;
+}
+
+.welcome-content h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.welcome-content p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.welcome-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 700;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary { background-color: #7B2CBF; color: white; }
+.btn-secondary { background-color: #F3E8FF; color: #555555; }
+.btn-link { 
+  background: none; 
+  color: #7B2CBF; 
+  text-decoration: none; 
+  font-weight: 400;
+  box-shadow: none;
+}
+.btn-link:hover { text-decoration: underline; transform: none; }

@@ -1,0 +1,23 @@
+.intro-slide {
+  text-align: center;
+  max-width: 400px;
+}
+
+.slide-image {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+}
+
+.slide-title {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.slide-description {
+  font-size: 1.1rem;
+  color: #666;
+}
