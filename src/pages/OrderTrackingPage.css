@@ -1,0 +1,100 @@
+.order-tracking-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+}
+
+.order-summary-header {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.tracking-timeline {
+  margin-bottom: 3rem;
+}
+
+.timeline {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin-top: 2rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: #e9ecef;
+  width: 100%;
+  z-index: -1;
+}
+
+.timeline-step {
+  text-align: center;
+  position: relative;
+  width: 25%;
+}
+
+.timeline-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #fff;
+  border: 4px solid #e9ecef;
+  display: inline-block;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.timeline-label {
+  margin-top: 0.5rem;
+  font-weight: 700;
+  color: #adb5bd;
+  text-transform: capitalize;
+}
+
+.timeline-step.completed .timeline-dot {
+  background-color: #7B2CBF;
+  border-color: #7B2CBF;
+}
+
+.timeline-step.completed .timeline-label {
+  color: #222;
+}
+
+.order-contents {
+  margin-top: 2rem;
+}
+
+.order-item-card {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.order-item-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.order-item-info h4 {
+  margin: 0 0 0.5rem;
+}
+
+.order-item-info p {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}

@@ -18,3 +18,18 @@
   max-width: 500px;
   margin: 0 auto 2rem;
 }
+
+.order-id-confirmation {
+  font-weight: 700;
+  background-color: #f8f9fa;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 2rem;
+}
+
+.order-success-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}

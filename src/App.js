@@ -9,6 +9,9 @@ import ProductDetailsPage from './pages/ProductDetailsPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import OrderSuccessPage from './pages/OrderSuccessPage';
+import MyOrdersPage from './pages/MyOrdersPage';
+import OrderTrackingPage from './pages/OrderTrackingPage';
+import UpiPaymentPage from './pages/UpiPaymentPage';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import MainLayout from './components/MainLayout';
@@ -49,6 +52,9 @@ function App() {
               <Route path="/cart" element={<CartPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/order-success" element={<OrderSuccessPage />} />
+            <Route path="/my-orders" element={<MyOrdersPage />} />
+            <Route path="/orders/:orderId" element={<OrderTrackingPage />} />
+            <Route path="/payment/upi/:orderId" element={<UpiPaymentPage />} />
             </Route>
           </Routes>
         </Router>

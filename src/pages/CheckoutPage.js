@@ -9,6 +9,7 @@ const CheckoutPage = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
+  const [paymentMethod, setPaymentMethod] = useState('cod'); // 'cod' or 'upi'
   const [fulfillmentMethod, setFulfillmentMethod] = useState('delivery'); // 'delivery' or 'pickup'
   const [deliveryOption, setDeliveryOption] = useState('saved'); // 'saved' or 'new'
   const [formData, setFormData] = useState({
@@ -19,14 +20,17 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     // Pre-populate form if a user is logged in
-    if (currentUser) {
+    if (deliveryOption === 'saved' && currentUser) {
       setFormData({
         name: currentUser.name,
         apartmentNumber: currentUser.apartmentNumber,
         phone: currentUser.phone,
       });
+    } else {
+      // Clear form when switching to 'new address'
+      setFormData({ name: '', apartmentNumber: '', phone: '' });
     }
-  }, [currentUser]);
+  }, [currentUser, deliveryOption]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -46,12 +50,14 @@ const CheckoutPage = () => {
       : formData;
 
     const order = {
+      userId: currentUser.id,
       buyerInfo: fulfillmentMethod === 'delivery' ? deliveryAddress : { name: currentUser.name, phone: currentUser.phone },
       fulfillmentMethod: fulfillmentMethod,
+      paymentMethod: paymentMethod,
       items: cartItems,
-      totalAmount: cartTotal,
+      totalAmount: cartTotal, 
       orderDate: new Date().toISOString(),
-      status: 'pending',
+      status: paymentMethod === 'cod' ? 'pending' : 'awaiting_payment',
     };
 
     try {
@@ -62,8 +68,15 @@ const CheckoutPage = () => {
       });
 
       if (response.ok) {
-        clearCart();
-        navigate('/order-success');
+        const newOrder = await response.json();
+        if (paymentMethod === 'upi') {
+          // Do not clear cart yet, redirect to payment page
+          navigate(`/payment/upi/${newOrder.id}`);
+        } else { // For COD
+          clearCart();
+          // Pass orderId to the success page
+          navigate('/order-success', { state: { orderId: newOrder.id } });
+        }
       } else {
         throw new Error('Failed to place order.');
       }
@@ -78,64 +91,85 @@ const CheckoutPage = () => {
       <h1>Checkout</h1>
       <div className="checkout-layout">
         <div className="checkout-form-container">
-          <h2>Fulfillment Method</h2>
-          <div className="fulfillment-options">
-            <div className="radio-group">
-              <input type="radio" id="delivery" name="fulfillmentMethod" value="delivery" checked={fulfillmentMethod === 'delivery'} onChange={() => setFulfillmentMethod('delivery')} />
-              <label htmlFor="delivery">Delivery</label>
+          <form id="checkout-form" onSubmit={handleSubmit}>
+            <h2>Fulfillment Method</h2>
+            <div className="fulfillment-options">
+              <div className="radio-group">
+                <input type="radio" id="delivery" name="fulfillmentMethod" value="delivery" checked={fulfillmentMethod === 'delivery'} onChange={() => setFulfillmentMethod('delivery')} />
+                <label htmlFor="delivery">Delivery</label>
+              </div>
+              <div className="radio-group">
+                <input type="radio" id="pickup" name="fulfillmentMethod" value="pickup" checked={fulfillmentMethod === 'pickup'} onChange={() => setFulfillmentMethod('pickup')} />
+                <label htmlFor="pickup">Pickup</label>
+              </div>
             </div>
-            <div className="radio-group">
-              <input type="radio" id="pickup" name="fulfillmentMethod" value="pickup" checked={fulfillmentMethod === 'pickup'} onChange={() => setFulfillmentMethod('pickup')} />
-              <label htmlFor="pickup">Pickup</label>
-            </div>
-          </div>
 
-          {fulfillmentMethod === 'delivery' && (
-            <div className="delivery-details-container">
-              <h2>Delivery Details</h2>
-              <div className="address-options">
-                <div className="radio-group">
-                  <input type="radio" id="savedAddress" name="deliveryOption" value="saved" checked={deliveryOption === 'saved'} onChange={() => setDeliveryOption('saved')} disabled={!currentUser} />
-                  <label htmlFor="savedAddress">Use Saved Address</label>
+            {fulfillmentMethod === 'delivery' && (
+              <div className="delivery-details-container">
+                <h2>Delivery Details</h2>
+                <div className="address-options">
+                  <div className="radio-group">
+                    <input type="radio" id="savedAddress" name="deliveryOption" value="saved" checked={deliveryOption === 'saved'} onChange={() => setDeliveryOption('saved')} disabled={!currentUser} />
+                    <label htmlFor="savedAddress">Use Saved Address</label>
+                  </div>
+                  {deliveryOption === 'saved' && currentUser && (
+                    <div className="saved-address-details">
+                      <p><strong>{currentUser.name}</strong></p>
+                      <p>{currentUser.apartmentNumber}</p>
+                      <p>{currentUser.phone}</p>
+                    </div>
+                  )}
+                  <div className="radio-group">
+                    <input type="radio" id="newAddress" name="deliveryOption" value="new" checked={deliveryOption === 'new'} onChange={() => setDeliveryOption('new')} />
+                    <label htmlFor="newAddress">Add a New Address</label>
+                  </div>
                 </div>
-                {deliveryOption === 'saved' && currentUser && (
-                  <div className="saved-address-details">
-                    <p><strong>{currentUser.name}</strong></p>
-                    <p>{currentUser.apartmentNumber}</p>
-                    <p>{currentUser.phone}</p>
+
+                {deliveryOption === 'new' && (
+                  <div className="new-address-form">
+                    <div className="form-group">
+                      <label htmlFor="name">Full Name</label>
+                      <input type="text" id="name" name="name" value={formData.name} onChange={handleInputChange} required />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="apartmentNumber">Apartment / Flat No.</label>
+                      <input type="text" id="apartmentNumber" name="apartmentNumber" value={formData.apartmentNumber} onChange={handleInputChange} required />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="phone">Mobile Number</label>
+                      <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleInputChange} required />
+                    </div>
                   </div>
                 )}
+              </div>
+            )}
+
+            {fulfillmentMethod === 'pickup' && (
+              <div className="pickup-info">
+                <h2>Pickup Information</h2>
+                <p>You will be notified about the pickup location and time once the seller confirms the order.</p>
+              </div>
+            )}
+
+            <div className="payment-method-container">
+              <h2>Payment Method</h2>
+              <div className="payment-options">
                 <div className="radio-group">
-                  <input type="radio" id="newAddress" name="deliveryOption" value="new" checked={deliveryOption === 'new'} onChange={() => setDeliveryOption('new')} />
-                  <label htmlFor="newAddress">Add a New Address</label>
+                  <input type="radio" id="cod" name="paymentMethod" value="cod" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} />
+                  <label htmlFor="cod">Cash on Delivery (COD)</label>
+                </div>
+                <div className="radio-group">
+                  <input type="radio" id="upi" name="paymentMethod" value="upi" checked={paymentMethod === 'upi'} onChange={() => setPaymentMethod('upi')} />
+                  <label htmlFor="upi">UPI</label>
                 </div>
               </div>
-
-              {deliveryOption === 'new' && (
-                <div className="new-address-form">
-                  <div className="form-group">
-                    <label htmlFor="name">Full Name</label>
-                    <input type="text" id="name" name="name" value={formData.name} onChange={handleInputChange} required />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="apartmentNumber">Apartment / Flat No.</label>
-                    <input type="text" id="apartmentNumber" name="apartmentNumber" value={formData.apartmentNumber} onChange={handleInputChange} required />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="phone">Mobile Number</label>
-                    <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleInputChange} required />
-                  </div>
+              {paymentMethod === 'upi' && (
+                <div className="upi-info">
+                  <p>After placing the order, you will be shown a QR code to complete the payment.</p>
                 </div>
               )}
             </div>
-          )}
-
-          {fulfillmentMethod === 'pickup' && (
-            <div className="pickup-info">
-              <h2>Pickup Information</h2>
-              <p>You will be notified about the pickup location and time once the seller confirms the order.</p>
-            </div>
-          )}
+          </form>
         </div>
         <div className="checkout-summary-container">
           <h2>Order Summary</h2>
@@ -149,7 +183,7 @@ const CheckoutPage = () => {
             <strong>Total</strong>
             <strong>${cartTotal.toFixed(2)}</strong>
           </div>
-          <button className="btn btn-primary place-order-btn" onClick={handleSubmit}>Place Order</button>
+          <button type="submit" form="checkout-form" className="btn btn-primary place-order-btn">Place Order</button>
         </div>
       </div>
     </div>
