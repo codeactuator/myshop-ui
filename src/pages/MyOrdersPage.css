@@ -55,7 +55,7 @@
   color: #856404;
 }
 
-.status-confirmed, .status-shipped {
+.status-confirmed, .status-shipped, .status-preparing {
   background-color: #d1ecf1;
   color: #0c5460;
 }

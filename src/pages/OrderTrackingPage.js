@@ -8,7 +8,14 @@ const OrderTrackingPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const statusSteps = ['pending', 'confirmed', 'shipped', 'delivered'];
+  const statusSteps = ['pending', 'confirmed', 'preparing', 'shipped', 'delivered'];
+  const statusDetails = {
+    pending: 'Your order has been placed and is awaiting confirmation from the seller.',
+    confirmed: 'The seller has confirmed your order.',
+    preparing: 'Your items are being prepared for shipment.',
+    shipped: 'Your order has been shipped and is on its way.',
+    delivered: 'Your order has been delivered. Enjoy!'
+  };
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -51,7 +58,10 @@ const OrderTrackingPage = () => {
           {statusSteps.map((step, index) => (
             <div key={step} className={`timeline-step ${index <= currentStatusIndex ? 'completed' : ''}`}>
               <div className="timeline-dot"></div>
-              <div className="timeline-label">{step}</div>
+              <div className="timeline-content">
+                <div className="timeline-label">{step}</div>
+                <div className="timeline-detail">{statusDetails[step]}</div>
+              </div>
             </div>
           ))}
         </div>

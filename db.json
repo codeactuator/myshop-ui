@@ -914,6 +914,188 @@
       "totalAmount": 18,
       "orderDate": "2025-09-28T19:37:46.139Z",
       "status": "pending"
+    },
+    {
+      "id": "1884",
+      "userId": 1,
+      "buyerInfo": {
+        "name": "Alice Johnson",
+        "apartmentNumber": "A-101",
+        "phone": "123-456-7890"
+      },
+      "fulfillmentMethod": "delivery",
+      "paymentMethod": "cod",
+      "items": [
+        {
+          "id": "6",
+          "name": "Wooden Toy Train Set",
+          "description": "Complete wooden train set with tracks and accessories. Perfect for kids aged 3-6.",
+          "price": 20,
+          "category": "Toys",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070"
+          ],
+          "status": "available",
+          "postedDate": "2023-10-29T11:30:00Z",
+          "userId": 2,
+          "quantity": 1
+        },
+        {
+          "id": "9",
+          "name": "Men's Casual T-Shirt",
+          "description": "Comfortable cotton t-shirt, size M. Brand new, never worn.",
+          "price": 12,
+          "category": "Clothing",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1622470953794-aa9c70b0fb9d?q=80&w=1964"
+          ],
+          "status": "available",
+          "postedDate": "2023-11-01T10:00:00Z",
+          "userId": 4,
+          "quantity": 2
+        }
+      ],
+      "totalAmount": 44,
+      "orderDate": "2025-09-28T19:43:46.502Z",
+      "status": "pending"
+    },
+    {
+      "id": "6a36",
+      "userId": 1,
+      "buyerInfo": {
+        "name": "Alice Johnson",
+        "apartmentNumber": "A-101",
+        "phone": "123-456-7890"
+      },
+      "fulfillmentMethod": "delivery",
+      "paymentMethod": "upi",
+      "items": [
+        {
+          "id": "1",
+          "name": "Vintage Wooden Chair",
+          "description": "A beautifully crafted wooden chair, perfect for a study or living room. Minor wear and tear.",
+          "price": 45,
+          "category": "Furniture",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?q=80&w=1887",
+            "https://images.unsplash.com/photo-1503602642458-232111445657?q=80&w=1887",
+            "https://images.unsplash.com/photo-1494903446931-37516c43ea15?q=80&w=1887"
+          ],
+          "status": "available",
+          "postedDate": "2023-10-26T10:00:00Z",
+          "userId": 1,
+          "quantity": 1
+        },
+        {
+          "id": "2",
+          "name": "Used 'The Great Gatsby' Book",
+          "description": "Paperback copy of the classic novel. In good condition.",
+          "price": 5.5,
+          "category": "Books",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1589998059171-988d887df646?q=80&w=2070"
+          ],
+          "status": "available",
+          "postedDate": "2023-10-27T14:30:00Z",
+          "userId": 2,
+          "quantity": 3
+        }
+      ],
+      "totalAmount": 61.5,
+      "orderDate": "2025-09-28T19:53:43.719Z",
+      "status": "pending"
+    },
+    {
+      "id": "e933",
+      "userId": 1,
+      "buyerInfo": {
+        "name": "Alice Johnson",
+        "apartmentNumber": "A-101",
+        "phone": "123-456-7890"
+      },
+      "fulfillmentMethod": "delivery",
+      "paymentMethod": "cod",
+      "items": [
+        {
+          "id": "7",
+          "name": "High-Density Yoga Mat",
+          "description": "Barely used, high-density foam yoga mat. Comes with a carrying strap. Color: Blue.",
+          "price": 15,
+          "category": "Sports",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=2120"
+          ],
+          "status": "available",
+          "postedDate": "2023-10-30T09:00:00Z",
+          "userId": 1,
+          "quantity": 1
+        }
+      ],
+      "totalAmount": 15,
+      "orderDate": "2025-09-28T19:55:33.808Z",
+      "status": "pending"
+    },
+    {
+      "id": "4bdc",
+      "buyerInfo": {
+        "name": "",
+        "apartmentNumber": "",
+        "phone": ""
+      },
+      "fulfillmentMethod": "delivery",
+      "paymentMethod": "cod",
+      "items": [
+        {
+          "id": "1",
+          "name": "Vintage Wooden Chair",
+          "description": "A beautifully crafted wooden chair, perfect for a study or living room. Minor wear and tear.",
+          "price": 45,
+          "category": "Furniture",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?q=80&w=1887",
+            "https://images.unsplash.com/photo-1503602642458-232111445657?q=80&w=1887",
+            "https://images.unsplash.com/photo-1494903446931-37516c43ea15?q=80&w=1887"
+          ],
+          "status": "available",
+          "postedDate": "2023-10-26T10:00:00Z",
+          "userId": 1,
+          "quantity": 1
+        }
+      ],
+      "totalAmount": 45,
+      "orderDate": "2025-09-29T18:31:20.275Z",
+      "status": "pending"
+    },
+    {
+      "id": "eff3",
+      "buyerInfo": {
+        "name": "",
+        "apartmentNumber": "",
+        "phone": ""
+      },
+      "fulfillmentMethod": "delivery",
+      "paymentMethod": "cod",
+      "items": [
+        {
+          "id": "1",
+          "name": "Vintage Wooden Chair",
+          "description": "A beautifully crafted wooden chair, perfect for a study or living room. Minor wear and tear.",
+          "price": 45,
+          "category": "Furniture",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?q=80&w=1887",
+            "https://images.unsplash.com/photo-1503602642458-232111445657?q=80&w=1887",
+            "https://images.unsplash.com/photo-1494903446931-37516c43ea15?q=80&w=1887"
+          ],
+          "status": "available",
+          "postedDate": "2023-10-26T10:00:00Z",
+          "userId": 1,
+          "quantity": 1
+        }
+      ],
+      "totalAmount": 45,
+      "orderDate": "2025-09-29T18:43:46.481Z",
+      "status": "pending"
     }
   ],
   "reviews": [

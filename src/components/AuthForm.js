@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
 import './AuthForm.css';
 
-const AuthForm = ({ formType, onSubmit }) => {
+const AuthForm = ({ formType, onSubmit, login }) => {
   const [mobileNumber, setMobileNumber] = useState('');
   const [name, setName] = useState('');
   const [apartment, setApartment] = useState('');
+  const [userType, setUserType] = useState('buyer');
 
   const isSignUp = formType === 'signup';
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formData = isSignUp ? { mobileNumber, name, apartment } : { mobileNumber };
-    onSubmit(formData);
+    const formData = isSignUp
+      ? { mobileNumber, name, apartment, userType }
+      : { mobileNumber, userType };
+
+    onSubmit(formData,login);
     // Here you would typically handle API calls
     alert(`${isSignUp ? 'Signing up' : 'Logging in'} with: ${JSON.stringify(formData)}`);
   };
@@ -56,6 +60,14 @@ const AuthForm = ({ formType, onSubmit }) => {
             />
           </div>
         )}
+          <div className="form-group">
+            <label htmlFor="userType">Login As</label>
+            <select id="userType" value={userType} onChange={(e) => setUserType(e.target.value)} required>
+              <option value="buyer">Buyer</option>
+              <option value="seller">Seller</option>
+            </select>
+          </div>
+
         <button type="submit" className="btn btn-primary auth-button">{isSignUp ? 'Sign Up' : 'Login'}</button>
       </form>
     </div>

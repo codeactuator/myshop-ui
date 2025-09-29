@@ -1,0 +1,17 @@
+.main-layout-container {
+  display: flex;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 2rem;
+  background-color: #fcfdff;
+  min-height: calc(100vh - 80px);
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem; /* Reduce padding on smaller screens */
+  }
+}

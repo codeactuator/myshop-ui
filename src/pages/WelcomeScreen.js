@@ -2,22 +2,24 @@ import React, { useState } from 'react';
 import './WelcomeScreen.css';
 import Modal from '../components/Modal';
 import AuthForm from '../components/AuthForm';
+import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
-const WelcomeScreen = ({ onNavigate }) => {
-  const [modalContent, setModalContent] = useState(null); // 'login' or 'signup'
 
-  const API_URL = 'http://localhost:3001';
+const WelcomeScreen = ({ onNavigate }) => {
+
+ const API_URL = 'http://localhost:3001';
 
   const openModal = (type) => setModalContent(type);
   const closeModal = () => setModalContent(null);
   const navigate = useNavigate();
+  const [modalContent, setModalContent] = useState(null); // 'login' or 'signup'
+  const { login } = useAuth();
 
   const handleAuthSubmit = async (formData) => {
-    const { mobileNumber, ...rest } = formData;
     const formType = modalContent;
-
     try {
+      const { mobileNumber, ...rest } = formData;
       // Check if user exists
       const response = await fetch(`${API_URL}/users?phone=${mobileNumber}`);
       const existingUsers = await response.json();
@@ -25,6 +27,7 @@ const WelcomeScreen = ({ onNavigate }) => {
       if (formType === 'login') {
         if (existingUsers.length > 0) {
           alert(`Welcome back, ${existingUsers[0].name}!`);
+          login(existingUsers[0]);
           closeModal();
           onNavigate('products'); // Navigate to products page
         } else {
@@ -45,7 +48,8 @@ const WelcomeScreen = ({ onNavigate }) => {
           });
 
           if (createResponse.ok) {
-            alert(`Welcome, ${newUser.name}! Your account has been created.`);
+            const createdUser = await createResponse.json();
+            login(createdUser);
             closeModal();
             onNavigate('products'); // Navigate to products page
           } else {
@@ -58,7 +62,6 @@ const WelcomeScreen = ({ onNavigate }) => {
       alert('An error occurred. Please try again.');
     }
   };
-
   return (
     <>
       <div className="welcome-screen">
@@ -75,6 +78,7 @@ const WelcomeScreen = ({ onNavigate }) => {
       <Modal isOpen={!!modalContent} onClose={closeModal}>
         {modalContent && <AuthForm formType={modalContent} onSubmit={handleAuthSubmit} />}
       </Modal>
+
     </>
   );
 };

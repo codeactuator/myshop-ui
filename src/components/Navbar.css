@@ -21,6 +21,12 @@
   max-width: 1200px;
 }
 
+.navbar-left-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .navbar-logo {
   color: #fff;
   justify-self: start;
@@ -31,6 +37,17 @@
   align-items: center;
   font-family: 'Poppins', sans-serif;
   font-weight: 700;
+}
+
+.menu-toggle-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.2s;
 }
 
 .nav-menu {
@@ -61,7 +78,9 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.nav-links .fa-shopping-cart {
+.nav-links .fa-shopping-cart,
+.nav-links .fa-box-open,
+.nav-links .fa-store {
   font-size: 1.4rem;
 }
 

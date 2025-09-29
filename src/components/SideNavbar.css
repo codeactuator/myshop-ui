@@ -1,0 +1,103 @@
+.side-navbar {
+  width: 250px;
+  background-color: #f8f9fa;
+  border-right: 1px solid #e9ecef;
+  height: calc(100vh - 80px); /* Full height minus top navbar */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1rem 0;
+  position: sticky;
+  top: 80px; /* Stick below top navbar */
+  transition: width 0.3s ease-in-out;
+}
+
+.side-navbar.collapsed {
+  width: 80px;
+}
+
+.side-navbar nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.side-navbar nav ul li a {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  text-decoration: none;
+  color: #555;
+  font-weight: 700;
+  transition: background-color 0.2s, color 0.2s;
+  border-left: 4px solid transparent;
+}
+
+.side-navbar nav ul li a:hover {
+  background-color: #e9ecef;
+}
+
+.side-navbar nav ul li a.active-link {
+  background-color: #f3e8ff;
+  color: #7B2CBF;
+  border-left-color: #7B2CBF;
+}
+
+.side-navbar.collapsed nav ul li a {
+  justify-content: center;
+}
+
+.side-navbar nav ul li a i {
+  width: 20px;
+  text-align: center;
+}
+
+.logout-section {
+  padding: 0 1.5rem;
+}
+
+.logout-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: none;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  color: #555;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: #dc3545;
+  color: white;
+  border-color: #dc3545;
+}
+
+.side-navbar span {
+  transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+}
+
+.side-navbar.collapsed span {
+  opacity: 0;
+  visibility: hidden;
+  width: 0;
+  margin-left: -1rem; /* Prevent layout shift */
+}
+
+/* On smaller screens, fully hide the navbar when collapsed */
+@media (max-width: 768px) {
+  .side-navbar.collapsed {
+    width: 0;
+    padding: 1rem 0; /* Keep vertical padding */
+    overflow: hidden; /* Hide content when width is 0 */
+  }
+
+  .side-navbar.collapsed .logout-section {
+    padding: 0;
+  }
+}

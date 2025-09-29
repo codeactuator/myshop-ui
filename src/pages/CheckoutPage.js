@@ -50,7 +50,7 @@ const CheckoutPage = () => {
       : formData;
 
     const order = {
-      userId: currentUser.id,
+      userId: currentUser?.id,
       buyerInfo: fulfillmentMethod === 'delivery' ? deliveryAddress : { name: currentUser.name, phone: currentUser.phone },
       fulfillmentMethod: fulfillmentMethod,
       paymentMethod: paymentMethod,

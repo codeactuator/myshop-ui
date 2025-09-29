@@ -1,23 +1,24 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
-
-const Navbar = () => {
+ 
+const Navbar = ({ toggleSideNav }) => {
   const { cartCount } = useCart();
 
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <Link to="/products" className="navbar-logo">
-          My Shop
-        </Link>
+        <div className="navbar-left-section">
+          <button className="menu-toggle-btn" onClick={toggleSideNav}>
+            <i className="fas fa-bars"></i>
+          </button>
+          <Link to="/products" className="navbar-logo">
+            My Shop
+          </Link>
+        </div>
         <ul className="nav-menu">
-          <li className="nav-item">
-            <Link to="/my-orders" className="nav-links">
-              My Orders
-            </Link>
-          </li>
           <li className="nav-item">
             <Link to="/cart" className="nav-links">
               <i className="fas fa-shopping-cart"></i>

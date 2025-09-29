@@ -11,6 +11,9 @@ import CheckoutPage from './pages/CheckoutPage';
 import OrderSuccessPage from './pages/OrderSuccessPage';
 import MyOrdersPage from './pages/MyOrdersPage';
 import OrderTrackingPage from './pages/OrderTrackingPage';
+import SellerDashboardPage from './pages/SellerDashboardPage';
+import ProfilePage from './pages/ProfilePage';
+import AddProductPage from './pages/AddProductPage';
 import UpiPaymentPage from './pages/UpiPaymentPage';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
@@ -54,6 +57,9 @@ function App() {
               <Route path="/order-success" element={<OrderSuccessPage />} />
             <Route path="/my-orders" element={<MyOrdersPage />} />
             <Route path="/orders/:orderId" element={<OrderTrackingPage />} />
+            <Route path="/seller/dashboard" element={<SellerDashboardPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/seller/add-product" element={<AddProductPage />} />
             <Route path="/payment/upi/:orderId" element={<UpiPaymentPage />} />
             </Route>
           </Routes>
