@@ -14,7 +14,7 @@ const ProductListingPage = () => {
     const fetchProducts = async () => {
       try {
         // _expand=user will automatically include the seller's user object
-        const response = await fetch('http://localhost:3001/products?_expand=user');
+        const response = await fetch('http://localhost:3001/products?status=available&_expand=user');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }

@@ -46,16 +46,25 @@ const SideNavbar = ({ isCollapsed }) => {
             </NavLink>
           </li>
           {currentUser?.userType === 'seller' && (
-            <li>
-              <NavLink to="/seller/dashboard" className={({ isActive }) => (isActive ? 'active-link' : '')}>
-                <i className="fas fa-tachometer-alt"></i>
-                <span>Seller Dashboard</span>
-              </NavLink>
-            </li>
+            <>
+              <li>
+                <NavLink to="/seller/dashboard" className={({ isActive }) => (isActive ? 'active-link' : '')}>
+                  <i className="fas fa-tachometer-alt"></i>
+                  <span>Seller Dashboard</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/seller/inventory" className={({ isActive }) => (isActive ? 'active-link' : '')}>
+                  <i className="fas fa-boxes"></i>
+                  <span>My Inventory</span>
+                </NavLink>
+              </li>
+            </>
           )}
         </ul>
         </nav>
-      </div>      <div className="logout-section">
+      </div>
+      <div className="logout-section">
         <button onClick={handleLogout} className="logout-btn">
           <i className="fas fa-sign-out-alt"></i>
           <span>Logout</span>

@@ -30,7 +30,7 @@ const ProductCard = ({ product }) => {
           <h3 className="product-name">{name}</h3>
           <p className="product-price">${price.toFixed(2)}</p>
           <div className="product-seller-info">
-            <span>Sold by: {user ? user.name : 'Unknown Seller'}</span>
+            <span>Sold by: {user ? (user.shopName || user.name) : 'Unknown Seller'}</span>
             <span>{user ? `(Apt: ${user.apartmentNumber})` : ''}</span>
           </div>
           <button className="add-to-cart-btn" onClick={handleAddToCart}>

@@ -93,7 +93,7 @@ const ProductDetailsPage = () => {
           </div>
           <div className="details-seller">
             <h3>Seller Information</h3>
-            <p><strong>Name:</strong> {product.user?.name || 'N/A'}</p>
+            <p><strong>Shop:</strong> {product.user?.shopName || product.user?.name || 'N/A'}</p>
             <p><strong>Apartment:</strong> {product.user?.apartmentNumber || 'N/A'}</p>
           </div>
           <button className="btn btn-primary contact-seller-btn" onClick={handleAddToCart}>

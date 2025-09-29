@@ -28,11 +28,18 @@ const SellerOrderCard = ({ order, sellerItems, onUpdateStatus }) => {
           <p><strong>Payment:</strong> {paymentMethod.toUpperCase()}</p>
         </div>
       </div>
-      {status === 'pending' && (
-        <button className="btn btn-primary confirm-order-btn" onClick={() => onUpdateStatus(order.id, 'confirmed')}>
-          Confirm Order
-        </button>
-      )}
+      <div className="seller-order-actions">
+        {status === 'pending' && (
+          <button className="btn btn-primary" onClick={() => onUpdateStatus(order.id, 'confirmed')}>
+            Confirm Order
+          </button>
+        )}
+        {status === 'confirmed' && (
+          <button className="btn btn-primary" onClick={() => onUpdateStatus(order.id, 'preparing')}>
+            Start Preparing
+          </button>
+        )}
+      </div>
     </div>
   );
 };
