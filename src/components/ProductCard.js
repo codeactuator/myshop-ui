@@ -1,17 +1,25 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './ProductCard.css';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 const ProductCard = ({ product }) => {
   const { id, name, price, imageUrls, user } = product;
   const { addToCart } = useCart();
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
 
   const handleAddToCart = (e) => {
     // Prevent the click from navigating to the product details page
     e.preventDefault();
     e.stopPropagation();
-    addToCart(product);
+    if (currentUser) {
+      addToCart(product);
+    } else {
+      alert('Please log in to add items to your cart.');
+      navigate('/welcome');
+    }
   };
   
   return (

@@ -78,9 +78,22 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
+.nav-button {
+  background-color: #fff;
+  color: #7B2CBF !important;
+  padding: 8px 20px !important;
+  border-radius: 5px;
+  font-weight: 700;
+}
+
+.nav-button:hover {
+  background-color: #f3e8ff !important;
+}
+
 .nav-links .fa-shopping-cart,
 .nav-links .fa-box-open,
-.nav-links .fa-store {
+.nav-links .fa-store,
+.nav-links .fa-sign-in-alt {
   font-size: 1.4rem;
 }
 

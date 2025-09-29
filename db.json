@@ -5,42 +5,55 @@
       "name": "Alice Johnson",
       "apartmentNumber": "A-101",
       "email": "alice@example.com",
-      "phone": "123-456-7890"
+      "phone": "1234567890",
+      "userType": "seller"
     },
     {
       "id": "2",
       "name": "Bob Williams",
       "apartmentNumber": "B-204",
       "email": "bob@example.com",
-      "phone": "234-567-8901"
+      "phone": "2345678901",
+      "userType": "seller"
     },
     {
       "id": "3",
       "name": "Charlie Brown",
       "apartmentNumber": "C-302",
       "email": "charlie@example.com",
-      "phone": "345-678-9012"
+      "phone": "3456789012",
+      "userType": "buyer"
     },
     {
       "id": "4",
       "name": "Shekhar Kumar",
       "apartmentNumber": "H-602",
       "email": "shekhar@example.com",
-      "phone": "826-448-1868"
+      "phone": "8264481868",
+      "userType": "seller"
     },
     {
       "id": "5",
       "name": "Priya Sharma",
       "apartmentNumber": "D-401",
       "email": "priya@example.com",
-      "phone": "456-789-0123"
+      "phone": "4567890123",
+      "userType": "seller"
     },
     {
       "id": "6",
       "name": "Rohan Mehta",
       "apartmentNumber": "E-110",
       "email": "rohan@example.com",
-      "phone": "567-890-1234"
+      "phone": "5678901234",
+      "userType": "seller"
+    },
+    {
+      "id": "59af",
+      "phone": "8789416315",
+      "name": "Anjali",
+      "apartment": "H-603",
+      "userType": "seller"
     }
   ],
   "products": [

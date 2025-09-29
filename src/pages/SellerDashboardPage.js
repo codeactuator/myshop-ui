@@ -35,8 +35,8 @@ const SellerDashboardPage = () => {
     if (!currentUser) return [];
     return allOrders
       .map(order => {
-        const sellerItems = order.items.filter(item => item.userId === currentUser.id);
-        return sellerItems.length > 0 ? { ...order, sellerItems } : null;
+        const sellerItems = order.items?.filter(item => item.userId === currentUser.id);
+        return sellerItems && sellerItems.length > 0 ? { ...order, sellerItems } : null;
       })
       .filter(Boolean); // Remove null entries
   }, [allOrders, currentUser]);

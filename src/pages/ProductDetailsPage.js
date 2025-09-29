@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import './ProductDetailsPage.css';
 import Review from '../components/Review';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 const ProductDetailsPage = () => {
   const { productId } = useParams();
   const { addToCart } = useCart();
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [selectedImage, setSelectedImage] = useState('');
   const [reviews, setReviews] = useState([]);
@@ -53,6 +56,15 @@ const ProductDetailsPage = () => {
   if (error) return <div className="page-status">Error: {error}</div>;
   if (!product) return <div className="page-status">Product not found.</div>;
 
+  const handleAddToCart = () => {
+    if (currentUser) {
+      addToCart(product);
+    } else {
+      alert('Please log in to add items to your cart.');
+      navigate('/welcome');
+    }
+  };
+
   return (
     <div className="product-details-container">
       <Link to="/products" className="back-link">&larr; Back to all products</Link>
@@ -84,7 +96,7 @@ const ProductDetailsPage = () => {
             <p><strong>Name:</strong> {product.user?.name || 'N/A'}</p>
             <p><strong>Apartment:</strong> {product.user?.apartmentNumber || 'N/A'}</p>
           </div>
-          <button className="btn btn-primary contact-seller-btn" onClick={() => addToCart(product)}>
+          <button className="btn btn-primary contact-seller-btn" onClick={handleAddToCart}>
             Add to Cart
           </button>
         </div>

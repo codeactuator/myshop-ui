@@ -9,12 +9,23 @@ const SideNavbar = ({ isCollapsed }) => {
 
   const handleLogout = () => {
     logout();
-    navigate('/welcome');
+    navigate('/products');
   };
 
   return (
     <aside className={`side-navbar ${isCollapsed ? 'collapsed' : ''}`}>
-      <nav>
+      <div>
+        {currentUser && (
+          <div className="user-profile-section">
+            <div className="user-avatar">
+              <span>{currentUser.name.charAt(0)}</span>
+            </div>
+            <div className="user-details">
+              <span className="user-name">{currentUser.name}</span>
+            </div>
+          </div>
+        )}
+        <nav>
         <ul>
           <li>
             <NavLink to="/products" className={({ isActive }) => (isActive ? 'active-link' : '')}>
@@ -43,8 +54,8 @@ const SideNavbar = ({ isCollapsed }) => {
             </li>
           )}
         </ul>
-      </nav>
-      <div className="logout-section">
+        </nav>
+      </div>      <div className="logout-section">
         <button onClick={handleLogout} className="logout-btn">
           <i className="fas fa-sign-out-alt"></i>
           <span>Logout</span>

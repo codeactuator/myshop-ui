@@ -12,6 +12,34 @@
   transition: width 0.3s ease-in-out;
 }
 
+.user-profile-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+  margin-bottom: 1rem;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #7B2CBF;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+  flex-shrink: 0; /* Prevent avatar from shrinking */
+}
+
+.user-name {
+  font-weight: 700;
+  white-space: nowrap; /* Prevent name from wrapping */
+}
+
 .side-navbar.collapsed {
   width: 80px;
 }
@@ -76,6 +104,11 @@
   background-color: #dc3545;
   color: white;
   border-color: #dc3545;
+}
+
+.side-navbar.collapsed .user-details {
+  opacity: 0;
+  visibility: hidden;
 }
 
 .side-navbar span {

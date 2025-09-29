@@ -13,7 +13,7 @@ const AuthForm = ({ formType, onSubmit, login }) => {
     e.preventDefault();
     const formData = isSignUp
       ? { mobileNumber, name, apartment, userType }
-      : { mobileNumber, userType };
+      : { mobileNumber };
 
     onSubmit(formData,login);
     // Here you would typically handle API calls
@@ -60,13 +60,15 @@ const AuthForm = ({ formType, onSubmit, login }) => {
             />
           </div>
         )}
+        {isSignUp && (
           <div className="form-group">
-            <label htmlFor="userType">Login As</label>
+            <label htmlFor="userType">Sign up as a</label>
             <select id="userType" value={userType} onChange={(e) => setUserType(e.target.value)} required>
               <option value="buyer">Buyer</option>
               <option value="seller">Seller</option>
             </select>
           </div>
+        )}
 
         <button type="submit" className="btn btn-primary auth-button">{isSignUp ? 'Sign Up' : 'Login'}</button>
       </form>
