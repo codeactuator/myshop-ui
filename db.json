@@ -1,13 +1,26 @@
 {
   "users": [
     {
+      "id": "0",
+      "name": "Admin User",
+      "apartmentNumber": "N/A",
+      "email": "admin@example.com",
+      "phone": "0000000000",
+      "userType": "admin",
+      "shopName": "Platform Admin",
+      "isVerified": true,
+      "isBlocked": false
+    },
+    {
       "id": "1",
       "name": "Alice Johnson",
       "apartmentNumber": "A-101",
       "email": "alice@example.com",
       "phone": "1234567890",
       "userType": "seller",
-      "shopName": "Alice's Attic"
+      "shopName": "Alice's Attic",
+      "isVerified": true,
+      "isBlocked": false
     },
     {
       "id": "2",
@@ -16,7 +29,9 @@
       "email": "bob@example.com",
       "phone": "2345678901",
       "userType": "seller",
-      "shopName": "Bob's Bargains"
+      "shopName": "Bob's Bargains",
+      "isVerified": false,
+      "isBlocked": false
     },
     {
       "id": "3",
@@ -25,7 +40,9 @@
       "email": "charlie@example.com",
       "phone": "3456789012",
       "userType": "buyer",
-      "shopName": ""
+      "shopName": "Charlie Shop",
+      "isVerified": false,
+      "isBlocked": false
     },
     {
       "id": "4",
@@ -34,7 +51,9 @@
       "email": "shekhar@example.com",
       "phone": "8264481868",
       "userType": "seller",
-      "shopName": "Shekhar's Finds"
+      "shopName": "Shekhar's Finds",
+      "isVerified": false,
+      "isBlocked": false
     },
     {
       "id": "5",
@@ -43,7 +62,9 @@
       "email": "priya@example.com",
       "phone": "4567890123",
       "userType": "seller",
-      "shopName": "Priya's Treasures"
+      "shopName": "Priya's Treasures",
+      "isVerified": false,
+      "isBlocked": false
     },
     {
       "id": "6",
@@ -52,7 +73,9 @@
       "email": "rohan@example.com",
       "phone": "5678901234",
       "userType": "seller",
-      "shopName": "Rohan's Relics"
+      "shopName": "Rohan's Relics",
+      "isVerified": false,
+      "isBlocked": false
     },
     {
       "id": "7",
@@ -60,7 +83,9 @@
       "name": "Anjali",
       "apartmentNumber": "H-603",
       "userType": "seller",
-      "shopName": "Anjali's Artistry"
+      "shopName": "Anjali's Artistry",
+      "isVerified": true,
+      "isBlocked": false
     }
   ],
   "products": [
@@ -288,15 +313,15 @@
         "https://tiimg.tistatic.com/fp/1/009/000/bath-soaps-930.jpg"
       ],
       "userId": "7",
-      "status": "unavailable",
+      "status": "available",
       "postedDate": "2025-09-29T19:58:23.728Z"
     }
   ],
   "orders": [
     {
       "id": "1",
-      "productId": 3,
-      "buyerId": 2,
+      "productId": "3",
+      "buyerId": "2",
       "orderDate": "2023-10-26T18:00:00Z",
       "totalAmount": 25
     },
@@ -319,7 +344,7 @@
           ],
           "status": "available",
           "postedDate": "2023-10-27T14:30:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 1
         },
         {
@@ -333,7 +358,7 @@
           ],
           "status": "available",
           "postedDate": "2023-11-04T09:00:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 5
         }
       ],
@@ -360,7 +385,7 @@
           ],
           "status": "available",
           "postedDate": "2023-10-27T14:30:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 1
         },
         {
@@ -374,7 +399,7 @@
           ],
           "status": "available",
           "postedDate": "2023-11-04T09:00:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 5
         }
       ],
@@ -402,7 +427,7 @@
           ],
           "status": "available",
           "postedDate": "2023-10-27T14:30:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 1
         }
       ],
@@ -431,7 +456,7 @@
           ],
           "status": "available",
           "postedDate": "2023-10-27T14:30:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 1
         },
         {
@@ -445,7 +470,7 @@
           ],
           "status": "available",
           "postedDate": "2023-11-04T09:00:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 5
         }
       ],
@@ -474,7 +499,7 @@
           ],
           "status": "available",
           "postedDate": "2023-10-27T14:30:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 1
         },
         {
@@ -488,7 +513,7 @@
           ],
           "status": "available",
           "postedDate": "2023-11-04T09:00:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 5
         }
       ],
@@ -517,7 +542,7 @@
           ],
           "status": "available",
           "postedDate": "2023-10-27T14:30:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 1
         },
         {
@@ -531,7 +556,7 @@
           ],
           "status": "available",
           "postedDate": "2023-11-04T09:00:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 5
         }
       ],
@@ -560,7 +585,7 @@
           ],
           "status": "available",
           "postedDate": "2023-10-27T14:30:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 1
         }
       ],
@@ -589,7 +614,7 @@
           ],
           "status": "available",
           "postedDate": "2023-10-27T14:30:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 1
         }
       ],
@@ -618,7 +643,7 @@
           ],
           "status": "available",
           "postedDate": "2023-10-27T14:30:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 1
         }
       ],
@@ -647,7 +672,7 @@
           ],
           "status": "available",
           "postedDate": "2023-10-27T14:30:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 1
         }
       ],
@@ -676,7 +701,7 @@
           ],
           "status": "available",
           "postedDate": "2023-10-27T14:30:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 1
         }
       ],
@@ -773,7 +798,7 @@
     },
     {
       "id": "e077",
-      "userId": 1,
+      "userId": "1",
       "buyerInfo": {
         "name": "Alice Johnson",
         "apartmentNumber": "A-101",
@@ -793,7 +818,7 @@
           ],
           "status": "available",
           "postedDate": "2023-11-04T09:00:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 1
         }
       ],
@@ -803,7 +828,7 @@
     },
     {
       "id": "b75a",
-      "userId": 1,
+      "userId": "1",
       "buyerInfo": {
         "name": "Alice Johnson",
         "apartmentNumber": "A-101",
@@ -823,7 +848,7 @@
           ],
           "status": "available",
           "postedDate": "2023-11-04T09:00:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 1
         }
       ],
@@ -833,7 +858,7 @@
     },
     {
       "id": "4812",
-      "userId": 1,
+      "userId": "1",
       "buyerInfo": {
         "name": "Alice Johnson",
         "apartmentNumber": "A-101",
@@ -853,7 +878,7 @@
           ],
           "status": "available",
           "postedDate": "2023-11-04T09:00:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 1
         }
       ],
@@ -863,7 +888,7 @@
     },
     {
       "id": "063c",
-      "userId": 1,
+      "userId": "1",
       "buyerInfo": {
         "name": "Alice Johnson",
         "apartmentNumber": "A-101",
@@ -883,7 +908,7 @@
           ],
           "status": "available",
           "postedDate": "2023-11-02T09:30:00Z",
-          "userId": 1,
+          "userId": "1",
           "quantity": 1
         }
       ],
@@ -893,7 +918,7 @@
     },
     {
       "id": "d6b5",
-      "userId": 1,
+      "userId": "1",
       "buyerInfo": {
         "name": "Alice Johnson",
         "apartmentNumber": "A-101",
@@ -913,7 +938,7 @@
           ],
           "status": "available",
           "postedDate": "2023-11-02T09:30:00Z",
-          "userId": 1,
+          "userId": "1",
           "quantity": 1
         }
       ],
@@ -923,7 +948,7 @@
     },
     {
       "id": "7d77",
-      "userId": 1,
+      "userId": "1",
       "buyerInfo": {
         "name": "Alice Johnson",
         "apartmentNumber": "A-101",
@@ -943,7 +968,7 @@
           ],
           "status": "available",
           "postedDate": "2023-11-02T09:30:00Z",
-          "userId": 1,
+          "userId": "1",
           "quantity": 1
         }
       ],
@@ -953,7 +978,7 @@
     },
     {
       "id": "1884",
-      "userId": 1,
+      "userId": "1",
       "buyerInfo": {
         "name": "Alice Johnson",
         "apartmentNumber": "A-101",
@@ -973,7 +998,7 @@
           ],
           "status": "available",
           "postedDate": "2023-10-29T11:30:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 1
         },
         {
@@ -987,7 +1012,7 @@
           ],
           "status": "available",
           "postedDate": "2023-11-01T10:00:00Z",
-          "userId": 4,
+          "userId": "4",
           "quantity": 2
         }
       ],
@@ -997,7 +1022,7 @@
     },
     {
       "id": "6a36",
-      "userId": 1,
+      "userId": "1",
       "buyerInfo": {
         "name": "Alice Johnson",
         "apartmentNumber": "A-101",
@@ -1019,7 +1044,7 @@
           ],
           "status": "available",
           "postedDate": "2023-10-26T10:00:00Z",
-          "userId": 1,
+          "userId": "1",
           "quantity": 1
         },
         {
@@ -1033,7 +1058,7 @@
           ],
           "status": "available",
           "postedDate": "2023-10-27T14:30:00Z",
-          "userId": 2,
+          "userId": "2",
           "quantity": 3
         }
       ],
@@ -1043,7 +1068,7 @@
     },
     {
       "id": "e933",
-      "userId": 1,
+      "userId": "1",
       "buyerInfo": {
         "name": "Alice Johnson",
         "apartmentNumber": "A-101",
@@ -1063,7 +1088,7 @@
           ],
           "status": "available",
           "postedDate": "2023-10-30T09:00:00Z",
-          "userId": 1,
+          "userId": "1",
           "quantity": 1
         }
       ],
@@ -1094,7 +1119,7 @@
           ],
           "status": "available",
           "postedDate": "2023-10-26T10:00:00Z",
-          "userId": 1,
+          "userId": "1",
           "quantity": 1
         }
       ],
@@ -1125,7 +1150,7 @@
           ],
           "status": "available",
           "postedDate": "2023-10-26T10:00:00Z",
-          "userId": 1,
+          "userId": "1",
           "quantity": 1
         }
       ],
@@ -1153,7 +1178,7 @@
           "imageUrls": [
             "https://media.istockphoto.com/id/1487212836/photo/single-dry-pink-soap-bar-isolated-on-white-background-with-clipping-path.jpg?s=612x612&w=0&k=20&c=Jy7tGrpDeVFrCKlpqnAoiNeFFVc-OU2uwZI1E2rjb4Q="
           ],
-          "userId": "59af",
+          "userId": "7",
           "status": "available",
           "postedDate": "2025-09-29T19:58:23.728Z",
           "quantity": 2
@@ -1165,7 +1190,7 @@
     },
     {
       "id": "1018",
-      "userId": "59af",
+      "userId": "7",
       "buyerInfo": {
         "name": "Anjali",
         "phone": "8789416315"
@@ -1184,7 +1209,7 @@
           ],
           "status": "available",
           "postedDate": "2023-11-01T10:00:00Z",
-          "userId": 4,
+          "userId": "4",
           "quantity": 1
         }
       ],
@@ -1221,40 +1246,279 @@
       "totalAmount": 5.5,
       "orderDate": "2025-09-29T20:59:46.677Z",
       "status": "pending"
+    },
+    {
+      "id": "7f1c",
+      "userId": "7",
+      "buyerInfo": {
+        "name": "Anjali",
+        "apartmentNumber": "H-603",
+        "phone": "8789416315"
+      },
+      "fulfillmentMethod": "delivery",
+      "paymentMethod": "cod",
+      "items": [
+        {
+          "id": "2fa9",
+          "name": "Bath Soap",
+          "description": "Soap with beautiful fragance",
+          "price": 50,
+          "category": "Soap",
+          "imageUrls": [
+            "https://media.istockphoto.com/id/1487212836/photo/single-dry-pink-soap-bar-isolated-on-white-background-with-clipping-path.jpg?s=612x612&w=0&k=20&c=Jy7tGrpDeVFrCKlpqnAoiNeFFVc-OU2uwZI1E2rjb4Q=",
+            "https://media.istockphoto.com/id/96831795/photo/a-rectangle-piece-of-pink-soap-against-a-white-background.jpg?s=612x612&w=0&k=20&c=inUWigKAVQc69YwUZvN9MD-BtN5YWbZtc_Ad8PBC4hM=",
+            "https://www.shutterstock.com/image-photo/soap-bar-isolated-on-white-260nw-1020891106.jpg",
+            "https://tiimg.tistatic.com/fp/1/009/000/bath-soaps-930.jpg"
+          ],
+          "userId": "7",
+          "status": "available",
+          "postedDate": "2025-09-29T19:58:23.728Z",
+          "quantity": 1
+        }
+      ],
+      "totalAmount": 50,
+      "orderDate": "2025-09-29T21:05:25.956Z",
+      "status": "preparing"
+    },
+    {
+      "id": "201b",
+      "userId": "4",
+      "buyerInfo": {
+        "name": "Shekhar Kumar",
+        "apartmentNumber": "H-602",
+        "phone": "8264481868"
+      },
+      "fulfillmentMethod": "delivery",
+      "paymentMethod": "cod",
+      "items": [
+        {
+          "id": "1",
+          "name": "Vintage Wooden Chair",
+          "description": "A beautifully crafted wooden chair, perfect for a study or living room. Minor wear and tear.",
+          "price": 45,
+          "category": "Furniture",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?q=80&w=1887",
+            "https://images.unsplash.com/photo-1503602642458-232111445657?q=80&w=1887",
+            "https://images.unsplash.com/photo-1494903446931-37516c43ea15?q=80&w=1887"
+          ],
+          "status": "available",
+          "postedDate": "2023-10-26T10:00:00Z",
+          "userId": "1",
+          "quantity": 1
+        }
+      ],
+      "totalAmount": 45,
+      "orderDate": "2025-09-29T21:08:12.416Z",
+      "status": "pending"
+    },
+    {
+      "id": "2d3a",
+      "userId": "4",
+      "buyerInfo": {
+        "name": "Shekhar Kumar",
+        "apartmentNumber": "H-602",
+        "phone": "8264481868"
+      },
+      "fulfillmentMethod": "delivery",
+      "paymentMethod": "upi",
+      "items": [
+        {
+          "id": "6",
+          "name": "Wooden Toy Train Set",
+          "description": "Complete wooden train set with tracks and accessories. Perfect for kids aged 3-6.",
+          "price": 20,
+          "category": "Toys",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070"
+          ],
+          "status": "available",
+          "postedDate": "2023-10-29T11:30:00Z",
+          "userId": "2",
+          "user": {
+            "id": "2",
+            "name": "Bob Williams",
+            "apartmentNumber": "B-204",
+            "email": "bob@example.com",
+            "phone": "2345678901",
+            "userType": "seller",
+            "shopName": "Bob's Bargains",
+            "paymentQrUrl": "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=bob@example"
+          },
+          "quantity": 1
+        }
+      ],
+      "totalAmount": 20,
+      "orderDate": "2025-10-01T07:50:33.377Z",
+      "status": "awaiting_payment"
+    },
+    {
+      "id": "a247",
+      "userId": "4",
+      "buyerInfo": {
+        "name": "Shekhar Kumar",
+        "apartmentNumber": "H-602",
+        "phone": "8264481868"
+      },
+      "fulfillmentMethod": "delivery",
+      "paymentMethod": "upi",
+      "items": [
+        {
+          "id": "9",
+          "name": "Men's Casual T-Shirt",
+          "description": "Comfortable cotton t-shirt, size M. Brand new, never worn.",
+          "price": 12,
+          "category": "Clothing",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1622470953794-aa9c70b0fb9d?q=80&w=1964"
+          ],
+          "status": "available",
+          "postedDate": "2023-11-01T10:00:00Z",
+          "userId": "4",
+          "user": {
+            "id": "4",
+            "name": "Shekhar Kumar",
+            "apartmentNumber": "H-602",
+            "email": "shekhar@example.com",
+            "phone": "8264481868",
+            "userType": "seller",
+            "shopName": "Shekhar's Finds",
+            "paymentQrUrl": "",
+            "upiId": "shekharkumargupta-1@oksbi"
+          },
+          "quantity": 1
+        }
+      ],
+      "totalAmount": 12,
+      "orderDate": "2025-10-01T03:51:28.707Z",
+      "status": "awaiting_payment"
+    },
+    {
+      "id": "95ed",
+      "userId": "4",
+      "buyerInfo": {
+        "name": "Shekhar Kumar",
+        "apartmentNumber": "H-602",
+        "phone": "8264481868"
+      },
+      "fulfillmentMethod": "delivery",
+      "paymentMethod": "upi",
+      "items": [
+        {
+          "id": "9",
+          "name": "Men's Casual T-Shirt",
+          "description": "Comfortable cotton t-shirt, size M. Brand new, never worn.",
+          "price": 12,
+          "category": "Clothing",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1622470953794-aa9c70b0fb9d?q=80&w=1964"
+          ],
+          "status": "available",
+          "postedDate": "2023-11-01T10:00:00Z",
+          "userId": "4",
+          "user": {
+            "id": "4",
+            "name": "Shekhar Kumar",
+            "apartmentNumber": "H-602",
+            "email": "shekhar@example.com",
+            "phone": "8264481868",
+            "userType": "seller",
+            "shopName": "Shekhar's Finds",
+            "paymentQrUrl": "",
+            "upiId": "shekharkumargupta-1@oksbi"
+          },
+          "quantity": 1
+        }
+      ],
+      "totalAmount": 12,
+      "orderDate": "2025-10-01T03:58:59.273Z",
+      "status": "pending"
+    },
+    {
+      "id": "ce95",
+      "userId": "4",
+      "buyerInfo": {
+        "name": "Shekhar Kumar",
+        "apartmentNumber": "H-602",
+        "phone": "8264481868"
+      },
+      "fulfillmentMethod": "delivery",
+      "paymentMethod": "upi",
+      "items": [
+        {
+          "id": "1",
+          "name": "Vintage Wooden Chair",
+          "description": "A beautifully crafted wooden chair, perfect for a study or living room. Minor wear and tear.",
+          "price": 45,
+          "category": "Furniture",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?q=80&w=1887",
+            "https://images.unsplash.com/photo-1503602642458-232111445657?q=80&w=1887",
+            "https://images.unsplash.com/photo-1494903446931-37516c43ea15?q=80&w=1887"
+          ],
+          "status": "available",
+          "postedDate": "2023-10-26T10:00:00Z",
+          "userId": "1",
+          "user": {
+            "id": "1",
+            "name": "Alice Johnson",
+            "apartmentNumber": "A-101",
+            "email": "alice@example.com",
+            "phone": "1234567890",
+            "userType": "seller",
+            "shopName": "Alice's Attic"
+          },
+          "quantity": 1
+        }
+      ],
+      "totalAmount": 45,
+      "orderDate": "2025-10-01T04:05:37.095Z",
+      "status": "awaiting_payment"
     }
   ],
   "reviews": [
     {
       "id": "1",
-      "productId": 1,
-      "userId": 2,
+      "productId": "1",
+      "userId": "2",
       "rating": 4,
       "comment": "Great chair, very sturdy. Has a few scratches as described, but that adds to the vintage charm.",
       "date": "2023-10-28T10:00:00Z"
     },
     {
       "id": "2",
-      "productId": 5,
-      "userId": 1,
+      "productId": "5",
+      "userId": "1",
       "rating": 5,
       "comment": "The pan set is in excellent condition, practically new. A great deal!",
       "date": "2023-10-30T14:20:00Z"
     },
     {
       "id": "3",
-      "productId": 7,
-      "userId": 5,
+      "productId": "7",
+      "userId": "5",
       "rating": 5,
       "comment": "Perfect yoga mat, and the seller was very friendly. Highly recommend.",
       "date": "2023-11-01T18:00:00Z"
     },
     {
       "id": "4",
-      "productId": 1,
-      "userId": 3,
+      "productId": "1",
+      "userId": "3",
       "rating": 3,
       "comment": "It's a decent chair for the price, but a bit wobbly. Might need some minor repairs.",
       "date": "2023-11-02T11:00:00Z"
+    }
+  ],
+  "deliveryVehicles": [
+    {
+      "id": "1",
+      "vehicleNumber": "UP16 CD 1234",
+      "vehicleType": "bike"
+    },
+    {
+      "vehicleNumber": "DL 04324",
+      "vehicleType": "Truck"
     }
   ]
 }

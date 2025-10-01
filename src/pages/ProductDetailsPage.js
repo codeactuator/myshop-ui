@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import './ProductDetailsPage.css';
 import Review from '../components/Review';
-import { useCart } from '../context/CartContext';
+import Modal from '../components/Modal';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 
 const ProductDetailsPage = () => {
   const { productId } = useParams();
@@ -15,25 +16,31 @@ const ProductDetailsPage = () => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [selectedReportOption, setSelectedReportOption] = useState('');
 
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
-        // Fetch product and reviews in parallel for better performance
-        const [productResponse, reviewsResponse] = await Promise.all([
-          fetch(`http://localhost:3001/products/${productId}?_expand=user`),
-          fetch(`http://localhost:3001/reviews?productId=${productId}&_expand=user`)
-        ]);
-
+        // Step 1: Fetch the product
+        const productResponse = await fetch(`http://localhost:3001/products/${productId}`);
         if (!productResponse.ok) {
           throw new Error(`Product not found (status: ${productResponse.status})`);
         }
+        const productData = await productResponse.json();
 
+        // Step 2: Fetch the seller information using the userId from the product
+        const userResponse = await fetch(`http://localhost:3001/users/${productData.userId}`);
+        if (userResponse.ok) {
+          productData.user = await userResponse.json();
+        }
+
+        // Step 3: Fetch the reviews for the product
+        const reviewsResponse = await fetch(`http://localhost:3001/reviews?productId=${productId}&_expand=user`);
         if (!reviewsResponse.ok) {
           throw new Error(`Could not fetch reviews (status: ${reviewsResponse.status})`);
         }
-
-        const productData = await productResponse.json();
         const reviewsData = await reviewsResponse.json();
 
         setProduct(productData);
@@ -61,9 +68,54 @@ const ProductDetailsPage = () => {
       addToCart(product);
     } else {
       alert('Please log in to add items to your cart.');
-      navigate('/welcome');
+      navigate('/welcome', { state: { addProductAfterLogin: product.id } });
     }
   };
+
+  const handleReportSubmit = async (e) => {
+    e.preventDefault();
+    const finalReason = selectedReportOption === 'Other' ? reportReason.trim() : selectedReportOption;
+
+    if (!finalReason) {
+      alert('Please provide a reason for your report.');
+      return;
+    }
+
+    const report = {
+      reportedUserId: product.user.id,
+      reportedByUserId: currentUser.id,
+      productId: product.id,
+      type: 'user',
+      reason: finalReason,
+      date: new Date().toISOString(),
+    };
+
+    try {
+      const response = await fetch('http://localhost:3001/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(report),
+      });
+
+      if (response.ok) {
+        alert('Thank you for your report. An admin will review it shortly.');
+        setIsReportModalOpen(false);
+        setReportReason('');
+        setSelectedReportOption('');
+      } else {
+        throw new Error('Failed to submit report.');
+      }
+    } catch (error) {
+      alert('An error occurred while submitting your report.');
+    }
+  };
+
+  const reportOptions = [
+    'Misleading Information',
+    'Prohibited Item',
+    'Suspicious Seller',
+    'Other'
+  ];
 
   return (
     <div className="product-details-container">
@@ -93,9 +145,18 @@ const ProductDetailsPage = () => {
           </div>
           <div className="details-seller">
             <h3>Seller Information</h3>
-            <p><strong>Shop:</strong> {product.user?.shopName || product.user?.name || 'N/A'}</p>
-            <p><strong>Apartment:</strong> {product.user?.apartmentNumber || 'N/A'}</p>
+            <p className="seller-info-name">
+              <strong>Sold by:</strong> {product.user?.shopName || product.user?.name || 'N/A'}
+              {product.user?.isVerified && (
+                <i className="fas fa-check-circle verified-badge" title="Verified Resident"></i>
+              )}
+            </p>
           </div>
+          {currentUser && product.user && currentUser.id !== product.user.id && (
+            <button className="report-btn" onClick={() => setIsReportModalOpen(true)} title="Report this seller">
+              <i className="fas fa-flag"></i> Report Seller
+            </button>
+          )}
           <button className="btn btn-primary contact-seller-btn" onClick={handleAddToCart}>
             Add to Cart
           </button>
@@ -111,6 +172,30 @@ const ProductDetailsPage = () => {
           <p>No reviews for this product yet.</p>
         )}
       </div>
+      <Modal isOpen={isReportModalOpen} onClose={() => setIsReportModalOpen(false)}>
+        <div className="report-modal-content">
+          <h2>Report Seller</h2>
+          <p>Why are you reporting <strong>{product.user?.shopName || product.user?.name}</strong>?</p>
+          <form onSubmit={handleReportSubmit}>
+            <div className="report-options">
+              {reportOptions.map(option => (
+                <button
+                  key={option}
+                  type="button"
+                  className={`report-option-btn ${selectedReportOption === option ? 'selected' : ''}`}
+                  onClick={() => setSelectedReportOption(option)}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+            {selectedReportOption === 'Other' && (
+              <textarea value={reportReason} onChange={(e) => setReportReason(e.target.value)} placeholder="Please provide more details..." required />
+            )}
+            <button type="submit" className="btn btn-primary">Submit Report</button>
+          </form>
+        </div>
+      </Modal>
     </div>
   );
 };

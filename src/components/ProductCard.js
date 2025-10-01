@@ -18,7 +18,7 @@ const ProductCard = ({ product }) => {
       addToCart(product);
     } else {
       alert('Please log in to add items to your cart.');
-      navigate('/welcome');
+      navigate('/welcome', { state: { addProductAfterLogin: product.id } });
     }
   };
   
@@ -30,8 +30,12 @@ const ProductCard = ({ product }) => {
           <h3 className="product-name">{name}</h3>
           <p className="product-price">${price.toFixed(2)}</p>
           <div className="product-seller-info">
-            <span>Sold by: {user ? (user.shopName || user.name) : 'Unknown Seller'}</span>
-            <span>{user ? `(Apt: ${user.apartmentNumber})` : ''}</span>
+            <span className="seller-name">
+              Sold by: {user ? (user.shopName || user.name) : 'Unknown Seller'}
+              {user?.isVerified && (
+                <i className="fas fa-check-circle verified-badge" title="Verified Resident"></i>
+              )}
+            </span>
           </div>
           <button className="add-to-cart-btn" onClick={handleAddToCart}>
             Add to Cart

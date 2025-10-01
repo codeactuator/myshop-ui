@@ -26,42 +26,42 @@ const SideNavbar = ({ isCollapsed }) => {
           </div>
         )}
         <nav>
-        <ul>
-          <li>
-            <NavLink to="/products" className={({ isActive }) => (isActive ? 'active-link' : '')}>
-              <i className="fas fa-store"></i>
-              <span>All Products</span>
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/my-orders" className={({ isActive }) => (isActive ? 'active-link' : '')}>
-              <i className="fas fa-box-open"></i>
-              <span>My Orders</span>
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/profile" className={({ isActive }) => (isActive ? 'active-link' : '')}>
-              <i className="fas fa-user-circle"></i>
-              <span>Profile</span>
-            </NavLink>
-          </li>
-          {currentUser?.userType === 'seller' && (
-            <>
-              <li>
-                <NavLink to="/seller/dashboard" className={({ isActive }) => (isActive ? 'active-link' : '')}>
-                  <i className="fas fa-tachometer-alt"></i>
-                  <span>Seller Dashboard</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/seller/inventory" className={({ isActive }) => (isActive ? 'active-link' : '')}>
-                  <i className="fas fa-boxes"></i>
-                  <span>My Inventory</span>
-                </NavLink>
-              </li>
-            </>
-          )}
-        </ul>
+          <ul>
+            <li>
+              <NavLink to="/products" className={({ isActive }) => (isActive ? 'active-link' : '')}>
+                <i className="fas fa-store"></i>
+                <span>All Products</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/my-orders" className={({ isActive }) => (isActive ? 'active-link' : '')}>
+                <i className="fas fa-box-open"></i>
+                <span>My Orders</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/profile" className={({ isActive }) => (isActive ? 'active-link' : '')}>
+                <i className="fas fa-user-circle"></i>
+                <span>Profile</span>
+              </NavLink>
+            </li>
+            {currentUser?.userType === 'seller' && (
+              <>
+                <li><NavLink to="/seller/dashboard" className={({ isActive }) => (isActive ? 'active-link' : '')}><i className="fas fa-tachometer-alt"></i><span>Seller Dashboard</span></NavLink></li>
+                <li><NavLink to="/seller/inventory" className={({ isActive }) => (isActive ? 'active-link' : '')}><i className="fas fa-boxes"></i><span>My Inventory</span></NavLink></li>
+              </>
+            )}
+            {currentUser?.userType === 'admin' && (
+              <>
+                <li>
+                  <NavLink to="/admin/dashboard" className={({ isActive }) => (isActive ? 'active-link' : '')}>
+                    <i className="fas fa-user-shield"></i>
+                    <span>Admin Dashboard</span>
+                  </NavLink>
+                </li>
+              </>
+            )}
+          </ul>
         </nav>
       </div>
       <div className="logout-section">

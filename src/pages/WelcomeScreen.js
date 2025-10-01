@@ -3,7 +3,8 @@ import './WelcomeScreen.css';
 import Modal from '../components/Modal';
 import AuthForm from '../components/AuthForm';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
 
 const WelcomeScreen = ({ onNavigate }) => {
@@ -15,6 +16,8 @@ const WelcomeScreen = ({ onNavigate }) => {
   const navigate = useNavigate();
   const [modalContent, setModalContent] = useState(null); // 'login' or 'signup'
   const { login } = useAuth();
+  const { addToCart } = useCart();
+  const location = useLocation();
 
   const handleAuthSubmit = async (formData) => {
     const formType = modalContent;
@@ -26,8 +29,22 @@ const WelcomeScreen = ({ onNavigate }) => {
 
       if (formType === 'login') {
         if (existingUsers.length > 0) {
-          alert(`Welcome back, ${existingUsers[0].name}!`);
-          login(existingUsers[0]);
+          const user = existingUsers[0];
+          alert(`Welcome back, ${user.name}!`);
+          login(user);
+
+          // Check if a product needs to be added to the cart
+          const productIdToAdd = location.state?.addProductAfterLogin;
+          if (productIdToAdd) {
+            const productResponse = await fetch(`http://localhost:3001/products/${productIdToAdd}`);
+            if (productResponse.ok) {
+              const productToAdd = await productResponse.json();
+              addToCart(productToAdd);
+              // Clear the state to prevent re-adding
+              navigate(location.pathname, { replace: true, state: {} });
+            }
+          }
+
           closeModal();
           onNavigate('products'); // Navigate to products page
         } else {
@@ -50,6 +67,17 @@ const WelcomeScreen = ({ onNavigate }) => {
           if (createResponse.ok) {
             const createdUser = await createResponse.json();
             login(createdUser);
+
+            // Check if a product needs to be added to the cart
+            const productIdToAdd = location.state?.addProductAfterLogin;
+            if (productIdToAdd) {
+              const productResponse = await fetch(`http://localhost:3001/products/${productIdToAdd}`);
+              if (productResponse.ok) {
+                const productToAdd = await productResponse.json();
+                addToCart(productToAdd);
+              }
+            }
+
             closeModal();
             onNavigate('products'); // Navigate to products page
           } else {

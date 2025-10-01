@@ -4,7 +4,7 @@ import './ProfilePage.css';
 
 const ProfilePage = () => {
   const { currentUser, login } = useAuth();
-  const [shopName, setShopName] = useState('');
+  const [shopName, setShopName] = useState(currentUser?.shopName || '');
 
   if (!currentUser) {
     return <div className="page-status">Please log in to view your profile.</div>;

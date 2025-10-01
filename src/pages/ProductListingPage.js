@@ -13,13 +13,33 @@ const ProductListingPage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // _expand=user will automatically include the seller's user object
-        const response = await fetch('http://localhost:3001/products?status=available&_expand=user');
-        if (!response.ok) {
+        // Step 1: Fetch all available products
+        const productsResponse = await fetch('http://localhost:3001/products?status=available');
+        if (!productsResponse.ok) {
           throw new Error('Network response was not ok');
         }
-        const data = await response.json();
-        setProducts(data);
+        const productsData = await productsResponse.json();
+
+        // Step 2: Get all unique seller IDs from the products
+        const sellerIds = [...new Set(productsData.map(p => p.userId))];
+
+        // Step 3: Fetch all unique sellers in a single request
+        const usersResponse = await fetch(`http://localhost:3001/users?${sellerIds.map(id => `id=${id}`).join('&')}`);
+        if (!usersResponse.ok) {
+          throw new Error('Failed to fetch seller information.');
+        }
+        const usersData = await usersResponse.json();
+        const usersMap = new Map(usersData.map(user => [user.id, user]));
+
+        // Step 4: Combine products with seller info and filter out products from blocked users
+        const productsWithSellers = productsData
+          .map(product => ({
+            ...product,
+            user: usersMap.get(product.userId)
+          }))
+          .filter(product => product.user && !product.user.isBlocked);
+
+        setProducts(productsWithSellers);
       } catch (err) {
         setError(err.message);
       } finally {

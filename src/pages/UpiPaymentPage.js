@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import './UpiPaymentPage.css';
 
@@ -37,10 +37,10 @@ const UpiPaymentPage = () => {
         <h2>Complete Your Payment</h2>
         <p>Scan the QR code with your favorite UPI app to complete the transaction.</p>
         <div className="qr-code-placeholder">
-          {/* In a real app, you would generate and display a QR code here */}
+          {/* This now points to a generic, platform-level UPI address */}
           <img 
-            src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=example@upi" 
-            alt="UPI QR Code" 
+            src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=platform@my-shop" 
+            alt="Platform UPI QR Code" 
           />
         </div>
         <p className="order-id-text">Your Order ID: {orderId}</p>

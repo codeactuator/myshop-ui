@@ -1,0 +1,30 @@
+.delivery-fleet-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.add-vehicle-btn {
+    margin-bottom: 2rem;
+}
+
+.vehicle-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.page-status {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #555;
+    padding: 2rem;
+}
+
+/* New Styles for Modal */
+.modal-title {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #333;
+}

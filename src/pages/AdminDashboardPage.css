@@ -1,0 +1,116 @@
+.admin-dashboard-container {
+  display: flex;
+}
+
+.admin-sidebar {
+  width: 220px;
+  background-color: #fff;
+  border-right: 1px solid #e9ecef;
+  padding: 2rem 0;
+  height: calc(100vh - 80px);
+  position: sticky;
+  top: 80px;
+}
+
+.admin-sidebar nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-sidebar nav a {
+  padding: 1rem 1.5rem;
+  text-decoration: none;
+  color: #333;
+  font-weight: 700;
+}
+
+.admin-sidebar nav a.active {
+  background-color: #f3e8ff;
+  color: #7B2CBF;
+  border-right: 4px solid #7B2CBF;
+}
+
+.admin-main-content {
+  flex-grow: 1;
+  padding: 2rem;
+}
+
+.dashboard-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.summary-card {
+  background-color: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.summary-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: #555;
+}
+
+.summary-card p {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #7B2CBF;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.dashboard-card {
+  background-color: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1.5rem;
+  height: 60vh;
+  overflow-y: auto;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0;
+}
+
+.manage-link {
+  font-weight: 700;
+  color: #7B2CBF;
+}
+
+.admin-list {
+  list-style: none;
+  padding: 0;
+}
+
+.admin-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f1f3f5;
+}
+
+.role-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.role-admin { background-color: #f8d7da; color: #721c24; }
+.role-seller { background-color: #d1ecf1; color: #0c5460; }
+.role-buyer { background-color: #e2e3e5; color: #383d41; }

@@ -1,0 +1,92 @@
+.transaction-management-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.transaction-table-container {
+  background-color: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin-top: 2rem;
+}
+
+.transaction-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transaction-table th,
+.transaction-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e9ecef;
+  white-space: nowrap;
+}
+
+.transaction-table th {
+  background-color: #f8f9fa;
+  font-weight: 700;
+}
+
+.transaction-table tbody tr:hover {
+  background-color: #fcfdff;
+}
+
+/* Re-using status-badge styles from MyOrdersPage.css */
+.refund-status {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.refund-requested {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.refund-processed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.dispute-link {
+  color: #dc3545;
+  font-weight: 700;
+  text-decoration: none;
+}
+.process-refund-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  background-color: #7B2CBF;
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+  transition: background-color 0.2s;
+}
+.refund-status {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.refund-requested {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.refund-processed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.dispute-link {
+  color: #dc3545;
+  font-weight: 700;
+  text-decoration: none;
+}

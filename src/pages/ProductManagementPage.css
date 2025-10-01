@@ -1,0 +1,41 @@
+.product-management-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.product-table-container {
+  background-color: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin-top: 2rem;
+}
+
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.product-table th,
+.product-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.product-table th {
+  background-color: #f8f9fa;
+  font-weight: 700;
+}
+
+.product-table tbody tr:hover {
+  background-color: #fcfdff;
+}
+
+.product-table a {
+  color: #7B2CBF;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* Re-using toggle switch styles from UserManagementPage.css */

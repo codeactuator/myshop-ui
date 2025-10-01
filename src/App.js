@@ -14,6 +14,12 @@ import OrderTrackingPage from './pages/OrderTrackingPage';
 import SellerDashboardPage from './pages/SellerDashboardPage';
 import ProfilePage from './pages/ProfilePage';
 import InventoryPage from './pages/InventoryPage';
+import UserManagementPage from './pages/UserManagementPage';
+import DeliveryFleetPage from './pages/DeliveryFleetPage';
+import ProductManagementPage from './pages/ProductManagementPage';
+import TransactionManagementPage from './pages/TransactionManagementPage';
+import ReportsPage from './pages/ReportsPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 import EditProductPage from './pages/EditProductPage';
 import AddProductPage from './pages/AddProductPage';
 import UpiPaymentPage from './pages/UpiPaymentPage';
@@ -62,6 +68,14 @@ function App() {
             <Route path="/seller/dashboard" element={<SellerDashboardPage />} />
             <Route path="/seller/inventory" element={<InventoryPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/admin/dashboard" element={<AdminDashboardPage />}>
+              {/* Nested Admin Routes */}
+              <Route path="users" element={<UserManagementPage />} />
+              <Route path="products" element={<ProductManagementPage />} />
+              <Route path="transactions" element={<TransactionManagementPage />} />
+              <Route path="delivery-fleet" element={<DeliveryFleetPage />} />
+              <Route path="reports" element={<ReportsPage />} />
+            </Route>
             <Route path="/seller/edit-product/:productId" element={<EditProductPage />} />
             <Route path="/seller/add-product" element={<AddProductPage />} />
             <Route path="/payment/upi/:orderId" element={<UpiPaymentPage />} />
