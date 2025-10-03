@@ -32,6 +32,19 @@
 
 .admin-main-content {
   flex-grow: 1;
+  background-color: #f8f9fa;
+}
+
+.admin-header {
+  background-color: #fff;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-page-content {
   padding: 2rem;
 }
 
@@ -65,7 +78,7 @@
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 2rem;
   margin-top: 2rem;
 }
@@ -75,8 +88,13 @@
   border: 1px solid #e9ecef;
   border-radius: 8px;
   padding: 1.5rem;
-  height: 60vh;
-  overflow-y: auto;
+}
+.chart-card {
+  height: auto;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .card-header {

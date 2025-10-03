@@ -1,40 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Navigate, Link } from 'react-router-dom';
+import { Navigate, Link, useOutletContext } from 'react-router-dom';
 import './TransactionManagementPage.css';
 
 const TransactionManagementPage = () => {
   const { currentUser } = useAuth();
+  const { orders: allOrders, deliveryPartners, handleManualAssign } = useOutletContext();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const [ordersResponse, usersResponse, reportsResponse] = await Promise.all([
-          fetch('http://localhost:3001/orders?_sort=orderDate&_order=desc'),
-          fetch('http://localhost:3001/users'),
-          fetch('http://localhost:3001/reports')
-        ]);
-
-        if (!ordersResponse.ok || !usersResponse.ok || !reportsResponse.ok) {
-          throw new Error('Failed to fetch transaction data.');
+        // For simplicity, we'll just use the orders data passed down.
+        // A more robust solution might involve re-fetching enriched data here
+        // or ensuring the parent passes down fully enriched data.
+        if (allOrders) {
+          setOrders(allOrders);
         }
-
-        const ordersData = await ordersResponse.json();
-        const usersData = await usersResponse.json();
-        const reportsData = await reportsResponse.json();
-        const usersMap = new Map(usersData.map(u => [u.id, u]));
-        const reportsMap = new Map(reportsData.map(r => [r.id, r]));
-
-        const enrichedOrders = ordersData.map(order => ({
-          ...order,
-          buyer: usersMap.get(order.userId),
-          dispute: order.reportId ? reportsMap.get(order.reportId) : null
-        }));
-
-        setOrders(enrichedOrders);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -43,7 +29,26 @@ const TransactionManagementPage = () => {
     };
 
     fetchTransactions();
-  }, []);
+  }, [allOrders]);
+
+  const filteredOrders = useMemo(() => {
+    let filtered = orders;
+
+    // 1. Filter by status
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(order => order.status === statusFilter);
+    }
+
+    // 2. Filter by search query
+    if (searchQuery) {
+      filtered = filtered.filter(order => {
+        const lowerCaseQuery = searchQuery.toLowerCase();
+        const buyerName = order.buyerInfo?.name?.toLowerCase() || '';
+        return order.id.toLowerCase().includes(lowerCaseQuery) || buyerName.includes(lowerCaseQuery);
+      });
+    }
+    return filtered;
+  }, [orders, searchQuery, statusFilter]);
 
   const handleProcessRefund = async (orderId, refundDetails) => {
     if (window.confirm('Are you sure you want to process this refund? This action cannot be undone.')) {
@@ -81,26 +86,55 @@ const TransactionManagementPage = () => {
 
   return (
     <div className="transaction-management-container">
-      <h1>Transaction Management</h1>
+      <h1>Order Management</h1>
+      <div className="table-controls">
+        <input
+          type="text"
+          placeholder="Search by Order ID or Buyer Name..."
+          className="search-input"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <select className="filter-select" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+          <option value="all">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="preparing">Preparing</option>
+          <option value="ready_for_ship">Ready for Ship</option>
+          <option value="out_for_delivery">Out for Delivery</option>
+          <option value="delivered">Delivered</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
       <div className="transaction-table-container">
         <table className="transaction-table">
           <thead>
             <tr>
               <th>Order ID</th>
               <th>Buyer</th>
+              <th>Seller(s)</th>
               <th>Date</th>
               <th>Amount</th>
               <th>Payment Method</th>
               <th>Status</th>
               <th>Refund</th>
+              <th>Assignment</th>
               <th>Dispute</th>
             </tr>
           </thead>
           <tbody>
-            {orders.map(order => (
+            {filteredOrders.map(order => (
               <tr key={order.id}>
-                <td>#{order.id}</td>
-                <td>{order.buyer?.name || 'N/A'}</td>
+                <td><Link to={`/admin/dashboard/orders/${order.id}`}>#{order.id}</Link></td>
+                <td>{order.buyerInfo?.name || 'N/A'}</td>
+                <td className="seller-cell">
+                  {order.sellers?.length === 1
+                    ? (order.sellers[0].shopName || order.sellers[0].name)
+                    : order.sellers?.length > 1
+                      ? 'Multiple Sellers'
+                      : 'N/A'}
+                </td>
                 <td>{new Date(order.orderDate).toLocaleDateString()}</td>
                 <td>${order.totalAmount.toFixed(2)}</td>
                 <td>{order.paymentMethod?.toUpperCase() || 'N/A'}</td>
@@ -113,6 +147,23 @@ const TransactionManagementPage = () => {
                       <span className={`refund-status refund-${order.refund.status}`}>{order.refund.status}</span>
                     )
                   ) : ('N/A')}
+                </td>
+                <td>
+                  {order.deliveryPartnerId ? (
+                    deliveryPartners.find(p => p.id === order.deliveryPartnerId)?.name || 'Assigned'
+                  ) : order.status === 'ready_for_ship' ? (
+                    <div className="assignment-controls-table">
+                      <select id={`partner-select-${order.id}`}>
+                        <option value="">Select...</option>
+                        {deliveryPartners.filter(p => p.isAvailable).map(p => (
+                          <option key={p.id} value={p.id}>{p.name}</option>
+                        ))}
+                      </select>
+                      <button className="btn btn-secondary btn-sm" onClick={() => handleManualAssign(order.id, document.getElementById(`partner-select-${order.id}`).value)}>Assign</button>
+                    </div>
+                  ) : (
+                    'N/A'
+                  )}
                 </td>
                 <td>
                   {order.dispute ? (<Link to="/admin/dashboard/reports" className="dispute-link">View</Link>) : ('N/A')}

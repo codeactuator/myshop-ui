@@ -1,26 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import './OrderTrackingPage.css'; // Re-using styles
-import './DeliveryOrderTrackingPage.css'; // For specific overrides
 
-const DeliveryOrderTrackingPage = () => {
+const AdminOrderDetailsPage = () => {
   const { orderId } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const statusSteps = ['pending', 'confirmed', 'preparing', 'ready_for_ship', 'out_for_delivery', 'delivered'];
-  const statusDetails = {
-    pending: 'Order placed, awaiting seller confirmation.',
-    confirmed: 'Seller has confirmed the order.',
-    preparing: 'Items are being prepared for pickup.',
-    ready_for_ship: 'Order is ready for pickup.',
-    out_for_delivery: 'Order has been picked up and is on its way.',
-    delivered: 'Order has been successfully delivered.'
-  };
+  const statusSteps = ['pending', 'confirmed', 'preparing', 'ready_for_ship', 'out_for_delivery', 'delivered', 'completed'];
 
   useEffect(() => {
-    const fetchOrder = async () => {
+    const fetchOrderDetails = async () => {
       try {
         const response = await fetch(`http://localhost:3001/orders/${orderId}?_expand=deliveryPartner`);
         if (!response.ok) {
@@ -28,7 +19,6 @@ const DeliveryOrderTrackingPage = () => {
         }
         const data = await response.json();
 
-        // If a delivery partner is assigned and has a vehicle, fetch vehicle details
         if (data.deliveryPartner && data.deliveryPartner.vehicleId) {
           const vehicleResponse = await fetch(`http://localhost:3001/deliveryVehicles/${data.deliveryPartner.vehicleId}`);
           if (vehicleResponse.ok) {
@@ -44,7 +34,7 @@ const DeliveryOrderTrackingPage = () => {
       }
     };
 
-    fetchOrder();
+    fetchOrderDetails();
   }, [orderId]);
 
   if (loading) return <div className="page-status">Loading order details...</div>;
@@ -55,12 +45,13 @@ const DeliveryOrderTrackingPage = () => {
 
   return (
     <div className="order-tracking-container">
-      <Link to="/delivery/dashboard" className="dp-back-link">&larr; Back to Dashboard</Link>
+      <Link to="/admin/dashboard/orders" className="back-link">&larr; Back to Order Management</Link>
       <h1>Order Details</h1>
       <div className="order-summary-header">
         <p><strong>Order ID:</strong> {order.id}</p>
-        <p><strong>Buyer:</strong> {order.buyerInfo.name}</p>
-        <p><strong>Address:</strong> {order.buyerInfo.apartmentNumber}</p>
+        <p><strong>Buyer:</strong> {order.buyerInfo?.name || 'N/A'}</p>
+        <p><strong>Date:</strong> {new Date(order.orderDate).toLocaleDateString()}</p>
+        <p><strong>Total:</strong> ${order.totalAmount.toFixed(2)}</p>
       </div>
 
       {order.deliveryPartner && (
@@ -82,7 +73,6 @@ const DeliveryOrderTrackingPage = () => {
               <div className="timeline-dot"></div>
               <div className="timeline-content">
                 <div className="timeline-label">{step}</div>
-                <div className="timeline-detail">{statusDetails[step]}</div>
               </div>
             </div>
           ))}
@@ -95,7 +85,9 @@ const DeliveryOrderTrackingPage = () => {
           <div key={item.id} className="order-item-card">
             <img src={item.imageUrls[0]} alt={item.name} className="order-item-image" />
             <div className="order-item-info">
-              <h4>{item.name} (x{item.quantity})</h4>
+              <h4>{item.name}</h4>
+              <p>Quantity: {item.quantity}</p>
+              <p>Price: ${item.price.toFixed(2)}</p>
             </div>
           </div>
         ))}
@@ -104,4 +96,4 @@ const DeliveryOrderTrackingPage = () => {
   );
 };
 
-export default DeliveryOrderTrackingPage;
+export default AdminOrderDetailsPage;

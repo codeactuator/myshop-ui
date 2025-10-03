@@ -46,7 +46,9 @@ const WelcomeScreen = ({ onNavigate }) => {
           }
 
           closeModal();
-          if (user.userType === 'delivery_partner') {
+          if (user.userType === 'admin') {
+            navigate('/admin/dashboard');
+          } else if (user.userType === 'delivery_partner') {
             navigate('/delivery/dashboard');
           } else {
             onNavigate('products'); // Navigate to products page

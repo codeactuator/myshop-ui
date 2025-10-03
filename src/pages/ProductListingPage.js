@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import ProductCard from '../components/ProductCard';
-import './ProductListingPage.css';
+import './ProductListingPage.css'; // This import is now correct
 
 const ProductListingPage = () => {
   const [products, setProducts] = useState([]); // Holds the original, unfiltered list of products
@@ -99,9 +99,6 @@ const ProductListingPage = () => {
     <div className="product-listing-container">
       <h1 className="page-title">Community Marketplace</h1>
       <div className="search-bar-container" ref={searchContainerRef}>
-        <svg xmlns="http://www.w3.org/2000/svg" className="search-icon" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-        </svg>
         <input
           type="text"
           placeholder="Search by product name or category..."

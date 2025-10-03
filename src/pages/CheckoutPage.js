@@ -57,7 +57,7 @@ const CheckoutPage = () => {
       items: cartItems,
       totalAmount: cartTotal, 
       orderDate: new Date().toISOString(),
-      status: paymentMethod === 'cod' ? 'pending' : 'awaiting_payment',
+      status: 'pending',
       deliveryPartnerId: null,
     };
 

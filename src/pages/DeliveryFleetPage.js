@@ -154,7 +154,7 @@ const DeliveryFleetPage = () => {
               <Popup>
                 <strong>{partner.name}</strong><br />
                 Status: {partner.isAvailable ? 'Available' : 'Unavailable'}<br />
-                Active Deliveries: {orders.filter(o => o.deliveryPartnerId === partner.id && (o.status === 'preparing' || o.status === 'shipped')).length}
+                Active Deliveries: {orders.filter(o => o.deliveryPartnerId === partner.id && (o.status === 'preparing' || o.status === 'out_for_delivery')).length}
               </Popup>
             </Marker>
           ))}
@@ -185,7 +185,7 @@ const DeliveryFleetPage = () => {
               <div className="partner-info">
                 <h3>{partner.name}</h3>
                 <p>Phone: {partner.phone}</p>
-                <p>Active Deliveries: {orders.filter(o => o.deliveryPartnerId === partner.id && (o.status === 'preparing' || o.status === 'shipped')).length}</p>
+                <p>Active Deliveries: {orders.filter(o => o.deliveryPartnerId === partner.id && (o.status === 'preparing' || o.status === 'out_for_delivery')).length}</p>
                 <p>Status: <span className={partner.isAvailable ? 'status-available' : 'status-unavailable'}>{partner.isAvailable ? 'Available' : 'Unavailable'}</span></p>
                 <div className="partner-actions">
                   <button className="btn btn-secondary" onClick={(e) => { e.stopPropagation(); handleToggleAvailability(partner.id, partner.isAvailable); }}>Toggle Availability</button>
@@ -194,11 +194,11 @@ const DeliveryFleetPage = () => {
               </div>
               <div className="assigned-orders">
                 <h4>Assigned Orders</h4>
-                {orders.filter(o => o.deliveryPartnerId === partner.id && (o.status === 'preparing' || o.status === 'shipped')).length > 0 ? (
+                {orders.filter(o => o.deliveryPartnerId === partner.id && (o.status === 'preparing' || o.status === 'out_for_delivery')).length > 0 ? (
                   <ul className="assigned-orders-list">
-                    {orders.filter(o => o.deliveryPartnerId === partner.id && (o.status === 'preparing' || o.status === 'shipped')).map(order => (
-                      <li key={order.id}>
-                        <Link to={`/orders/${order.id}`}>Order #{order.id}</Link> - <span className={`status-badge status-${order.status}`}>{order.status}</span>
+                    {orders.filter(o => o.deliveryPartnerId === partner.id && (o.status === 'preparing' || o.status === 'out_for_delivery')).map(order => (
+                      <li key={order.id} className="assigned-order-item">
+                        <Link to={`/admin/dashboard/orders/${order.id}`}>Order #{order.id}</Link> - <span className={`status-badge status-${order.status}`}>{order.status.replace('_', ' ')}</span>
                       </li>
                     ))}
                   </ul>

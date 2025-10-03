@@ -9,26 +9,10 @@ const UpiPaymentPage = () => {
   const navigate = useNavigate();
 
   const handlePaymentConfirmation = async () => {
-    try {
-      // In a real app, you'd verify payment status with your payment gateway.
-      // Here, we'll just update the order status to 'pending'.
-      const response = await fetch(`http://localhost:3001/orders/${orderId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'pending' }),
-      });
-
-      if (response.ok) {
-        clearCart();
-        // Pass orderId to the success page
-        navigate('/order-success', { state: { orderId: orderId } });
-      } else {
-        throw new Error('Failed to confirm payment.');
-      }
-    } catch (error) {
-      console.error('Payment confirmation error:', error);
-      alert('An error occurred while confirming your payment. Please try again.');
-    }
+    // The order status is already 'pending'. We just need to clear the cart and navigate.
+    clearCart();
+    // Pass orderId to the success page
+    navigate('/order-success', { state: { orderId: orderId } });
   };
 
   return (

@@ -18,9 +18,12 @@ import UserManagementPage from './pages/UserManagementPage';
 import DeliveryFleetPage from './pages/DeliveryFleetPage';
 import DeliveryPartnerDashboardPage from './pages/DeliveryPartnerDashboardPage';
 import DeliveryOrderTrackingPage from './pages/DeliveryOrderTrackingPage';
+import AdminOrderDetailsPage from './pages/AdminOrderDetailsPage';
+import AdminProductDetailsPage from './pages/AdminProductDetailsPage';
 import ProductManagementPage from './pages/ProductManagementPage';
 import TransactionManagementPage from './pages/TransactionManagementPage';
 import ReportsPage from './pages/ReportsPage';
+import DashboardHomePage from './pages/DashboardHomePage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import EditProductPage from './pages/EditProductPage';
 import AddProductPage from './pages/AddProductPage';
@@ -72,17 +75,21 @@ function App() {
             <Route path="/seller/dashboard" element={<SellerDashboardPage />} />
             <Route path="/seller/inventory" element={<InventoryPage />} />
             <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/admin/dashboard" element={<AdminDashboardPage />}>
-              {/* Nested Admin Routes */}
-              <Route path="users" element={<UserManagementPage />} />
-              <Route path="products" element={<ProductManagementPage />} />
-              <Route path="transactions" element={<TransactionManagementPage />} />
-              <Route path="delivery-fleet" element={<DeliveryFleetPage />} />
-              <Route path="reports" element={<ReportsPage />} />
-            </Route>
             <Route path="/seller/edit-product/:productId" element={<EditProductPage />} />
             <Route path="/seller/add-product" element={<AddProductPage />} />
             <Route path="/payment/upi/:orderId" element={<UpiPaymentPage />} />
+            </Route>
+
+            {/* Admin Routes (outside of MainLayout) */}
+            <Route path="/admin/dashboard" element={<AdminDashboardPage />}>
+              <Route index element={<DashboardHomePage />} />
+              <Route path="users" element={<UserManagementPage />} />
+              <Route path="products/:productId" element={<AdminProductDetailsPage />} />
+              <Route path="orders/:orderId" element={<AdminOrderDetailsPage />} />
+              <Route path="products" element={<ProductManagementPage />} />
+              <Route path="orders" element={<TransactionManagementPage />} />
+              <Route path="delivery-fleet" element={<DeliveryFleetPage />} />
+              <Route path="reports" element={<ReportsPage />} />
             </Route>
           </Routes>
         </Router>

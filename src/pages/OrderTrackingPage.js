@@ -8,23 +8,25 @@ const OrderTrackingPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const statusSteps = ['pending', 'confirmed', 'preparing', 'shipped', 'delivered'];
+  const statusSteps = ['pending', 'confirmed', 'preparing', 'ready_for_ship', 'out_for_delivery', 'delivered'];
   const statusDetails = {
     pending: 'Your order has been placed and is awaiting confirmation from the seller.',
     confirmed: 'The seller has confirmed your order.',
     preparing: 'Your items are being prepared for shipment.',
-    shipped: 'Your order has been shipped and is on its way.',
+    ready_for_ship: 'Your order is ready for the rider to pick up.',
+    out_for_delivery: 'Your order is out for delivery.',
     delivered: 'Your order has been delivered. Enjoy!'
   };
 
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/orders/${orderId}`);
+        const response = await fetch(`http://localhost:3001/orders/${orderId}?_expand=deliveryPartner&_embed=deliveryVehicles`);
         if (!response.ok) {
           throw new Error('Order not found.');
         }
         const data = await response.json();
+
         setOrder(data);
       } catch (err) {
         setError(err.message);
@@ -42,6 +44,19 @@ const OrderTrackingPage = () => {
 
   const currentStatusIndex = statusSteps.indexOf(order.status);
 
+  // Define dummy rider info for orders in 'shipped' or later stages without a real assigned partner
+  const dummyRider = {
+    name: 'Alex Ray',
+    phone: '555-012-3456',
+    vehicle: {
+      vehicleType: 'Bike',
+      vehicleNumber: 'UP32 XY 5678'
+    }
+  };
+
+  // Determine which rider info to show. If status is shipped or later, show dummy info if no real partner exists.
+  const riderInfo = order.deliveryPartner || (currentStatusIndex >= 4 ? dummyRider : null);
+
   return (
     <div className="order-tracking-container">
       <Link to="/my-orders" className="back-link">&larr; Back to My Orders</Link>
@@ -51,6 +66,17 @@ const OrderTrackingPage = () => {
         <p><strong>Date:</strong> {new Date(order.orderDate).toLocaleDateString()}</p>
         <p><strong>Total:</strong> ${order.totalAmount.toFixed(2)}</p>
       </div>
+
+      {riderInfo && (
+        <div className="rider-info-card">
+          <h2>Rider Information</h2>
+          <div className="rider-details">
+            <p><strong>Name:</strong> {riderInfo.name}</p>
+            <p><strong>Phone:</strong> <a href={`tel:${riderInfo.phone}`}>{riderInfo.phone}</a></p>
+            <p><strong>Vehicle:</strong> {riderInfo.vehicle ? `${riderInfo.vehicle.vehicleType} (${riderInfo.vehicle.vehicleNumber})` : 'N/A'}</p>
+          </div>
+        </div>
+      )}
 
       <div className="tracking-timeline">
         <h2>Order Status</h2>

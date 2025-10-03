@@ -10,6 +10,7 @@ const DeliveryPartnerDashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [partnerProfile, setPartnerProfile] = useState(null);
+  const [showCompleted, setShowCompleted] = useState(false);
   
   useEffect(() => {
     if (!currentUser || currentUser.userType !== 'delivery_partner') return;
@@ -41,7 +42,11 @@ const DeliveryPartnerDashboardPage = () => {
   }, [currentUser]);
 
   const activeOrders = useMemo(() => {
-    return assignedOrders.filter(o => o.status === 'preparing' || o.status === 'shipped');
+    return assignedOrders.filter(o => ['ready_for_ship', 'out_for_delivery'].includes(o.status));
+  }, [assignedOrders]);
+
+  const completedOrders = useMemo(() => {
+    return assignedOrders.filter(o => o.status === 'delivered' || o.status === 'completed');
   }, [assignedOrders]);
 
   const handleStatusUpdate = async (orderId, newStatus) => {
@@ -64,6 +69,22 @@ const DeliveryPartnerDashboardPage = () => {
     navigate('/welcome');
   };
 
+  const handleAvailabilityToggle = async () => {
+    if (!partnerProfile) return;
+
+    const newAvailability = !partnerProfile.isAvailable;
+    try {
+      const response = await fetch(`http://localhost:3001/deliveryPartners/${partnerProfile.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isAvailable: newAvailability }),
+      });
+      if (!response.ok) throw new Error('Failed to update availability.');
+      setPartnerProfile(prev => ({ ...prev, isAvailable: newAvailability }));
+    } catch (err) {
+      alert(err.message);
+    }
+  };
   if (!currentUser || currentUser.userType !== 'delivery_partner') {
     return <Navigate to="/products" />;
   }
@@ -75,7 +96,15 @@ const DeliveryPartnerDashboardPage = () => {
     <div className="dp-dashboard-container">
       <div className="dp-dashboard-header">
         <h1>Delivery Dashboard</h1>
-        <button onClick={handleLogout} className="btn btn-secondary">Logout</button>
+        <div className="dp-header-actions">
+          <div className="availability-toggle">
+            <span className={`status-text ${partnerProfile?.isAvailable ? 'available' : 'unavailable'}`}>
+              {partnerProfile?.isAvailable ? 'Available' : 'Unavailable'}
+            </span>
+            <label className="switch"><input type="checkbox" checked={partnerProfile?.isAvailable || false} onChange={handleAvailabilityToggle} /><span className="slider round"></span></label>
+          </div>
+          <button onClick={handleLogout} className="btn btn-secondary">Logout</button>
+        </div>
       </div>
       <p>Welcome, <strong>{currentUser.name}</strong>!</p>
 
@@ -93,12 +122,12 @@ const DeliveryPartnerDashboardPage = () => {
                   <p><strong>Status:</strong> <span className={`status-badge status-${order.status}`}>{order.status.replace('_', ' ')}</span></p>
                 </div>
               <div className="dp-order-actions">
-                {order.status === 'preparing' && (
-                    <button className="btn btn-primary" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleStatusUpdate(order.id, 'shipped'); }}>
-                    Mark as Shipped
+                {order.status === 'ready_for_ship' && (
+                    <button className="btn btn-primary" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleStatusUpdate(order.id, 'out_for_delivery'); }}>
+                    Pick Up Order
                   </button>
                 )}
-                {order.status === 'shipped' && (
+                {order.status === 'out_for_delivery' && (
                     <button className="btn btn-success" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleStatusUpdate(order.id, 'delivered'); }}>
                     Mark as Delivered
                   </button>
@@ -109,6 +138,29 @@ const DeliveryPartnerDashboardPage = () => {
           ))
         ) : (
           <p>You have no active deliveries right now.</p>
+        )}
+      </div>
+
+      <div className="dp-orders-list completed-deliveries">
+        <div className="completed-header">
+          <h2>Completed Deliveries ({completedOrders.length})</h2>
+          <button className="btn-toggle-completed" onClick={() => setShowCompleted(!showCompleted)}>
+            {showCompleted ? 'Hide' : 'Show'}
+          </button>
+        </div>
+        {showCompleted && (
+          <div className="completed-orders-grid">
+            {completedOrders.length > 0 ? (
+              completedOrders.map(order => (
+                <Link key={order.id} to={`/delivery/orders/${order.id}`} className="dp-order-card-link">
+                  <div className="dp-order-card dp-order-card-completed">
+                    <h3>Order #{order.id}</h3>
+                    <p><span className={`status-badge status-${order.status}`}>{order.status}</span></p>
+                  </div>
+                </Link>
+              ))
+            ) : <p>No completed deliveries to show.</p>}
+          </div>
         )}
       </div>
     </div>

@@ -31,6 +31,40 @@
   box-sizing: border-box;
 }
 
+.image-upload-wrapper {
+  flex-grow: 1;
+}
+
+.image-file-input {
+  display: none; /* Hide the default file input */
+}
+
+.image-file-label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 150px;
+  border: 2px dashed #ced4da;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+  color: #adb5bd;
+  font-weight: 700;
+}
+
+.image-file-label:hover {
+  border-color: #7B2CBF;
+  background-color: #f8f9fa;
+}
+
+.image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
 .image-url-field {
   display: flex;
   align-items: center;

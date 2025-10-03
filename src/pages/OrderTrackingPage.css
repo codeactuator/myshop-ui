@@ -14,6 +14,28 @@
   justify-content: space-between;
 }
 
+.rider-info-card {
+  background-color: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.rider-info-card h2 {
+  margin-top: 0;
+}
+
+.rider-details p {
+  margin: 0.5rem 0;
+}
+.rider-details a {
+  color: #7B2CBF;
+  text-decoration: none;
+}
+.rider-details a:hover {
+  text-decoration: underline;
+}
 .tracking-timeline {
   margin-bottom: 3rem;
 }

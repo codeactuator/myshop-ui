@@ -26,10 +26,19 @@ const AddProductPage = () => {
     setProduct(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleImageUrlChange = (index, value) => {
-    const newImageUrls = [...product.imageUrls];
-    newImageUrls[index] = value;
-    setProduct(prev => ({ ...prev, imageUrls: newImageUrls }));
+  const handleImageFileChange = (index, file) => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const newImageUrls = [...product.imageUrls];
+        newImageUrls[index] = reader.result; // reader.result contains the base64 data URL
+        setProduct(prev => ({
+          ...prev,
+          imageUrls: newImageUrls,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const addImageUrlField = () => {
@@ -100,7 +109,18 @@ const AddProductPage = () => {
           <label>Image URLs</label>
           {product.imageUrls.map((url, index) => (
             <div key={index} className="image-url-field">
-              <input type="url" placeholder="https://example.com/image.jpg" value={url} onChange={(e) => handleImageUrlChange(index, e.target.value)} required />
+              <div className="image-upload-wrapper">
+                <input
+                  type="file"
+                  id={`image-upload-${index}`}
+                  className="image-file-input"
+                  accept="image/png, image/jpeg, image/webp"
+                  onChange={(e) => handleImageFileChange(index, e.target.files[0])}
+                />
+                <label htmlFor={`image-upload-${index}`} className="image-file-label">
+                  {url ? <img src={url} alt="Preview" className="image-preview" /> : <span>+ Click to upload</span>}
+                </label>
+              </div>
               {product.imageUrls.length > 1 && (
                 <button type="button" className="remove-image-btn" onClick={() => removeImageUrlField(index)}>&times;</button>
               )}

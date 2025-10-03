@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Navigate, Link, Outlet, NavLink } from 'react-router-dom';
+import { Navigate, Link, Outlet, NavLink, useNavigate } from 'react-router-dom';
 import './AdminDashboardPage.css';
 
 const AdminDashboardPage = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, logout } = useAuth();
   const [users, setUsers] = useState([]);
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [deliveryPartners, setDeliveryPartners] = useState([]);
   const [reports, setReports] = useState([]);
@@ -34,9 +35,25 @@ const AdminDashboardPage = () => {
         const reportsData = await reportsResponse.json();
         const deliveryPartnersData = await deliveryPartnersResponse.json();
 
+        // Enrich products with seller info
+        const usersMap = new Map(usersData.map(u => [u.id, u]));
+        const enrichedProducts = productsData.map(p => ({
+          ...p,
+          seller: usersMap.get(p.userId)
+        }));
+
+        // Enrich orders with seller(s) info
+        const enrichedOrders = ordersData.map(order => {
+          const sellerIds = new Set(order.items?.map(item => item.userId).filter(Boolean));
+          return {
+            ...order,
+            sellers: [...sellerIds].map(id => usersMap.get(String(id))).filter(Boolean)
+          };
+        });
+
         setUsers(usersData);
-        setOrders(ordersData);
-        setProducts(productsData);
+        setOrders(enrichedOrders);
+        setProducts(enrichedProducts);
         setReports(reportsData);
         setDeliveryPartners(deliveryPartnersData);
       } catch (err) {
@@ -75,9 +92,31 @@ const AdminDashboardPage = () => {
   }, [products]);
 
   const unassignedOrders = useMemo(() => {
-    return orders.filter(order => order.status === 'pending' && !order.deliveryPartnerId);
+    return orders.filter(order => order.status === 'ready_for_ship' && !order.deliveryPartnerId);
   }, [orders]);
 
+  const partnerAvailability = useMemo(() => {
+    return deliveryPartners.reduce((acc, partner) => {
+      if (partner.isAvailable) {
+        acc.available += 1;
+      } else {
+        acc.unavailable += 1;
+      }
+      return acc;
+    }, { available: 0, unavailable: 0 });
+  }, [deliveryPartners]);
+
+  const ordersByStatus = useMemo(() => {
+    const statusCounts = orders.reduce((acc, order) => {
+      const status = order.status || 'unknown';
+      acc[status] = (acc[status] || 0) + 1;
+      return acc;
+    }, {});
+    return {
+      labels: Object.keys(statusCounts).map(s => s.replace('_', ' ')),
+      data: Object.values(statusCounts),
+    };
+  }, [orders]);
   const handleManualAssign = async (orderId, partnerId) => {
     if (!partnerId) {
       alert('Please select a delivery partner.');
@@ -87,7 +126,7 @@ const AdminDashboardPage = () => {
       const response = await fetch(`http://localhost:3001/orders/${orderId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ deliveryPartnerId: partnerId, status: 'preparing' }),
+        body: JSON.stringify({ deliveryPartnerId: partnerId, status: 'out_for_delivery' }),
       });
       if (!response.ok) throw new Error('Failed to assign order.');
       const updatedOrder = await response.json();
@@ -124,6 +163,11 @@ const AdminDashboardPage = () => {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/welcome');
+  };
+
   // Protect this route
   if (!currentUser || currentUser.userType !== 'admin') {
     return <Navigate to="/products" />;
@@ -136,28 +180,37 @@ const AdminDashboardPage = () => {
     <div className="admin-dashboard-container">
       <aside className="admin-sidebar">
         <nav>
+          <NavLink to="/admin/dashboard" end>Home</NavLink>
           <NavLink to="/admin/dashboard/users">Users</NavLink>
           <NavLink to="/admin/dashboard/products">Products</NavLink>
-          <NavLink to="/admin/dashboard/transactions">Transactions</NavLink>
+          <NavLink to="/admin/dashboard/orders">Orders</NavLink>
           <NavLink to="/admin/dashboard/delivery-fleet">Delivery Fleet</NavLink>
           <NavLink to="/admin/dashboard/reports">Reports</NavLink>
         </nav>
       </aside>
       <div className="admin-main-content">
-        <Outlet context={{
-          users,
-          orders,
-          setOrders,
-          products,
-          reports,
-          deliveryPartners,
-          unassignedOrders,
-          handleManualAssign,
-          handleAutoAssign,
-          popularCategories,
-          totalRevenue,
-          activeUsersCount
-        }} />
+        <div className="admin-header">
+          <h1>Admin Dashboard</h1>
+          <button onClick={handleLogout} className="btn btn-secondary">Logout</button>
+        </div>
+        <div className="admin-page-content">
+          <Outlet context={{
+            users,
+            orders,
+            setOrders,
+            products,
+            reports,
+            deliveryPartners,
+            unassignedOrders,
+            handleManualAssign,
+            handleAutoAssign,
+            popularCategories,
+            totalRevenue,
+            activeUsersCount,
+            partnerAvailability,
+            ordersByStatus
+          }} />
+        </div>
       </div>
     </div>
   );

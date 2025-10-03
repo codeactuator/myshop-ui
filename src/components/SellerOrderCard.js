@@ -1,18 +1,70 @@
 import React from 'react';
+import { useAuth } from '../context/AuthContext';
 import './SellerOrderCard.css';
 
-const SellerOrderCard = ({ order, sellerItems, onUpdateStatus }) => {
-  const { buyerInfo, fulfillmentMethod, paymentMethod, status } = order;
+const SellerOrderCard = ({ order, onUpdate }) => {
+  const { currentUser } = useAuth();
+
+  // Filter to show only items by the current seller
+  const sellerItems = order.items.filter(item => item.userId === currentUser.id);
+
+  const handleMarkAsReady = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/orders/${order.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'ready_for_ship' }),
+      });
+      if (!response.ok) throw new Error('Failed to update order status.');
+      onUpdate(order.id, 'ready_for_ship');
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleConfirmOrder = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/orders/${order.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'confirmed' }),
+      });
+      if (!response.ok) throw new Error('Failed to confirm order.');
+      onUpdate(order.id, 'confirmed');
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleStartPreparing = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/orders/${order.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'preparing' }),
+      });
+      if (!response.ok) throw new Error('Failed to update order status.');
+      onUpdate(order.id, 'preparing');
+    } catch (err) {
+      alert(err.message);
+    }
+  };
 
   return (
     <div className="seller-order-card">
       <div className="seller-order-header">
         <h3>Order #{order.id}</h3>
-        <span className={`status-badge status-${status}`}>{status.replace('_', ' ')}</span>
+        <span className={`status-badge status-${order.status}`}>{order.status.replace('_', ' ')}</span>
       </div>
       <div className="seller-order-details">
         <div className="order-section">
-          <h4>Items to Fulfill</h4>
+          <h4>Buyer Information</h4>
+          <p><strong>Name:</strong> {order.buyerInfo.name}</p>
+          <p><strong>Address:</strong> {order.buyerInfo.apartmentNumber}</p>
+          <p><strong>Phone:</strong> {order.buyerInfo.phone}</p>
+        </div>
+        <div className="order-section">
+          <h4>Your Items in this Order</h4>
           {sellerItems.map(item => (
             <div key={item.id} className="order-item-summary">
               <span>{item.name} (x{item.quantity})</span>
@@ -20,23 +72,21 @@ const SellerOrderCard = ({ order, sellerItems, onUpdateStatus }) => {
             </div>
           ))}
         </div>
-        <div className="order-section">
-          <h4>Buyer Information</h4>
-          <p><strong>Name:</strong> {buyerInfo.name}</p>
-          {fulfillmentMethod === 'delivery' && <p><strong>Address:</strong> {buyerInfo.apartmentNumber}</p>}
-          <p><strong>Fulfillment:</strong> {fulfillmentMethod}</p>
-          <p><strong>Payment:</strong> {paymentMethod.toUpperCase()}</p>
-        </div>
       </div>
       <div className="seller-order-actions">
-        {status === 'pending' && (
-          <button className="btn btn-primary" onClick={() => onUpdateStatus(order.id, 'confirmed')}>
+        {order.status === 'pending' && (
+          <button className="btn btn-success" onClick={handleConfirmOrder}>
             Confirm Order
           </button>
         )}
-        {status === 'confirmed' && (
-          <button className="btn btn-primary" onClick={() => onUpdateStatus(order.id, 'preparing')}>
+        {order.status === 'confirmed' && (
+          <button className="btn btn-primary" onClick={handleStartPreparing}>
             Start Preparing
+          </button>
+        )}
+        {order.status === 'preparing' && (
+          <button className="btn btn-primary" onClick={handleMarkAsReady}>
+            Mark as Ready for Ship
           </button>
         )}
       </div>

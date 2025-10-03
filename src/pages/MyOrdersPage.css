@@ -4,6 +4,29 @@
   padding: 2rem;
 }
 
+.order-filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.order-filters button {
+  background: none;
+  border: 1px solid #ced4da;
+  padding: 0.5rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: #555;
+  border-radius: 20px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.order-filters button.active {
+  background-color: #7B2CBF;
+  color: #fff;
+  border-color: #7B2CBF;
+}
+
 .orders-list {
   display: flex;
   flex-direction: column;
@@ -50,14 +73,19 @@
   text-transform: capitalize;
 }
 
-.status-pending, .status-awaiting_payment {
+.status-pending {
   background-color: #fff3cd;
   color: #856404;
 }
 
-.status-confirmed, .status-shipped, .status-preparing {
+.status-confirmed, .status-preparing, .status-ready_for_ship {
   background-color: #d1ecf1;
   color: #0c5460;
+}
+
+.status-out_for_delivery {
+  background-color: #cce5ff;
+  color: #004085;
 }
 
 .status-delivered, .status-completed {

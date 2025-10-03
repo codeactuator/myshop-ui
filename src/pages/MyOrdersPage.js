@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import './MyOrdersPage.css';
@@ -8,6 +8,7 @@ const MyOrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'active', 'completed'
 
   useEffect(() => {
     if (!currentUser) {
@@ -33,17 +34,35 @@ const MyOrdersPage = () => {
     fetchOrders();
   }, [currentUser]);
 
+  const filteredOrders = useMemo(() => {
+    if (statusFilter === 'active') {
+      return orders.filter(o => o.status !== 'delivered' && o.status !== 'completed' && o.status !== 'cancelled');
+    }
+    if (statusFilter === 'completed') {
+      return orders.filter(o => o.status === 'delivered' || o.status === 'completed');
+    }
+    // 'all'
+    return orders;
+  }, [orders, statusFilter]);
+
   if (loading) return <div className="page-status">Loading your orders...</div>;
   if (error) return <div className="page-status">Error: {error}</div>;
 
   return (
     <div className="my-orders-container">
       <h1>My Orders</h1>
-      {orders.length === 0 ? (
+
+      <div className="order-filters">
+        <button className={statusFilter === 'all' ? 'active' : ''} onClick={() => setStatusFilter('all')}>All Orders</button>
+        <button className={statusFilter === 'active' ? 'active' : ''} onClick={() => setStatusFilter('active')}>Active</button>
+        <button className={statusFilter === 'completed' ? 'active' : ''} onClick={() => setStatusFilter('completed')}>Completed</button>
+      </div>
+
+      {filteredOrders.length === 0 ? (
         <p>You haven't placed any orders yet.</p>
       ) : (
         <div className="orders-list">
-          {orders.map(order => (
+          {filteredOrders.map(order => (
             <Link to={`/orders/${order.id}`} key={order.id} className="order-card-link">
               <div className="order-card">
                 <div className="order-card-header">

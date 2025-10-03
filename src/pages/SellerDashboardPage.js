@@ -1,26 +1,33 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { Navigate, Link } from 'react-router-dom';
 import SellerOrderCard from '../components/SellerOrderCard';
 import './SellerDashboardPage.css';
-import { Link } from 'react-router-dom';
-import { Navigate } from 'react-router-dom';
 
 const SellerDashboardPage = () => {
   const { currentUser } = useAuth();
-
-  const [allOrders, setAllOrders] = useState([]);
-  const [error, setError] = useState(null);
+  const [sellerOrders, setSellerOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchAllOrders = async () => {
+    if (!currentUser || currentUser.userType !== 'seller') {
+      setLoading(false);
+      return;
+    }
+
+    const fetchSellerOrders = async () => {
       try {
+        // Fetch all orders and filter for those containing the seller's items
         const response = await fetch('http://localhost:3001/orders');
-        if (!response.ok) {
-          throw new Error('Failed to fetch orders.');
-        }
-        const data = await response.json();
-        setAllOrders(data.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate)));
+        if (!response.ok) throw new Error('Failed to fetch orders.');
+        const allOrders = await response.json();
+
+        const myOrders = allOrders.filter(order =>
+          order.items && order.items.some(item => item.userId === currentUser.id)
+        );
+
+        setSellerOrders(myOrders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate)));
       } catch (err) {
         setError(err.message);
       } finally {
@@ -28,57 +35,35 @@ const SellerDashboardPage = () => {
       }
     };
 
-    fetchAllOrders();
-  }, []);
+    fetchSellerOrders();
+  }, [currentUser]);
 
-  const sellerOrders = useMemo(() => {
-    if (!currentUser) return [];
-    return allOrders
-      .map(order => {
-        const sellerItems = order.items?.filter(item => item.userId === currentUser.id);
-        return sellerItems && sellerItems.length > 0 ? { ...order, sellerItems } : null;
-      })
-      .filter(Boolean); // Remove null entries
-  }, [allOrders, currentUser]);
-
-  const handleUpdateStatus = async (orderId, newStatus) => {
-    try {
-      const response = await fetch(`http://localhost:3001/orders/${orderId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus }),
-      });
-      if (!response.ok) throw new Error('Failed to update status.');
-
-      // Update local state to reflect the change immediately
-      setAllOrders(prevOrders =>
-        prevOrders.map(order =>
-          order.id === orderId ? { ...order, status: newStatus } : order
-        )
-      );
-    } catch (err) {
-      alert(err.message);
-    }
+  const handleOrderStatusUpdate = (orderId, newStatus) => {
+    setSellerOrders(prevOrders =>
+      prevOrders.map(order =>
+        order.id === orderId ? { ...order, status: newStatus } : order
+      )
+    );
   };
 
-  if (loading) return <div className="page-status">Loading dashboard...</div>;
+  if (!currentUser || currentUser.userType !== 'seller') {
+    return <Navigate to="/products" />;
+  }
+
+  if (loading) return <div className="page-status">Loading your dashboard...</div>;
   if (error) return <div className="page-status">Error: {error}</div>;
 
   return (
     <div className="seller-dashboard-container">
       <div className="dashboard-header">
         <h1>Seller Dashboard</h1>
-        <Link to="/seller/add-product" className="btn btn-primary">
-          + Add New Product
-        </Link>
+        <Link to="/seller/inventory" className="btn btn-secondary">Manage Inventory</Link>
       </div>
-      <h2>Incoming Orders</h2>
-      {sellerOrders.length === 0 ? (
-        <p>You have no incoming orders.</p>
+      <h2>Your Orders</h2>
+      {sellerOrders.length > 0 ? (
+        sellerOrders.map(order => <SellerOrderCard key={order.id} order={order} onUpdate={handleOrderStatusUpdate} />)
       ) : (
-        sellerOrders.map(order => (
-          <SellerOrderCard key={order.id} order={order} sellerItems={order.sellerItems} onUpdateStatus={handleUpdateStatus} />
-        ))
+        <p>You have no orders yet.</p>
       )}
     </div>
   );

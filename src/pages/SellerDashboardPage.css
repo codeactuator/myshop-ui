@@ -4,6 +4,11 @@
   padding: 2rem;
 }
 
+.page-status {
+  text-align: center;
+  padding: 2rem;
+}
+
 .seller-dashboard-container h2 {
   margin-top: 2rem;
   margin-bottom: 1.5rem;

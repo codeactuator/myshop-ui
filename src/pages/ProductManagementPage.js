@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Navigate, Link, useOutletContext } from 'react-router-dom';
 import './ProductManagementPage.css';
@@ -9,6 +9,8 @@ const ProductManagementPage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
 
   useEffect(() => {
     const fetchProductsAndSellers = async () => {
@@ -24,6 +26,32 @@ const ProductManagementPage = () => {
 
     fetchProductsAndSellers();
   }, [allProducts]);
+
+  const categories = useMemo(() => {
+    if (!allProducts) return [];
+    const allCats = allProducts.map(p => p.category || 'Uncategorized');
+    return ['all', ...Array.from(new Set(allCats)).sort()];
+  }, [allProducts]);
+
+  const filteredProducts = useMemo(() => {
+    let tempProducts = products;
+
+    // 1. Filter by category
+    if (categoryFilter !== 'all') {
+      tempProducts = tempProducts.filter(product => (product.category || 'Uncategorized') === categoryFilter);
+    }
+
+    // 2. Filter by search query
+    if (searchQuery) {
+      tempProducts = tempProducts.filter(product => {
+        const lowerCaseQuery = searchQuery.toLowerCase();
+        const productName = product.name.toLowerCase();
+        const sellerName = (product.seller?.shopName || product.seller?.name || '').toLowerCase();
+        return productName.includes(lowerCaseQuery) || sellerName.includes(lowerCaseQuery);
+      });
+    }
+    return tempProducts;
+  }, [products, searchQuery, categoryFilter]);
 
   const handleStatusToggle = async (productId, currentStatus) => {
     const newStatus = currentStatus === 'available' ? 'unavailable' : 'available';
@@ -53,21 +81,19 @@ const ProductManagementPage = () => {
   return (
     <div className="product-management-container">
       <h1>Product Management</h1>
-      <div className="dashboard-grid">
-        <div className="dashboard-card">
-            <h2>Popular Categories</h2>
-            {popularCategories && popularCategories.length > 0 ? (
-              <ul className="admin-list">
-                {popularCategories.map(cat => (
-                  <li key={cat.name}>
-                    <span>{cat.name}</span>
-                    <span>{cat.count} listings</span>
-                  </li>
-                ))}
-              </ul>
-            ) : <p>No category data available.</p>
-            }
-        </div>
+      <div className="table-controls">
+        <input
+          type="text"
+          placeholder="Search by Product or Seller Name..."
+          className="search-input"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <select className="filter-select" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+          {categories.map(cat => (
+            <option key={cat} value={cat}>{cat === 'all' ? 'All Categories' : cat}</option>
+          ))}
+        </select>
       </div>
       <div className="product-table-container">
         <table className="product-table">
@@ -80,10 +106,10 @@ const ProductManagementPage = () => {
             </tr>
           </thead>
           <tbody>
-            {products.map(product => (
+            {filteredProducts.map(product => (
               <tr key={product.id}>
-                <td><Link to={`/products/${product.id}`}>{product.name}</Link></td>
-                <td>{product.seller?.name || 'N/A'}</td>
+                <td><Link to={`/admin/dashboard/products/${product.id}`}>{product.name}</Link></td>
+                <td>{product.seller?.shopName || product.seller?.name || 'N/A'}</td>
                 <td>${product.price.toFixed(2)}</td>
                 <td>
                   <label className="switch">
