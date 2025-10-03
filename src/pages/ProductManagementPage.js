@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Navigate, Link } from 'react-router-dom';
+import { Navigate, Link, useOutletContext } from 'react-router-dom';
 import './ProductManagementPage.css';
 
 const ProductManagementPage = () => {
   const { currentUser } = useAuth();
+  const { products: allProducts, popularCategories } = useOutletContext();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -12,25 +13,8 @@ const ProductManagementPage = () => {
   useEffect(() => {
     const fetchProductsAndSellers = async () => {
       try {
-        const [productsResponse, usersResponse] = await Promise.all([
-          fetch('http://localhost:3001/products'),
-          fetch('http://localhost:3001/users')
-        ]);
-
-        if (!productsResponse.ok || !usersResponse.ok) {
-          throw new Error('Failed to fetch data.');
-        }
-
-        const productsData = await productsResponse.json();
-        const usersData = await usersResponse.json();
-        const usersMap = new Map(usersData.map(u => [u.id, u]));
-
-        const productsWithSellers = productsData.map(product => ({
-          ...product,
-          seller: usersMap.get(product.userId)
-        }));
-
-        setProducts(productsWithSellers);
+        // Data is now coming from the parent route context
+        setProducts(allProducts);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -39,7 +23,7 @@ const ProductManagementPage = () => {
     };
 
     fetchProductsAndSellers();
-  }, []);
+  }, [allProducts]);
 
   const handleStatusToggle = async (productId, currentStatus) => {
     const newStatus = currentStatus === 'available' ? 'unavailable' : 'available';
@@ -69,6 +53,22 @@ const ProductManagementPage = () => {
   return (
     <div className="product-management-container">
       <h1>Product Management</h1>
+      <div className="dashboard-grid">
+        <div className="dashboard-card">
+            <h2>Popular Categories</h2>
+            {popularCategories && popularCategories.length > 0 ? (
+              <ul className="admin-list">
+                {popularCategories.map(cat => (
+                  <li key={cat.name}>
+                    <span>{cat.name}</span>
+                    <span>{cat.count} listings</span>
+                  </li>
+                ))}
+              </ul>
+            ) : <p>No category data available.</p>
+            }
+        </div>
+      </div>
       <div className="product-table-container">
         <table className="product-table">
           <thead>

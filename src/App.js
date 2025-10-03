@@ -16,6 +16,8 @@ import ProfilePage from './pages/ProfilePage';
 import InventoryPage from './pages/InventoryPage';
 import UserManagementPage from './pages/UserManagementPage';
 import DeliveryFleetPage from './pages/DeliveryFleetPage';
+import DeliveryPartnerDashboardPage from './pages/DeliveryPartnerDashboardPage';
+import DeliveryOrderTrackingPage from './pages/DeliveryOrderTrackingPage';
 import ProductManagementPage from './pages/ProductManagementPage';
 import TransactionManagementPage from './pages/TransactionManagementPage';
 import ReportsPage from './pages/ReportsPage';
@@ -55,6 +57,8 @@ function App() {
             <Route path="/" element={<Navigate to={initialRoute} replace />} />
             <Route path="/welcome" element={<WelcomeScreenWrapper />} />
             <Route path="/intro" element={<AppIntroScreenWrapper />} />
+            <Route path="/delivery/dashboard" element={<DeliveryPartnerDashboardPage />} />
+            <Route path="/delivery/orders/:orderId" element={<DeliveryOrderTrackingPage />} />
 
             {/* Routes with the main navbar */}
             <Route element={<MainLayout />}>

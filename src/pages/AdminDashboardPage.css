@@ -114,3 +114,30 @@
 .role-admin { background-color: #f8d7da; color: #721c24; }
 .role-seller { background-color: #d1ecf1; color: #0c5460; }
 .role-buyer { background-color: #e2e3e5; color: #383d41; }
+
+.order-assignment-item {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.order-info {
+  font-size: 1rem;
+}
+
+.assignment-actions {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.assignment-actions select {
+  flex-grow: 1;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.order-assignment-card .admin-list {
+  margin-top: 1rem;
+}

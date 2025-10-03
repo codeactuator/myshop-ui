@@ -86,6 +86,16 @@
       "shopName": "Anjali's Artistry",
       "isVerified": true,
       "isBlocked": false
+    },
+    {
+      "id": "dp_user_1",
+      "name": "Ravi Kumar",
+      "apartmentNumber": "DP-01",
+      "email": "ravi@example.com",
+      "phone": "9876543210",
+      "userType": "delivery_partner",
+      "isVerified": true,
+      "isBlocked": false
     }
   ],
   "products": [
@@ -364,7 +374,8 @@
       ],
       "totalAmount": 15.5,
       "orderDate": "2025-09-28T18:59:10.731Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "ba9f",
@@ -405,7 +416,8 @@
       ],
       "totalAmount": 15.5,
       "orderDate": "2025-09-28T18:59:49.492Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "aa38",
@@ -433,7 +445,8 @@
       ],
       "totalAmount": 5.5,
       "orderDate": "2025-09-28T19:06:26.480Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "888b",
@@ -476,7 +489,8 @@
       ],
       "totalAmount": 15.5,
       "orderDate": "2025-09-28T19:11:47.203Z",
-      "status": "pending"
+      "status": "awaiting_payment",
+      "deliveryPartnerId": null
     },
     {
       "id": "4991",
@@ -519,7 +533,8 @@
       ],
       "totalAmount": 15.5,
       "orderDate": "2025-09-28T19:12:02.335Z",
-      "status": "pending"
+      "status": "awaiting_payment",
+      "deliveryPartnerId": null
     },
     {
       "id": "f7f7",
@@ -562,7 +577,8 @@
       ],
       "totalAmount": 15.5,
       "orderDate": "2025-09-28T19:13:00.069Z",
-      "status": "pending"
+      "status": "awaiting_payment",
+      "deliveryPartnerId": null
     },
     {
       "id": "89bd",
@@ -591,7 +607,8 @@
       ],
       "totalAmount": 5.5,
       "orderDate": "2025-09-28T19:16:25.343Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "5752",
@@ -620,7 +637,8 @@
       ],
       "totalAmount": 5.5,
       "orderDate": "2025-09-28T19:18:51.332Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "738a",
@@ -649,7 +667,8 @@
       ],
       "totalAmount": 5.5,
       "orderDate": "2025-09-28T19:19:02.816Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "5b1f",
@@ -678,7 +697,8 @@
       ],
       "totalAmount": 5.5,
       "orderDate": "2025-09-28T19:21:56.614Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "67fe",
@@ -707,7 +727,8 @@
       ],
       "totalAmount": 5.5,
       "orderDate": "2025-09-28T19:22:13.108Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "2e6e",
@@ -736,7 +757,8 @@
       ],
       "totalAmount": 5.5,
       "orderDate": "2025-09-28T19:23:05.007Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "0fdd",
@@ -765,7 +787,8 @@
       ],
       "totalAmount": 5.5,
       "orderDate": "2025-09-28T19:26:18.485Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "0a56",
@@ -794,7 +817,8 @@
       ],
       "totalAmount": 5.5,
       "orderDate": "2025-09-28T19:26:36.677Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "e077",
@@ -824,7 +848,8 @@
       ],
       "totalAmount": 2,
       "orderDate": "2025-09-28T19:32:48.810Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "b75a",
@@ -854,7 +879,8 @@
       ],
       "totalAmount": 2,
       "orderDate": "2025-09-28T19:33:32.257Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "4812",
@@ -884,7 +910,8 @@
       ],
       "totalAmount": 2,
       "orderDate": "2025-09-28T19:33:41.441Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "063c",
@@ -914,7 +941,8 @@
       ],
       "totalAmount": 18,
       "orderDate": "2025-09-28T19:35:59.768Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "d6b5",
@@ -944,7 +972,8 @@
       ],
       "totalAmount": 18,
       "orderDate": "2025-09-28T19:37:40.132Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "7d77",
@@ -974,7 +1003,8 @@
       ],
       "totalAmount": 18,
       "orderDate": "2025-09-28T19:37:46.139Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "1884",
@@ -1018,7 +1048,8 @@
       ],
       "totalAmount": 44,
       "orderDate": "2025-09-28T19:43:46.502Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "6a36",
@@ -1064,7 +1095,8 @@
       ],
       "totalAmount": 61.5,
       "orderDate": "2025-09-28T19:53:43.719Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "e933",
@@ -1094,7 +1126,8 @@
       ],
       "totalAmount": 15,
       "orderDate": "2025-09-28T19:55:33.808Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "4bdc",
@@ -1125,7 +1158,8 @@
       ],
       "totalAmount": 45,
       "orderDate": "2025-09-29T18:31:20.275Z",
-      "status": "pending"
+      "status": "delivered",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "eff3",
@@ -1156,7 +1190,8 @@
       ],
       "totalAmount": 45,
       "orderDate": "2025-09-29T18:43:46.481Z",
-      "status": "pending"
+      "status": "preparing",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "e9c2",
@@ -1215,7 +1250,7 @@
       ],
       "totalAmount": 12,
       "orderDate": "2025-09-29T20:39:35.708Z",
-      "status": "pending"
+      "status": "preparing"
     },
     {
       "id": "185a",
@@ -1310,7 +1345,8 @@
       ],
       "totalAmount": 45,
       "orderDate": "2025-09-29T21:08:12.416Z",
-      "status": "pending"
+      "status": "preparing",
+      "deliveryPartnerId": "dp1"
     },
     {
       "id": "2d3a",
@@ -1432,7 +1468,7 @@
       ],
       "totalAmount": 12,
       "orderDate": "2025-10-01T03:58:59.273Z",
-      "status": "pending"
+      "status": "preparing"
     },
     {
       "id": "ce95",
@@ -1474,6 +1510,131 @@
       "totalAmount": 45,
       "orderDate": "2025-10-01T04:05:37.095Z",
       "status": "awaiting_payment"
+    },
+    {
+      "id": "916d",
+      "userId": "4",
+      "buyerInfo": {
+        "name": "Shekhar Kumar",
+        "apartmentNumber": "H-602",
+        "phone": "8264481868"
+      },
+      "fulfillmentMethod": "delivery",
+      "paymentMethod": "cod",
+      "items": [
+        {
+          "id": "15",
+          "name": "Fresh Milk (1L)",
+          "description": "One liter carton of fresh, full-fat milk. Expires in 3 days.",
+          "price": 2,
+          "category": "Dairy",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1620189507195-68309c04c4d0?q=80&w=1964"
+          ],
+          "status": "available",
+          "postedDate": "2023-11-04T09:00:00Z",
+          "userId": "2",
+          "user": {
+            "id": "2",
+            "name": "Bob Williams",
+            "apartmentNumber": "B-204",
+            "email": "bob@example.com",
+            "phone": "2345678901",
+            "userType": "seller",
+            "shopName": "Bob's Bargains",
+            "isVerified": false,
+            "isBlocked": false
+          },
+          "quantity": 1
+        }
+      ],
+      "totalAmount": 2,
+      "orderDate": "2025-10-03T05:46:55.054Z",
+      "status": "pending"
+    },
+    {
+      "id": "7ca6",
+      "userId": "4",
+      "buyerInfo": {
+        "name": "Shekhar Kumar",
+        "apartmentNumber": "H-602",
+        "phone": "8264481868"
+      },
+      "fulfillmentMethod": "delivery",
+      "paymentMethod": "cod",
+      "items": [
+        {
+          "id": "1",
+          "name": "Vintage Wooden Chair",
+          "description": "A beautifully crafted wooden chair, perfect for a study or living room. Minor wear and tear.",
+          "price": 45,
+          "category": "Furniture",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?q=80&w=1887",
+            "https://images.unsplash.com/photo-1503602642458-232111445657?q=80&w=1887",
+            "https://images.unsplash.com/photo-1494903446931-37516c43ea15?q=80&w=1887"
+          ],
+          "status": "available",
+          "postedDate": "2023-10-26T10:00:00Z",
+          "userId": "1",
+          "user": {
+            "id": "1",
+            "name": "Alice Johnson",
+            "apartmentNumber": "A-101",
+            "email": "alice@example.com",
+            "phone": "1234567890",
+            "userType": "seller",
+            "shopName": "Alice's Attic",
+            "isVerified": true,
+            "isBlocked": false
+          },
+          "quantity": 1
+        }
+      ],
+      "totalAmount": 45,
+      "orderDate": "2025-10-03T05:47:51.981Z",
+      "status": "pending"
+    },
+    {
+      "id": "b278",
+      "userId": "4",
+      "buyerInfo": {
+        "name": "Shekhar Kumar",
+        "apartmentNumber": "H-602",
+        "phone": "8264481868"
+      },
+      "fulfillmentMethod": "delivery",
+      "paymentMethod": "upi",
+      "items": [
+        {
+          "id": "2",
+          "name": "Used 'The Great Gatsby' Book",
+          "description": "Paperback copy of the classic novel. In good condition.",
+          "price": 5.5,
+          "category": "Books",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1589998059171-988d887df646?q=80&w=2070"
+          ],
+          "status": "available",
+          "postedDate": "2023-10-27T14:30:00Z",
+          "userId": "2",
+          "user": {
+            "id": "2",
+            "name": "Bob Williams",
+            "apartmentNumber": "B-204",
+            "email": "bob@example.com",
+            "phone": "2345678901",
+            "userType": "seller",
+            "shopName": "Bob's Bargains",
+            "isVerified": false,
+            "isBlocked": false
+          },
+          "quantity": 1
+        }
+      ],
+      "totalAmount": 5.5,
+      "orderDate": "2025-10-03T05:48:17.271Z",
+      "status": "pending"
     }
   ],
   "reviews": [
@@ -1518,8 +1679,45 @@
     },
     {
       "vehicleNumber": "DL 04324",
-      "vehicleType": "Truck"
+      "vehicleType": "Truck",
+      "id": "43db"
     }
   ],
-  "reports": []
+  "reports": [],
+  "deliveryPartners": [
+    {
+      "id": "dp1",
+      "userId": "dp_user_1",
+      "name": "Ravi Kumar",
+      "phone": "9876543210",
+      "isAvailable": true,
+      "activeDeliveries": 0,
+      "location": {
+        "lat": 12.9716,
+        "lng": 77.5946
+      }
+    },
+    {
+      "id": "dp2",
+      "name": "Sunita Singh",
+      "phone": "9876543211",
+      "isAvailable": true,
+      "activeDeliveries": 2,
+      "location": {
+        "lat": 12.972,
+        "lng": 77.6
+      }
+    },
+    {
+      "id": "a9e1",
+      "name": "Pankaj",
+      "phone": "2233445566",
+      "isAvailable": true,
+      "activeDeliveries": 0,
+      "location": {
+        "lat": 12.9716,
+        "lng": 77.5946
+      }
+    }
+  ]
 }

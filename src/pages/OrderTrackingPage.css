@@ -104,6 +104,12 @@
 }
 
 @media (max-width: 768px) {
+  .order-summary-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
   .timeline {
     flex-direction: column;
     align-items: flex-start;

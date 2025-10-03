@@ -1,0 +1,109 @@
+.dp-dashboard-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+}
+
+.dp-dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.dp-orders-list {
+  margin-top: 2rem;
+}
+
+.dp-order-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.dp-order-card {
+  background-color: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap; /* Allow items to wrap onto the next line */
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.dp-order-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+}
+
+.dp-order-info {
+  flex-grow: 1;
+  flex-basis: 250px; /* Set a base size before growing/shrinking */
+}
+
+.dp-order-info h3 {
+  margin-top: 0;
+}
+
+.dp-order-info p {
+  margin: 0.5rem 0;
+  color: #495057;
+}
+
+.dp-order-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: stretch;
+  flex-basis: 200px; /* Set a base size */
+}
+
+.dp-order-actions .btn {
+  width: 100%;
+  text-align: center;
+}
+
+/* Re-using status-badge styles */
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.status-preparing {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.status-shipped {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+@media (max-width: 768px) {
+  .dp-dashboard-container {
+    padding: 1rem;
+  }
+
+  .dp-dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .dp-order-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dp-order-actions {
+    width: 100%;
+    margin-top: 1rem;
+  }
+}

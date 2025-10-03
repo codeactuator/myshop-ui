@@ -46,7 +46,11 @@ const WelcomeScreen = ({ onNavigate }) => {
           }
 
           closeModal();
-          onNavigate('products'); // Navigate to products page
+          if (user.userType === 'delivery_partner') {
+            navigate('/delivery/dashboard');
+          } else {
+            onNavigate('products'); // Navigate to products page
+          }
         } else {
           alert('No user found with this mobile number. Please sign up.');
         }

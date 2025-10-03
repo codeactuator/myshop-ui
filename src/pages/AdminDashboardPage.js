@@ -7,6 +7,7 @@ const AdminDashboardPage = () => {
   const { currentUser } = useAuth();
   const [users, setUsers] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [deliveryPartners, setDeliveryPartners] = useState([]);
   const [reports, setReports] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,14 +16,15 @@ const AdminDashboardPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [usersResponse, ordersResponse, productsResponse, reportsResponse] = await Promise.all([
+        const [usersResponse, ordersResponse, productsResponse, reportsResponse, deliveryPartnersResponse] = await Promise.all([
           fetch('http://localhost:3001/users'),
           fetch('http://localhost:3001/orders'),
           fetch('http://localhost:3001/products'),
-          fetch('http://localhost:3001/reports')
+          fetch('http://localhost:3001/reports'),
+          fetch('http://localhost:3001/deliveryPartners'),
         ]);
 
-        if (!usersResponse.ok || !ordersResponse.ok || !productsResponse.ok || !reportsResponse.ok) {
+        if (!usersResponse.ok || !ordersResponse.ok || !productsResponse.ok || !reportsResponse.ok || !deliveryPartnersResponse.ok) {
           throw new Error('Failed to fetch dashboard data.');
         }
 
@@ -30,11 +32,13 @@ const AdminDashboardPage = () => {
         const ordersData = await ordersResponse.json();
         const productsData = await productsResponse.json();
         const reportsData = await reportsResponse.json();
+        const deliveryPartnersData = await deliveryPartnersResponse.json();
 
         setUsers(usersData);
         setOrders(ordersData);
         setProducts(productsData);
         setReports(reportsData);
+        setDeliveryPartners(deliveryPartnersData);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -70,6 +74,56 @@ const AdminDashboardPage = () => {
       .map(([name, count]) => ({ name, count }));
   }, [products]);
 
+  const unassignedOrders = useMemo(() => {
+    return orders.filter(order => order.status === 'pending' && !order.deliveryPartnerId);
+  }, [orders]);
+
+  const handleManualAssign = async (orderId, partnerId) => {
+    if (!partnerId) {
+      alert('Please select a delivery partner.');
+      return;
+    }
+    try {
+      const response = await fetch(`http://localhost:3001/orders/${orderId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ deliveryPartnerId: partnerId, status: 'preparing' }),
+      });
+      if (!response.ok) throw new Error('Failed to assign order.');
+      const updatedOrder = await response.json();
+      setOrders(orders.map(o => o.id === orderId ? updatedOrder : o));
+      alert(`Order ${orderId} assigned to partner ${partnerId}.`);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleAutoAssign = (orderId) => {
+    // Simple auto-assign logic: find the available partner with the fewest active deliveries.
+    const availablePartners = deliveryPartners.filter(p => p.isAvailable);
+    if (availablePartners.length === 0) {
+      alert('No delivery partners are available right now.');
+      return;
+    }
+
+    // Sort by workload (ascending), then by a random factor to distribute evenly
+    const sortedPartners = [...availablePartners].sort((a, b) => {
+      if (a.activeDeliveries < b.activeDeliveries) return -1;
+      if (a.activeDeliveries > b.activeDeliveries) return 1;
+      return Math.random() - 0.5;
+    });
+
+    const bestPartner = sortedPartners[0];
+
+    // In a real app, you'd also consider location.
+    // For now, we just assign to the one with the least workload.
+    if (bestPartner) {
+      handleManualAssign(orderId, bestPartner.id);
+    } else {
+      alert('Could not determine the best partner to assign.');
+    }
+  };
+
   // Protect this route
   if (!currentUser || currentUser.userType !== 'admin') {
     return <Navigate to="/products" />;
@@ -90,26 +144,20 @@ const AdminDashboardPage = () => {
         </nav>
       </aside>
       <div className="admin-main-content">
-        <h1>Admin Dashboard</h1>
-        <div className="dashboard-summary">
-          <div className="summary-card"><h3>Total Users</h3><p>{users.length}</p></div>
-          <div className="summary-card"><h3>Total Listings</h3><p>{products.length}</p></div>
-          <div className="summary-card"><h3>Active Users</h3><p>{activeUsersCount}</p></div>
-          <div className="summary-card"><h3>Total Orders</h3><p>{orders.length}</p></div>
-          <div className="summary-card"><h3>Total Revenue</h3><p>${totalRevenue.toFixed(2)}</p></div>
-          <div className="summary-card"><h3>Open Reports</h3><p>{reports.length}</p></div>
-        </div>
-        <Outlet />
-        <div className="dashboard-grid">
-          <div className="dashboard-card">
-            <h2>Popular Categories</h2>
-            <ul className="admin-list">
-              {popularCategories.map(cat => (
-                <li key={cat.name}><span>{cat.name}</span><span>{cat.count} listings</span></li>
-              ))}
-            </ul>
-          </div>
-        </div>
+        <Outlet context={{
+          users,
+          orders,
+          setOrders,
+          products,
+          reports,
+          deliveryPartners,
+          unassignedOrders,
+          handleManualAssign,
+          handleAutoAssign,
+          popularCategories,
+          totalRevenue,
+          activeUsersCount
+        }} />
       </div>
     </div>
   );
