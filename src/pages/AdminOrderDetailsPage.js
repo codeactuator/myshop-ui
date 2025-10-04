@@ -13,16 +13,22 @@ const AdminOrderDetailsPage = () => {
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/orders/${orderId}?_expand=deliveryPartner`);
+        // Step 1: Fetch the basic order first
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/orders/${orderId}`);
         if (!response.ok) {
           throw new Error('Order not found.');
         }
-        const data = await response.json();
+        let data = await response.json();
 
-        if (data.deliveryPartner && data.deliveryPartner.vehicleId) {
-          const vehicleResponse = await fetch(`${process.env.REACT_APP_API_URL}/deliveryVehicles/${data.deliveryPartner.vehicleId}`);
-          if (vehicleResponse.ok) {
-            data.deliveryPartner.vehicle = await vehicleResponse.json();
+        // Step 2: If a delivery partner is assigned, re-fetch with expand and get vehicle details
+        if (data.deliveryPartnerId) {
+          const enrichedResponse = await fetch(`${process.env.REACT_APP_API_URL}/orders/${orderId}?_expand=deliveryPartner`);
+          if (enrichedResponse.ok) {
+            data = await enrichedResponse.json();
+            if (data.deliveryPartner && data.deliveryPartner.vehicleId) {
+              const vehicleResponse = await fetch(`${process.env.REACT_APP_API_URL}/deliveryVehicles/${data.deliveryPartner.vehicleId}`);
+              if (vehicleResponse.ok) data.deliveryPartner.vehicle = await vehicleResponse.json();
+            }
           }
         }
 

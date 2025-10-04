@@ -18,12 +18,33 @@ const MyOrdersPage = () => {
 
     const fetchOrders = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/orders?userId=${currentUser.id}`);
-        if (!response.ok) {
+        // Step 1: Fetch all orders for the current user
+        const ordersResponse = await fetch(`${process.env.REACT_APP_API_URL}/orders?userId=${currentUser.id}`);
+        if (!ordersResponse.ok) {
           throw new Error('Failed to fetch orders.');
         }
-        const data = await response.json();
-        setOrders(data.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate))); // Sort by most recent
+        const ordersData = await ordersResponse.json();
+
+        // Step 2: Get all unique seller IDs from all items in the orders
+        const sellerIds = [...new Set(ordersData.flatMap(order => order.items.map(item => item.userId)).filter(Boolean))];
+
+        if (sellerIds.length === 0) {
+          setOrders(ordersData.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate)));
+          return;
+        }
+
+        // Step 3: Fetch all unique sellers
+        const usersResponse = await fetch(`${process.env.REACT_APP_API_URL}/users?${sellerIds.map(id => `id=${id}`).join('&')}`);
+        if (!usersResponse.ok) throw new Error('Failed to fetch seller information.');
+        const usersData = await usersResponse.json();
+        const usersMap = new Map(usersData.map(user => [user.id, user]));
+
+        // Step 4: Filter out orders where all items are from blocked sellers
+        const validOrders = ordersData.filter(order => 
+          order.items.some(item => usersMap.get(item.userId) && !usersMap.get(item.userId).isBlocked)
+        );
+
+        setOrders(validOrders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate)));
       } catch (err) {
         setError(err.message);
       } finally {

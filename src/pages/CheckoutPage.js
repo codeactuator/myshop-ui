@@ -39,6 +39,12 @@ const CheckoutPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!currentUser) {
+      alert("Please log in to place an order.");
+      navigate('/welcome');
+      return;
+    }
     if (cartItems.length === 0) {
       alert("Your cart is empty.");
       return;
@@ -49,12 +55,21 @@ const CheckoutPage = () => {
       ? { name: currentUser.name, apartmentNumber: currentUser.apartmentNumber, phone: currentUser.phone } 
       : formData;
 
+    // Filter out items from blocked sellers before creating the order
+    const validItems = cartItems.filter(item => !item.user?.isBlocked);
+
+    if (validItems.length === 0) {
+      alert("Your order cannot be placed as all items are from sellers who are currently unavailable.");
+      clearCart(); // Clear the invalid items from the cart
+      return;
+    }
+
     const order = {
       userId: currentUser?.id,
       buyerInfo: fulfillmentMethod === 'delivery' ? deliveryAddress : { name: currentUser.name, phone: currentUser.phone },
       fulfillmentMethod: fulfillmentMethod,
       paymentMethod: paymentMethod,
-      items: cartItems,
+      items: validItems, // Use only valid items
       totalAmount: cartTotal, 
       orderDate: new Date().toISOString(),
       status: 'pending',

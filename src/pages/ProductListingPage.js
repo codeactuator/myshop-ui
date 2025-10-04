@@ -14,30 +14,30 @@ const ProductListingPage = () => {
     const fetchProducts = async () => {
       try {
         // Step 1: Fetch all available products
-        const productsResponse = await fetch('http://localhost:3001/products?status=available');
+        const productsResponse = await fetch(`${process.env.REACT_APP_API_URL}/products?status=available`);
         if (!productsResponse.ok) {
           throw new Error('Network response was not ok');
         }
         const productsData = await productsResponse.json();
 
         // Step 2: Get all unique seller IDs from the products
-        const sellerIds = [...new Set(productsData.map(p => p.userId))];
+        const sellerIds = [...new Set(productsData.map(p => p.userId).filter(id => id))];
 
         // Step 3: Fetch all unique sellers in a single request
-        const usersResponse = await fetch(`http://localhost:3001/users?${sellerIds.map(id => `id=${id}`).join('&')}`);
+        const usersResponse = await fetch(`${process.env.REACT_APP_API_URL}/users?${sellerIds.map(id => `id=${id}`).join('&')}`);
         if (!usersResponse.ok) {
           throw new Error('Failed to fetch seller information.');
         }
         const usersData = await usersResponse.json();
         const usersMap = new Map(usersData.map(user => [user.id, user]));
 
-        // Step 4: Combine products with seller info and filter out products from blocked users
+        // Step 4: Combine products with seller info and filter out products from blocked or non-existent sellers
         const productsWithSellers = productsData
           .map(product => ({
             ...product,
             user: usersMap.get(product.userId)
           }))
-          .filter(product => product.user && !product.user.isBlocked);
+          .filter(product => product.user && !product.user.isBlocked); // Ensure user exists and is not blocked
 
         setProducts(productsWithSellers);
       } catch (err) {

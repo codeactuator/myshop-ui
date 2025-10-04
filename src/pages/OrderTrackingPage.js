@@ -22,11 +22,24 @@ const OrderTrackingPage = () => {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/orders/${orderId}?_expand=deliveryPartner&_embed=deliveryVehicles`);
+        // Step 1: Fetch the basic order first
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/orders/${orderId}`);
         if (!response.ok) {
           throw new Error('Order not found.');
         }
-        const data = await response.json();
+        let data = await response.json();
+
+        // Step 2: If a delivery partner is assigned, re-fetch with expand and get vehicle details
+        if (data.deliveryPartnerId) {
+          const enrichedResponse = await fetch(`${process.env.REACT_APP_API_URL}/orders/${orderId}?_expand=deliveryPartner`);
+          if (enrichedResponse.ok) {
+            data = await enrichedResponse.json();
+            if (data.deliveryPartner && data.deliveryPartner.vehicleId) {
+              const vehicleResponse = await fetch(`${process.env.REACT_APP_API_URL}/deliveryVehicles/${data.deliveryPartner.vehicleId}`);
+              if (vehicleResponse.ok) data.deliveryPartner.vehicle = await vehicleResponse.json();
+            }
+          }
+        }
 
         setOrder(data);
       } catch (err) {
@@ -45,19 +58,6 @@ const OrderTrackingPage = () => {
 
   const currentStatusIndex = statusSteps.indexOf(order.status);
 
-  // Define dummy rider info for orders in 'shipped' or later stages without a real assigned partner
-  const dummyRider = {
-    name: 'Alex Ray',
-    phone: '555-012-3456',
-    vehicle: {
-      vehicleType: 'Bike',
-      vehicleNumber: 'UP32 XY 5678'
-    }
-  };
-
-  // Determine which rider info to show. If status is shipped or later, show dummy info if no real partner exists.
-  const riderInfo = order.deliveryPartner || (currentStatusIndex >= 4 ? dummyRider : null);
-
   return (
     <div className="order-tracking-container">
       <Link to="/my-orders" className="back-link">&larr; Back to My Orders</Link>
@@ -68,13 +68,13 @@ const OrderTrackingPage = () => {
         <p><strong>Total:</strong> ${order.totalAmount.toFixed(2)}</p>
       </div>
 
-      {riderInfo && (
+      {order.deliveryPartner && (
         <div className="rider-info-card">
           <h2>Rider Information</h2>
           <div className="rider-details">
-            <p><strong>Name:</strong> {riderInfo.name}</p>
-            <p><strong>Phone:</strong> <a href={`tel:${riderInfo.phone}`}>{riderInfo.phone}</a></p>
-            <p><strong>Vehicle:</strong> {riderInfo.vehicle ? `${riderInfo.vehicle.vehicleType} (${riderInfo.vehicle.vehicleNumber})` : 'N/A'}</p>
+            <p><strong>Name:</strong> {order.deliveryPartner.name}</p>
+            <p><strong>Phone:</strong> <a href={`tel:${order.deliveryPartner.phone}`}>{order.deliveryPartner.phone}</a></p>
+            <p><strong>Vehicle:</strong> {order.deliveryPartner.vehicle ? `${order.deliveryPartner.vehicle.vehicleType} (${order.deliveryPartner.vehicle.vehicleNumber})` : 'N/A'}</p>
           </div>
         </div>
       )}

@@ -30,7 +30,7 @@
       "phone": "2345678901",
       "userType": "seller",
       "shopName": "Bob's Bargains",
-      "isVerified": false,
+      "isVerified": true,
       "isBlocked": false
     },
     {
@@ -41,7 +41,7 @@
       "phone": "3456789012",
       "userType": "buyer",
       "shopName": "Charlie Shop",
-      "isVerified": false,
+      "isVerified": true,
       "isBlocked": false
     },
     {
@@ -52,7 +52,7 @@
       "phone": "8264481868",
       "userType": "seller",
       "shopName": "Shekhar's Finds",
-      "isVerified": false,
+      "isVerified": true,
       "isBlocked": false
     },
     {
@@ -63,7 +63,7 @@
       "phone": "4567890123",
       "userType": "seller",
       "shopName": "Priya's Treasures",
-      "isVerified": false,
+      "isVerified": true,
       "isBlocked": false
     },
     {
@@ -74,7 +74,7 @@
       "phone": "5678901234",
       "userType": "seller",
       "shopName": "Rohan's Relics",
-      "isVerified": false,
+      "isVerified": true,
       "isBlocked": false
     },
     {
@@ -136,7 +136,7 @@
       "imageUrls": [
         "https://images.unsplash.com/photo-1622226696972-3a054526765c?q=80&w=1887"
       ],
-      "status": "sold",
+      "status": "available",
       "postedDate": "2023-10-25T09:00:00Z",
       "userId": "1"
     },
@@ -2111,6 +2111,178 @@
       "orderDate": "2025-10-04T04:42:52.133Z",
       "status": "pending",
       "deliveryPartnerId": null
+    },
+    {
+      "userId": "4",
+      "buyerInfo": {
+        "name": "Shekhar Kumar",
+        "apartmentNumber": "H-602",
+        "phone": "8264481868"
+      },
+      "fulfillmentMethod": "delivery",
+      "paymentMethod": "cod",
+      "items": [
+        {
+          "id": "6",
+          "name": "Wooden Toy Train Set",
+          "description": "Complete wooden train set with tracks and accessories. Perfect for kids aged 3-6.",
+          "price": 20,
+          "category": "Toys",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070"
+          ],
+          "status": "available",
+          "postedDate": "2023-10-29T11:30:00Z",
+          "userId": "2",
+          "user": {
+            "id": "2",
+            "name": "Bob Williams",
+            "apartmentNumber": "B-204",
+            "email": "bob@example.com",
+            "phone": "2345678901",
+            "userType": "seller",
+            "shopName": "Bob's Bargains",
+            "isVerified": false,
+            "isBlocked": false
+          },
+          "quantity": 2
+        }
+      ],
+      "totalAmount": 40,
+      "orderDate": "2025-10-04T09:53:31.626Z",
+      "status": "pending",
+      "deliveryPartnerId": null,
+      "id": "EURiGnj"
+    },
+    {
+      "userId": "4",
+      "buyerInfo": {
+        "name": "Shekhar Kumar",
+        "apartmentNumber": "H-602",
+        "phone": "8264481868"
+      },
+      "fulfillmentMethod": "delivery",
+      "paymentMethod": "cod",
+      "items": [
+        {
+          "id": "6",
+          "name": "Wooden Toy Train Set",
+          "description": "Complete wooden train set with tracks and accessories. Perfect for kids aged 3-6.",
+          "price": 20,
+          "category": "Toys",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070"
+          ],
+          "status": "available",
+          "postedDate": "2023-10-29T11:30:00Z",
+          "userId": "2",
+          "user": {
+            "id": "2",
+            "name": "Bob Williams",
+            "apartmentNumber": "B-204",
+            "email": "bob@example.com",
+            "phone": "2345678901",
+            "userType": "seller",
+            "shopName": "Bob's Bargains",
+            "isVerified": false,
+            "isBlocked": false
+          },
+          "quantity": 1
+        }
+      ],
+      "totalAmount": 20,
+      "orderDate": "2025-10-04T09:54:41.053Z",
+      "status": "pending",
+      "deliveryPartnerId": null,
+      "id": "-RIyfS4"
+    },
+    {
+      "userId": "4",
+      "buyerInfo": {
+        "name": "Shekhar Kumar",
+        "apartmentNumber": "H-602",
+        "phone": "8264481868"
+      },
+      "fulfillmentMethod": "delivery",
+      "paymentMethod": "cod",
+      "items": [
+        {
+          "id": "1",
+          "name": "Vintage Wooden Chair",
+          "description": "A beautifully crafted wooden chair, perfect for a study or living room. Minor wear and tear.",
+          "price": 45,
+          "category": "Furniture",
+          "imageUrls": [
+            "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?q=80&w=1887",
+            "https://images.unsplash.com/photo-1503602642458-232111445657?q=80&w=1887",
+            "https://images.unsplash.com/photo-1494903446931-37516c43ea15?q=80&w=1887"
+          ],
+          "status": "available",
+          "postedDate": "2023-10-26T10:00:00Z",
+          "userId": "1",
+          "user": {
+            "id": "1",
+            "name": "Alice Johnson",
+            "apartmentNumber": "A-101",
+            "email": "alice@example.com",
+            "phone": "1234567890",
+            "userType": "seller",
+            "shopName": "Alice's Attic",
+            "isVerified": true,
+            "isBlocked": false
+          },
+          "quantity": 1
+        }
+      ],
+      "totalAmount": 45,
+      "orderDate": "2025-10-04T10:20:24.643Z",
+      "status": "pending",
+      "deliveryPartnerId": null,
+      "id": "KPuXx9n"
+    },
+    {
+      "userId": "4",
+      "buyerInfo": {
+        "name": "Shekhar Kumar",
+        "apartmentNumber": "H-602",
+        "phone": "8264481868"
+      },
+      "fulfillmentMethod": "delivery",
+      "paymentMethod": "cod",
+      "items": [
+        {
+          "id": "2fa9",
+          "name": "Bath Soap",
+          "description": "Soap with beautiful fragance",
+          "price": 50,
+          "category": "Soap",
+          "imageUrls": [
+            "https://media.istockphoto.com/id/1487212836/photo/single-dry-pink-soap-bar-isolated-on-white-background-with-clipping-path.jpg?s=612x612&w=0&k=20&c=Jy7tGrpDeVFrCKlpqnAoiNeFFVc-OU2uwZI1E2rjb4Q=",
+            "https://media.istockphoto.com/id/96831795/photo/a-rectangle-piece-of-pink-soap-against-a-white-background.jpg?s=612x612&w=0&k=20&c=inUWigKAVQc69YwUZvN9MD-BtN5YWbZtc_Ad8PBC4hM=",
+            "https://www.shutterstock.com/image-photo/soap-bar-isolated-on-white-260nw-1020891106.jpg",
+            "https://tiimg.tistatic.com/fp/1/009/000/bath-soaps-930.jpg"
+          ],
+          "userId": "7",
+          "status": "available",
+          "postedDate": "2025-09-29T19:58:23.728Z",
+          "user": {
+            "id": "7",
+            "phone": "8789416315",
+            "name": "Anjali",
+            "apartmentNumber": "H-603",
+            "userType": "seller",
+            "shopName": "Anjali's Artistry",
+            "isVerified": true,
+            "isBlocked": false
+          },
+          "quantity": 1
+        }
+      ],
+      "totalAmount": 50,
+      "orderDate": "2025-10-04T14:02:30.039Z",
+      "status": "delivered",
+      "deliveryPartnerId": "dp1",
+      "id": "6cHHjW6"
     }
   ],
   "reviews": [

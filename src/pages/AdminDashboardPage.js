@@ -43,12 +43,24 @@ const AdminDashboardPage = () => {
         }));
 
         // Enrich orders with seller(s) info
-        const enrichedOrders = ordersData.map(order => {
+        const deliveryPartnersMap = new Map(deliveryPartnersData.map(p => [p.id, p]));
+        const dummyPartner = { id: 'dummy', name: 'Unassigned' };
+        const enrichedOrders = ordersData.map(order => { 
           const sellerIds = new Set(order.items?.map(item => item.userId).filter(Boolean));
-          return {
+          const finalOrder = {
             ...order,
+            deliveryPartner: deliveryPartnersMap.get(order.deliveryPartnerId),
             sellers: [...sellerIds].map(id => usersMap.get(String(id))).filter(Boolean)
           };
+
+          // If an order has no delivery partner, assign a dummy one for display purposes.
+          if (!finalOrder.deliveryPartner) {
+            finalOrder.deliveryPartner = dummyPartner;
+          }
+
+          return {
+            ...finalOrder
+          }; 
         });
 
         setUsers(usersData);
