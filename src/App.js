@@ -18,6 +18,8 @@ import UserManagementPage from './pages/UserManagementPage';
 import DeliveryFleetPage from './pages/DeliveryFleetPage';
 import DeliveryPartnerDashboardPage from './pages/DeliveryPartnerDashboardPage';
 import DeliveryOrderTrackingPage from './pages/DeliveryOrderTrackingPage';
+import SellerProductDetailsPage from './pages/SellerProductDetailsPage';
+import SellerOrderDetailsPage from './pages/SellerOrderDetailsPage';
 import AdminOrderDetailsPage from './pages/AdminOrderDetailsPage';
 import AdminProductDetailsPage from './pages/AdminProductDetailsPage';
 import ProductManagementPage from './pages/ProductManagementPage';
@@ -71,6 +73,8 @@ function App() {
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/order-success" element={<OrderSuccessPage />} />
             <Route path="/my-orders" element={<MyOrdersPage />} />
+            <Route path="/seller/products/:productId" element={<SellerProductDetailsPage />} />
+            <Route path="/seller/orders/:orderId" element={<SellerOrderDetailsPage />} />
             <Route path="/orders/:orderId" element={<OrderTrackingPage />} />
             <Route path="/seller/dashboard" element={<SellerDashboardPage />} />
             <Route path="/seller/inventory" element={<InventoryPage />} />

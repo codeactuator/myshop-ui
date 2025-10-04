@@ -53,7 +53,7 @@ const TransactionManagementPage = () => {
   const handleProcessRefund = async (orderId, refundDetails) => {
     if (window.confirm('Are you sure you want to process this refund? This action cannot be undone.')) {
       try {
-        const response = await fetch(`http://localhost:3001/orders/${orderId}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/orders/${orderId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

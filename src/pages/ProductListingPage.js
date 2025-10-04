@@ -4,7 +4,7 @@ import './ProductListingPage.css'; // This import is now correct
 
 const ProductListingPage = () => {
   const [products, setProducts] = useState([]); // Holds the original, unfiltered list of products
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(''); // This import is now correct
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -77,20 +77,29 @@ const ProductListingPage = () => {
       if (product.category.toLowerCase().includes(lowerCaseQuery)) {
         uniqueSuggestions.add(product.category);
       }
+      if (product.user?.name?.toLowerCase().includes(lowerCaseQuery)) {
+        uniqueSuggestions.add(product.user.name);
+      }
+      if (product.user?.shopName?.toLowerCase().includes(lowerCaseQuery)) {
+        uniqueSuggestions.add(product.user.shopName);
+      }
     });
 
     return Array.from(uniqueSuggestions).slice(0, 7); // Limit to 7 suggestions
   }, [searchQuery, products]);
 
   // Filter products based on the search query
-  const filteredProducts = useMemo(() =>
-    products.filter(product => {
+  const filteredProducts = useMemo(() => {
+    return products.filter(product => {
       const lowerCaseQuery = searchQuery.toLowerCase();
       return (
         product.name.toLowerCase().includes(lowerCaseQuery) ||
-        product.category.toLowerCase().includes(lowerCaseQuery)
+        product.category.toLowerCase().includes(lowerCaseQuery) ||
+        (product.user?.name?.toLowerCase().includes(lowerCaseQuery)) ||
+        (product.user?.shopName?.toLowerCase().includes(lowerCaseQuery))
       );
-    }), [products, searchQuery]);
+    });
+  }, [products, searchQuery]);
 
   if (loading) return <div className="page-status">Loading products...</div>;
   if (error) return <div className="page-status">Error: {error}</div>;
@@ -99,9 +108,12 @@ const ProductListingPage = () => {
     <div className="product-listing-container">
       <h1 className="page-title">Community Marketplace</h1>
       <div className="search-bar-container" ref={searchContainerRef}>
+        <svg xmlns="http://www.w3.org/2000/svg" className="search-icon" viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+        </svg>
         <input
           type="text"
-          placeholder="Search by product name or category..."
+          placeholder="Search by product, category, or seller..."
           className="search-input"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}

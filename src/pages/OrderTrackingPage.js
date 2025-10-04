@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import './OrderTrackingPage.css';
 
 const OrderTrackingPage = () => {
   const { orderId } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   const [error, setError] = useState(null);
 
   const statusSteps = ['pending', 'confirmed', 'preparing', 'ready_for_ship', 'out_for_delivery', 'delivered'];
@@ -21,7 +22,7 @@ const OrderTrackingPage = () => {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/orders/${orderId}?_expand=deliveryPartner&_embed=deliveryVehicles`);
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/orders/${orderId}?_expand=deliveryPartner&_embed=deliveryVehicles`);
         if (!response.ok) {
           throw new Error('Order not found.');
         }
@@ -96,7 +97,7 @@ const OrderTrackingPage = () => {
       <div className="order-contents">
         <h2>Items in this Order</h2>
         {order.items.map(item => (
-          <div key={item.id} className="order-item-card">
+          <div key={item.id} className="order-item-card" onClick={() => navigate(`/products/${item.id}`)}>
             <img src={item.imageUrls[0]} alt={item.name} className="order-item-image" />
             <div className="order-item-info">
               <h4>{item.name}</h4>

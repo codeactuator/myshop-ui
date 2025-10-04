@@ -15,20 +15,20 @@ const AdminProductDetailsPage = () => {
     const fetchProductDetails = async () => {
       try {
         // Step 1: Fetch the product
-        const productResponse = await fetch(`http://localhost:3001/products/${productId}`);
+        const productResponse = await fetch(`${process.env.REACT_APP_API_URL}/products/${productId}`);
         if (!productResponse.ok) {
           throw new Error(`Product not found (status: ${productResponse.status})`);
         }
         const productData = await productResponse.json();
 
         // Step 2: Fetch the seller information using the userId from the product
-        const userResponse = await fetch(`http://localhost:3001/users/${productData.userId}`);
+        const userResponse = await fetch(`${process.env.REACT_APP_API_URL}/users/${productData.userId}`);
         if (userResponse.ok) {
           productData.user = await userResponse.json();
         }
 
         // Step 3: Fetch the reviews for the product
-        const reviewsResponse = await fetch(`http://localhost:3001/reviews?productId=${productId}&_expand=user`);
+        const reviewsResponse = await fetch(`${process.env.REACT_APP_API_URL}/reviews?productId=${productId}&_expand=user`);
         if (!reviewsResponse.ok) {
           throw new Error(`Could not fetch reviews (status: ${reviewsResponse.status})`);
         }
@@ -87,6 +87,9 @@ const AdminProductDetailsPage = () => {
               {product.user?.isVerified && (
                 <i className="fas fa-check-circle verified-badge" title="Verified Resident"></i>
               )}
+            </p>
+            <p className="seller-info-phone">
+              <strong>Contact:</strong> <a href={`tel:${product.user?.phone}`}>{product.user?.phone || 'N/A'}</a>
             </p>
           </div>
         </div>

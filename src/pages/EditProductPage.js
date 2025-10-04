@@ -14,7 +14,7 @@ const EditProductPage = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/products/${productId}`);
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/products/${productId}`);
         if (!response.ok) throw new Error('Product not found.');
         const data = await response.json();
 
@@ -70,7 +70,7 @@ const EditProductPage = () => {
     };
 
     try {
-      const response = await fetch(`http://localhost:3001/products/${productId}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/products/${productId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedProduct),

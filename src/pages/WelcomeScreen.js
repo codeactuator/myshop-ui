@@ -9,7 +9,7 @@ import { useCart } from '../context/CartContext';
 
 const WelcomeScreen = ({ onNavigate }) => {
 
- const API_URL = 'http://localhost:3001';
+ const API_URL = process.env.REACT_APP_API_URL;
 
   const openModal = (type) => setModalContent(type);
   const closeModal = () => setModalContent(null);
@@ -25,6 +25,12 @@ const WelcomeScreen = ({ onNavigate }) => {
       const { mobileNumber, ...rest } = formData;
       // Check if user exists
       const response = await fetch(`${API_URL}/users?phone=${mobileNumber}`);
+
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new TypeError("Oops, we haven't got JSON! The API server might be down.");
+      }
+
       const existingUsers = await response.json();
 
       if (formType === 'login') {
@@ -36,7 +42,7 @@ const WelcomeScreen = ({ onNavigate }) => {
           // Check if a product needs to be added to the cart
           const productIdToAdd = location.state?.addProductAfterLogin;
           if (productIdToAdd) {
-            const productResponse = await fetch(`http://localhost:3001/products/${productIdToAdd}`);
+            const productResponse = await fetch(`${API_URL}/products/${productIdToAdd}`);
             if (productResponse.ok) {
               const productToAdd = await productResponse.json();
               addToCart(productToAdd);
@@ -77,7 +83,7 @@ const WelcomeScreen = ({ onNavigate }) => {
             // Check if a product needs to be added to the cart
             const productIdToAdd = location.state?.addProductAfterLogin;
             if (productIdToAdd) {
-              const productResponse = await fetch(`http://localhost:3001/products/${productIdToAdd}`);
+              const productResponse = await fetch(`${API_URL}/products/${productIdToAdd}`);
               if (productResponse.ok) {
                 const productToAdd = await productResponse.json();
                 addToCart(productToAdd);

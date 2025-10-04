@@ -18,11 +18,11 @@ const AdminDashboardPage = () => {
     const fetchData = async () => {
       try {
         const [usersResponse, ordersResponse, productsResponse, reportsResponse, deliveryPartnersResponse] = await Promise.all([
-          fetch('http://localhost:3001/users'),
-          fetch('http://localhost:3001/orders'),
-          fetch('http://localhost:3001/products'),
-          fetch('http://localhost:3001/reports'),
-          fetch('http://localhost:3001/deliveryPartners'),
+          fetch(`${process.env.REACT_APP_API_URL}/users`),
+          fetch(`${process.env.REACT_APP_API_URL}/orders`),
+          fetch(`${process.env.REACT_APP_API_URL}/products`),
+          fetch(`${process.env.REACT_APP_API_URL}/reports`),
+          fetch(`${process.env.REACT_APP_API_URL}/deliveryPartners`),
         ]);
 
         if (!usersResponse.ok || !ordersResponse.ok || !productsResponse.ok || !reportsResponse.ok || !deliveryPartnersResponse.ok) {
@@ -123,7 +123,7 @@ const AdminDashboardPage = () => {
       return;
     }
     try {
-      const response = await fetch(`http://localhost:3001/orders/${orderId}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/orders/${orderId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ deliveryPartnerId: partnerId, status: 'out_for_delivery' }),

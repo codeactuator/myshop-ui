@@ -65,7 +65,7 @@ const AddProductPage = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:3001/products', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/products`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newProduct),

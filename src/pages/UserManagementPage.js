@@ -12,7 +12,7 @@ const UserManagementPage = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch('http://localhost:3001/users');
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/users`);
         if (!response.ok) {
           throw new Error('Failed to fetch users.');
         }
@@ -30,7 +30,7 @@ const UserManagementPage = () => {
 
   const handleRoleChange = async (userId, newRole) => {
     try {
-      const response = await fetch(`http://localhost:3001/users/${userId}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/${userId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userType: newRole }),
@@ -52,7 +52,7 @@ const UserManagementPage = () => {
   const handleVerificationToggle = async (userId, currentStatus) => {
     const newStatus = !currentStatus;
     try {
-      const response = await fetch(`http://localhost:3001/users/${userId}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/${userId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isVerified: newStatus }),
@@ -73,7 +73,7 @@ const UserManagementPage = () => {
   const handleBlockToggle = async (userId, currentBlockedStatus) => {
     const newBlockedStatus = !currentBlockedStatus;
     try {
-      const response = await fetch(`http://localhost:3001/users/${userId}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/${userId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isBlocked: newBlockedStatus }),

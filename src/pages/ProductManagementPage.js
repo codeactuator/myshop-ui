@@ -56,7 +56,7 @@ const ProductManagementPage = () => {
   const handleStatusToggle = async (productId, currentStatus) => {
     const newStatus = currentStatus === 'available' ? 'unavailable' : 'available';
     try {
-      const response = await fetch(`http://localhost:3001/products/${productId}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/products/${productId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),

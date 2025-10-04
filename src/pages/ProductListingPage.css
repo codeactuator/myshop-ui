@@ -11,15 +11,23 @@
 
 .search-bar-container {
   position: relative;
-  display: flex;
-  align-items: center;
-  max-width: 600px; /* Limit the width of the search bar */
-  margin: 0 auto 2rem; /* Center the container and add bottom margin */
+  margin-bottom: 2rem; /* Keep the bottom margin */
 }
 
-.search-input {
+.search-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px; /* Adjusted size */
+  height: 18px; /* Adjusted size */
+  color: #adb5bd; /* Match placeholder color */
+  z-index: 2; /* Ensure icon is above the input */
+}
+
+.product-listing-container .search-input {
   width: 100%;
-  padding: 12px 20px;
+  padding: 12px 20px 12px 45px; /* Added left padding for the icon */
   border: 1px solid #e9ecef;
   border-radius: 25px;
   font-size: 1rem;
@@ -27,11 +35,11 @@
   background-color: #f8f9fa;
 }
 
-.search-input::placeholder {
+.product-listing-container .search-input::placeholder {
   color: #adb5bd;
 }
 
-.search-input:focus {
+.product-listing-container .search-input:focus {
   outline: none;
   border-color: #7B2CBF;
   box-shadow: 0 0 8px rgba(123, 44, 191, 0.2);

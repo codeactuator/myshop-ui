@@ -18,7 +18,7 @@ const ProfilePage = () => {
     }
     if (window.confirm('Are you sure you want to become a seller? This will grant you access to the seller dashboard.')) {
       try {
-        const response = await fetch(`http://localhost:3001/users/${currentUser.id}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/users/${currentUser.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userType: 'seller', shopName: shopName }),

@@ -22,7 +22,7 @@ const DeliveryOrderTrackingPage = () => {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/orders/${orderId}?_expand=deliveryPartner`);
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/orders/${orderId}?_expand=deliveryPartner`);
         if (!response.ok) {
           throw new Error('Order not found.');
         }
@@ -30,7 +30,7 @@ const DeliveryOrderTrackingPage = () => {
 
         // If a delivery partner is assigned and has a vehicle, fetch vehicle details
         if (data.deliveryPartner && data.deliveryPartner.vehicleId) {
-          const vehicleResponse = await fetch(`http://localhost:3001/deliveryVehicles/${data.deliveryPartner.vehicleId}`);
+          const vehicleResponse = await fetch(`${process.env.REACT_APP_API_URL}/deliveryVehicles/${data.deliveryPartner.vehicleId}`);
           if (vehicleResponse.ok) {
             data.deliveryPartner.vehicle = await vehicleResponse.json();
           }

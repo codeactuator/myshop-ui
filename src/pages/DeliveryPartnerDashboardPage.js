@@ -18,7 +18,7 @@ const DeliveryPartnerDashboardPage = () => {
     const fetchData = async () => {
       try {
         // 1. Find the partner profile linked to the current user
-        const partnersResponse = await fetch(`http://localhost:3001/deliveryPartners?userId=${currentUser.id}`);
+        const partnersResponse = await fetch(`${process.env.REACT_APP_API_URL}/deliveryPartners?userId=${currentUser.id}`);
         if (!partnersResponse.ok) throw new Error('Could not fetch partner profile.');
         const partnersData = await partnersResponse.json();
         if (partnersData.length === 0) throw new Error('No delivery partner profile found for this user.');
@@ -26,7 +26,7 @@ const DeliveryPartnerDashboardPage = () => {
         setPartnerProfile(profile);
 
         // 2. Fetch orders assigned to this partner
-        const ordersResponse = await fetch(`http://localhost:3001/orders?deliveryPartnerId=${profile.id}&_sort=orderDate&_order=desc`);
+        const ordersResponse = await fetch(`${process.env.REACT_APP_API_URL}/orders?deliveryPartnerId=${profile.id}&_sort=orderDate&_order=desc`);
         if (!ordersResponse.ok) throw new Error('Could not fetch assigned orders.');
         const ordersData = await ordersResponse.json();
         setAssignedOrders(ordersData);
@@ -51,7 +51,7 @@ const DeliveryPartnerDashboardPage = () => {
 
   const handleStatusUpdate = async (orderId, newStatus) => {
     try {
-      const response = await fetch(`http://localhost:3001/orders/${orderId}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/orders/${orderId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
@@ -74,7 +74,7 @@ const DeliveryPartnerDashboardPage = () => {
 
     const newAvailability = !partnerProfile.isAvailable;
     try {
-      const response = await fetch(`http://localhost:3001/deliveryPartners/${partnerProfile.id}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/deliveryPartners/${partnerProfile.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isAvailable: newAvailability }),

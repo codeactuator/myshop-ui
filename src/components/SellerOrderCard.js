@@ -1,16 +1,18 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import './SellerOrderCard.css';
 
 const SellerOrderCard = ({ order, onUpdate }) => {
   const { currentUser } = useAuth();
+  const navigate = useNavigate();
 
   // Filter to show only items by the current seller
   const sellerItems = order.items.filter(item => item.userId === currentUser.id);
 
   const handleMarkAsReady = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/orders/${order.id}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/orders/${order.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'ready_for_ship' }),
@@ -24,7 +26,7 @@ const SellerOrderCard = ({ order, onUpdate }) => {
 
   const handleConfirmOrder = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/orders/${order.id}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/orders/${order.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'confirmed' }),
@@ -38,7 +40,7 @@ const SellerOrderCard = ({ order, onUpdate }) => {
 
   const handleStartPreparing = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/orders/${order.id}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/orders/${order.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'preparing' }),
@@ -50,8 +52,12 @@ const SellerOrderCard = ({ order, onUpdate }) => {
     }
   };
 
+  const handleCardClick = () => {
+    navigate(`/seller/orders/${order.id}`);
+  };
+
   return (
-    <div className="seller-order-card">
+    <div className="seller-order-card" onClick={handleCardClick}>
       <div className="seller-order-header">
         <h3>Order #{order.id}</h3>
         <span className={`status-badge status-${order.status}`}>{order.status.replace('_', ' ')}</span>
@@ -74,21 +80,9 @@ const SellerOrderCard = ({ order, onUpdate }) => {
         </div>
       </div>
       <div className="seller-order-actions">
-        {order.status === 'pending' && (
-          <button className="btn btn-success" onClick={handleConfirmOrder}>
-            Confirm Order
-          </button>
-        )}
-        {order.status === 'confirmed' && (
-          <button className="btn btn-primary" onClick={handleStartPreparing}>
-            Start Preparing
-          </button>
-        )}
-        {order.status === 'preparing' && (
-          <button className="btn btn-primary" onClick={handleMarkAsReady}>
-            Mark as Ready for Ship
-          </button>
-        )}
+        {order.status === 'pending' && (<button className="btn btn-success" onClick={(e) => { e.stopPropagation(); handleConfirmOrder(); }}>Confirm Order</button>)}
+        {order.status === 'confirmed' && (<button className="btn btn-primary" onClick={(e) => { e.stopPropagation(); handleStartPreparing(); }}>Start Preparing</button>)}
+        {order.status === 'preparing' && (<button className="btn btn-primary" onClick={(e) => { e.stopPropagation(); handleMarkAsReady(); }}>Mark as Ready for Ship</button>)}
       </div>
     </div>
   );

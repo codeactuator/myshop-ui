@@ -1,24 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import './ProductDetailsPage.css';
+import { useParams, Link } from 'react-router-dom';
+import './ProductDetailsPage.css'; // Re-using styles
 import Review from '../components/Review';
-import Modal from '../components/Modal';
-import { useAuth } from '../context/AuthContext';
-import { useCart } from '../context/CartContext';
 
-const ProductDetailsPage = () => {
+const SellerProductDetailsPage = () => {
   const { productId } = useParams();
-  const { addToCart } = useCart();
-  const { currentUser } = useAuth();
-  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [selectedImage, setSelectedImage] = useState('');
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [reportReason, setReportReason] = useState('');
-  const [selectedReportOption, setSelectedReportOption] = useState('');
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -63,63 +54,9 @@ const ProductDetailsPage = () => {
   if (error) return <div className="page-status">Error: {error}</div>;
   if (!product) return <div className="page-status">Product not found.</div>;
 
-  const handleAddToCart = () => {
-    if (currentUser) {
-      addToCart(product);
-    } else {
-      alert('Please log in to add items to your cart.');
-      navigate('/welcome', { state: { addProductAfterLogin: product.id } });
-    }
-  };
-
-  const handleReportSubmit = async (e) => {
-    e.preventDefault();
-    const finalReason = selectedReportOption === 'Other' ? reportReason.trim() : selectedReportOption;
-
-    if (!finalReason) {
-      alert('Please provide a reason for your report.');
-      return;
-    }
-
-    const report = {
-      reportedUserId: product.user.id,
-      reportedByUserId: currentUser.id,
-      productId: product.id,
-      type: 'user',
-      reason: finalReason,
-      date: new Date().toISOString(),
-    };
-
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/reports`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(report),
-      });
-
-      if (response.ok) {
-        alert('Thank you for your report. An admin will review it shortly.');
-        setIsReportModalOpen(false);
-        setReportReason('');
-        setSelectedReportOption('');
-      } else {
-        throw new Error('Failed to submit report.');
-      }
-    } catch (error) {
-      alert('An error occurred while submitting your report.');
-    }
-  };
-
-  const reportOptions = [
-    'Misleading Information',
-    'Prohibited Item',
-    'Suspicious Seller',
-    'Other'
-  ];
-
   return (
     <div className="product-details-container">
-      <Link to="/products" className="back-link">&larr; Back to all products</Link>
+      <Link to="/seller/dashboard" className="back-link">&larr; Back to Seller Dashboard</Link>
       <div className="details-content">
         <div className="details-image-container">
           <img src={selectedImage} alt={product.name} className="details-image-main" />
@@ -155,14 +92,6 @@ const ProductDetailsPage = () => {
               <strong>Contact:</strong> <a href={`tel:${product.user?.phone}`}>{product.user?.phone || 'N/A'}</a>
             </p>
           </div>
-          {currentUser && product.user && currentUser.id !== product.user.id && (
-            <button className="report-btn" onClick={() => setIsReportModalOpen(true)} title="Report this seller">
-              <i className="fas fa-flag"></i> Report Seller
-            </button>
-          )}
-          <button className="btn btn-primary contact-seller-btn" onClick={handleAddToCart}>
-            Add to Cart
-          </button>
         </div>
       </div>
       <div className="details-reviews-section">
@@ -175,32 +104,8 @@ const ProductDetailsPage = () => {
           <p>No reviews for this product yet.</p>
         )}
       </div>
-      <Modal isOpen={isReportModalOpen} onClose={() => setIsReportModalOpen(false)}>
-        <div className="report-modal-content">
-          <h2>Report Seller</h2>
-          <p>Why are you reporting <strong>{product.user?.shopName || product.user?.name}</strong>?</p>
-          <form onSubmit={handleReportSubmit}>
-            <div className="report-options">
-              {reportOptions.map(option => (
-                <button
-                  key={option}
-                  type="button"
-                  className={`report-option-btn ${selectedReportOption === option ? 'selected' : ''}`}
-                  onClick={() => setSelectedReportOption(option)}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-            {selectedReportOption === 'Other' && (
-              <textarea value={reportReason} onChange={(e) => setReportReason(e.target.value)} placeholder="Please provide more details..." required />
-            )}
-            <button type="submit" className="btn btn-primary">Submit Report</button>
-          </form>
-        </div>
-      </Modal>
     </div>
   );
 };
 
-export default ProductDetailsPage;
+export default SellerProductDetailsPage;
