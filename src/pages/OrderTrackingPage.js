@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import './OrderTrackingPage.css';
 
@@ -8,6 +8,8 @@ const OrderTrackingPage = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [error, setError] = useState(null);
+  const [soundEnabled, setSoundEnabled] = useState(false);
+  const notificationSound = useRef(null);
 
   const statusSteps = ['pending', 'confirmed', 'preparing', 'ready_for_ship', 'out_for_delivery', 'delivered'];
   const statusDetails = {
@@ -18,6 +20,13 @@ const OrderTrackingPage = () => {
     out_for_delivery: 'Your order is out for delivery.',
     delivered: 'Your order has been delivered. Enjoy!'
   };
+
+  // Initialize the audio object once
+  useEffect(() => {
+    const audio = new Audio('/notification.mp3');
+    audio.onerror = () => console.error("Failed to load notification sound.");
+    notificationSound.current = audio;
+  }, []);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -41,7 +50,15 @@ const OrderTrackingPage = () => {
           }
         }
 
-        setOrder(data);
+        setOrder(prevOrder => {
+          // Play sound if status has changed and it's not the initial load
+          if (prevOrder && prevOrder.status !== data.status) {
+            if (soundEnabled) {
+              notificationSound.current.play().catch(e => console.error("Error playing sound:", e));
+            }
+          }
+          return data; // Return the new state
+        });
       } catch (err) {
         setError(err.message);
       } finally {
@@ -50,11 +67,30 @@ const OrderTrackingPage = () => {
     };
 
     fetchOrder();
-  }, [orderId]);
+
+    // Set up polling to refresh data every 10 seconds
+    const interval = setInterval(fetchOrder, 10000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, [orderId, soundEnabled]); // Re-run effect if orderId or soundEnabled changes
 
   if (loading) return <div className="page-status">Loading order details...</div>;
   if (error) return <div className="page-status">Error: {error}</div>;
   if (!order) return <div className="page-status">Order not found.</div>;
+
+  const handleEnableSound = () => {
+    if (notificationSound.current) {
+      notificationSound.current.muted = true;
+      notificationSound.current.play()
+        .then(() => {
+          notificationSound.current.muted = false;
+          setSoundEnabled(true);
+          alert('Sound notifications for status updates are enabled!');
+        })
+        .catch(e => console.error("Could not enable sound:", e));
+    }
+  };
 
   const currentStatusIndex = statusSteps.indexOf(order.status);
 
@@ -67,6 +103,13 @@ const OrderTrackingPage = () => {
         <p><strong>Date:</strong> {new Date(order.orderDate).toLocaleDateString()}</p>
         <p><strong>Total:</strong> ${order.totalAmount.toFixed(2)}</p>
       </div>
+
+      {!soundEnabled && (
+        <div className="sound-enable-banner">
+          <p>Click to enable sound notifications for status updates.</p>
+          <button className="btn btn-primary" onClick={handleEnableSound}>Enable Sound</button>
+        </div>
+      )}
 
       {order.deliveryPartner && (
         <div className="rider-info-card">

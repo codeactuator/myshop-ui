@@ -1,16 +1,24 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Navigate, Link, useNavigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import './DeliveryPartnerDashboardPage.css';
 
 const DeliveryPartnerDashboardPage = () => {
-  const { currentUser, logout } = useAuth();
-  const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const [assignedOrders, setAssignedOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [partnerProfile, setPartnerProfile] = useState(null);
   const [showCompleted, setShowCompleted] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(false);
+  const notificationSound = useRef(null);
+
+  // Initialize the audio object once
+  useEffect(() => {
+    const audio = new Audio('/notification.mp3');
+    audio.onerror = () => console.error("Failed to load notification sound.");
+    notificationSound.current = audio;
+  }, []);
   
   useEffect(() => {
     if (!currentUser || currentUser.userType !== 'delivery_partner') return;
@@ -26,12 +34,27 @@ const DeliveryPartnerDashboardPage = () => {
         setPartnerProfile(profile);
 
         // 2. Fetch orders assigned to this partner
-        const ordersResponse = await fetch(`${process.env.REACT_APP_API_URL}/orders?deliveryPartnerId=${profile.id}&_sort=orderDate&_order=desc`);
+        const ordersResponse = await fetch(`${process.env.REACT_APP_API_URL}/orders?deliveryPartnerId=${profile.id}`);
         if (!ordersResponse.ok) throw new Error('Could not fetch assigned orders.');
         const ordersData = await ordersResponse.json();
-        setAssignedOrders(ordersData);
+
+        // Check for new orders to trigger notification
+        setAssignedOrders(prevOrders => {
+          if (ordersData.length > prevOrders.length && prevOrders.length > 0) { // Check if it's not the initial load
+            if (soundEnabled) {
+              notificationSound.current.play().catch(e => console.error("Error playing sound:", e));
+            }
+            alert('A new order has been assigned to you!');
+          }
+          return ordersData.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+        });
 
       } catch (err) {
+        // Only set error if it's a new error, to avoid flickering on poll failures
+        setError(currentError => {
+          if (currentError !== err.message) return err.message;
+          return currentError;
+        });
         setError(err.message);
       } finally {
         setLoading(false);
@@ -39,7 +62,12 @@ const DeliveryPartnerDashboardPage = () => {
     };
 
     fetchData();
-  }, [currentUser]);
+    // Set up polling to refresh data every 15 seconds
+    const interval = setInterval(fetchData, 15000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, [currentUser, soundEnabled]);
 
   const activeOrders = useMemo(() => {
     return assignedOrders.filter(o => ['ready_for_ship', 'out_for_delivery'].includes(o.status));
@@ -64,11 +92,6 @@ const DeliveryPartnerDashboardPage = () => {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/welcome');
-  };
-
   const handleAvailabilityToggle = async () => {
     if (!partnerProfile) return;
 
@@ -83,6 +106,19 @@ const DeliveryPartnerDashboardPage = () => {
       setPartnerProfile(prev => ({ ...prev, isAvailable: newAvailability }));
     } catch (err) {
       alert(err.message);
+    }
+  };
+
+  const handleEnableSound = () => {
+    if (notificationSound.current) {
+      notificationSound.current.muted = true;
+      notificationSound.current.play()
+        .then(() => {
+          notificationSound.current.muted = false;
+          setSoundEnabled(true);
+          alert('Sound notifications enabled!');
+        })
+        .catch(e => console.error("Could not enable sound:", e));
     }
   };
   if (!currentUser || currentUser.userType !== 'delivery_partner') {
@@ -103,10 +139,16 @@ const DeliveryPartnerDashboardPage = () => {
             </span>
             <label className="switch"><input type="checkbox" checked={partnerProfile?.isAvailable || false} onChange={handleAvailabilityToggle} /><span className="slider round"></span></label>
           </div>
-          <button onClick={handleLogout} className="btn btn-secondary">Logout</button>
         </div>
       </div>
       <p>Welcome, <strong>{currentUser.name}</strong>!</p>
+
+      {!soundEnabled && (
+        <div className="sound-enable-banner">
+          <p>Click to enable sound notifications for new orders.</p>
+          <button className="btn btn-primary" onClick={handleEnableSound}>Enable Sound</button>
+        </div>
+      )}
 
       <div className="dp-orders-list">
         <h2>Active Deliveries</h2>

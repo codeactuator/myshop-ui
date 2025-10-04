@@ -76,7 +76,13 @@ const AdminDashboardPage = () => {
     };
 
     fetchData();
-  }, []);
+
+    // Set up polling to refresh data every 15 seconds
+    const interval = setInterval(fetchData, 15000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, []); // Empty dependency array ensures this runs once on mount and cleans up on unmount
 
   const totalRevenue = useMemo(() => {
     return orders
