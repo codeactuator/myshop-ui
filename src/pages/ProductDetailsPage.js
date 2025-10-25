@@ -37,11 +37,22 @@ const ProductDetailsPage = () => {
         }
 
         // Step 3: Fetch the reviews for the product
-        const reviewsResponse = await fetch(`${process.env.REACT_APP_API_URL}/reviews?productId=${productId}&_expand=user`);
+        const reviewsResponse = await fetch(`${process.env.REACT_APP_API_URL}/reviews?productId=${productId}`);
         if (!reviewsResponse.ok) {
           throw new Error(`Could not fetch reviews (status: ${reviewsResponse.status})`);
         }
-        const reviewsData = await reviewsResponse.json();
+        let reviewsData = await reviewsResponse.json();
+
+        // Step 4: Fetch users for the reviews
+        const reviewUserIds = [...new Set(reviewsData.map(r => r.userId).filter(Boolean))];
+        if (reviewUserIds.length > 0) {
+          const reviewUsersResponse = await fetch(`${process.env.REACT_APP_API_URL}/users?ids=${reviewUserIds.join(',')}`);
+          if (reviewUsersResponse.ok) {
+            const reviewUsersData = await reviewUsersResponse.json();
+            const reviewUsersMap = new Map(reviewUsersData.map(u => [u.id, u]));
+            reviewsData = reviewsData.map(review => ({ ...review, user: reviewUsersMap.get(review.userId) }));
+          }
+        }
 
         setProduct(productData);
         setReviews(reviewsData);

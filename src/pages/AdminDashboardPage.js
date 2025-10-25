@@ -42,15 +42,28 @@ const AdminDashboardPage = () => {
           seller: usersMap.get(p.userId)
         }));
 
-        // Enrich orders with seller(s) info
+        // Step 5: Get all unique seller IDs from all orders
+        const allSellerIdsFromOrders = [...new Set(ordersData.flatMap(order => order.items?.map(item => item.userId).filter(Boolean) || []))];
+
+        // Step 6: Fetch all unique sellers for the orders in a single request
+        let orderSellersMap = new Map();
+        if (allSellerIdsFromOrders.length > 0) {
+          const orderSellersResponse = await fetch(`${process.env.REACT_APP_API_URL}/users?ids=${allSellerIdsFromOrders.join(',')}`);
+          if (!orderSellersResponse.ok) {
+            throw new Error('Failed to fetch seller information for orders.');
+          }
+          const orderSellersData = await orderSellersResponse.json();
+          orderSellersMap = new Map(orderSellersData.map(user => [user.id, user]));
+        }
+
         const deliveryPartnersMap = new Map(deliveryPartnersData.map(p => [p.id, p]));
         const dummyPartner = { id: 'dummy', name: 'Unassigned' };
-        const enrichedOrders = ordersData.map(order => { 
+        const enrichedOrders = ordersData.map(order => {
           const sellerIds = new Set(order.items?.map(item => item.userId).filter(Boolean));
           const finalOrder = {
             ...order,
             deliveryPartner: deliveryPartnersMap.get(order.deliveryPartnerId),
-            sellers: [...sellerIds].map(id => usersMap.get(String(id))).filter(Boolean)
+            sellers: [...sellerIds].map(id => orderSellersMap.get(id)).filter(Boolean)
           };
 
           // If an order has no delivery partner, assign a dummy one for display purposes.

@@ -34,7 +34,7 @@ const MyOrdersPage = () => {
         }
 
         // Step 3: Fetch all unique sellers
-        const usersResponse = await fetch(`${process.env.REACT_APP_API_URL}/users?${sellerIds.map(id => `id=${id}`).join('&')}`);
+        const usersResponse = await fetch(`${process.env.REACT_APP_API_URL}/users?ids=${sellerIds.join(',')}`);
         if (!usersResponse.ok) throw new Error('Failed to fetch seller information.');
         const usersData = await usersResponse.json();
         const usersMap = new Map(usersData.map(user => [user.id, user]));

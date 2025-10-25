@@ -22,17 +22,22 @@ const DeliveryOrderTrackingPage = () => {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/orders/${orderId}?_expand=deliveryPartner`);
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/orders/${orderId}`);
         if (!response.ok) {
           throw new Error('Order not found.');
         }
         const data = await response.json();
 
-        // If a delivery partner is assigned and has a vehicle, fetch vehicle details
-        if (data.deliveryPartner && data.deliveryPartner.vehicleId) {
-          const vehicleResponse = await fetch(`${process.env.REACT_APP_API_URL}/deliveryVehicles/${data.deliveryPartner.vehicleId}`);
-          if (vehicleResponse.ok) {
-            data.deliveryPartner.vehicle = await vehicleResponse.json();
+        // If a delivery partner is assigned, fetch its details, then its vehicle
+        if (data.deliveryPartnerId) {
+          const partnerResponse = await fetch(`${process.env.REACT_APP_API_URL}/deliveryPartners/${data.deliveryPartnerId}`);
+          if (partnerResponse.ok) {
+            const partnerData = await partnerResponse.json();
+            data.deliveryPartner = partnerData;
+            if (partnerData.vehicleId) {
+              const vehicleResponse = await fetch(`${process.env.REACT_APP_API_URL}/deliveryVehicles/${partnerData.vehicleId}`);
+              if (vehicleResponse.ok) data.deliveryPartner.vehicle = await vehicleResponse.json();
+            }
           }
         }
 

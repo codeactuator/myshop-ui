@@ -9,7 +9,7 @@ import { useCart } from '../context/CartContext';
 
 const WelcomeScreen = ({ onNavigate }) => {
 
- const API_URL = process.env.REACT_APP_API_URL;
+ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
   const openModal = (type) => setModalContent(type);
   const closeModal = () => setModalContent(null);
@@ -22,20 +22,12 @@ const WelcomeScreen = ({ onNavigate }) => {
   const handleAuthSubmit = async (formData) => {
     const formType = modalContent;
     try {
-      const { mobileNumber, ...rest } = formData;
-      // Check if user exists
-      const response = await fetch(`${API_URL}/users?phone=${mobileNumber}`);
-
-      const contentType = response.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        throw new TypeError("Oops, we haven't got JSON! The API server might be down.");
-      }
-
-      const existingUsers = await response.json();
+      const { mobileNumber: phone, ...rest } = formData;
 
       if (formType === 'login') {
-        if (existingUsers.length > 0) {
-          const user = existingUsers[0];
+        const response = await fetch(`${API_URL}/users/by-phone/${phone}`);
+        if (response.ok) {
+          const user = await response.json();
           alert(`Welcome back, ${user.name}!`);
           login(user);
 
@@ -56,18 +48,26 @@ const WelcomeScreen = ({ onNavigate }) => {
             navigate('/admin/dashboard');
           } else if (user.userType === 'delivery_partner') {
             navigate('/delivery/dashboard');
+          } else if (user.userType === 'seller') {
+            navigate('/seller/dashboard');
           } else {
-            onNavigate('products'); // Navigate to products page
+            navigate('/products');
           }
         } else {
-          alert('No user found with this mobile number. Please sign up.');
+          if (response.status === 404) {
+            alert('No user found with this mobile number. Please sign up.');
+          } else {
+            throw new Error('Login failed. Please try again.');
+          }
         }
       } else if (formType === 'signup') {
-        if (existingUsers.length > 0) {
-          alert('A user with this mobile number already exists. Please log in.');
-        } else {
-          // Create new user
-          const newUser = { phone: mobileNumber, ...rest };
+        // Create new user
+        const newUser = { phone, ...rest };
+        // Spring Boot expects 'apartmentNumber' not 'apartment'
+        if (newUser.apartment) {
+          newUser.apartmentNumber = newUser.apartment;
+          delete newUser.apartment;
+        }
           const createResponse = await fetch(`${API_URL}/users`, {
             method: 'POST',
             headers: {
@@ -91,11 +91,10 @@ const WelcomeScreen = ({ onNavigate }) => {
             }
 
             closeModal();
-            onNavigate('products'); // Navigate to products page
+            navigate('/products');
           } else {
             throw new Error('Failed to create user.');
           }
-        }
       }
     } catch (error) {
       console.error('Authentication error:', error);
