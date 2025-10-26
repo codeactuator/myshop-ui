@@ -55,25 +55,17 @@ const CheckoutPage = () => {
       ? { name: currentUser.name, apartmentNumber: currentUser.apartmentNumber, phone: currentUser.phone } 
       : formData;
 
-    // Filter out items from blocked sellers before creating the order
-    const validItems = cartItems.filter(item => !item.user?.isBlocked);
-
-    if (validItems.length === 0) {
-      alert("Your order cannot be placed as all items are from sellers who are currently unavailable.");
-      clearCart(); // Clear the invalid items from the cart
-      return;
-    }
+    // The cart items are already validated by the backend.
+    const validItems = cartItems;
 
     const order = {
-      userId: currentUser?.id,
-      buyerInfo: fulfillmentMethod === 'delivery' ? deliveryAddress : { name: currentUser.name, phone: currentUser.phone },
+      buyerInfo: {
+        id: currentUser.id,
+        ...(fulfillmentMethod === 'delivery' ? deliveryAddress : { name: currentUser.name, phone: currentUser.phone, apartmentNumber: currentUser.apartmentNumber })
+      },
       fulfillmentMethod: fulfillmentMethod,
       paymentMethod: paymentMethod,
-      items: validItems, // Use only valid items
-      totalAmount: cartTotal, 
-      orderDate: new Date().toISOString(),
-      status: 'pending',
-      deliveryPartnerId: null,
+      items: validItems.map(item => ({ id: item.productId, quantity: item.quantity })),
     };
 
     try {
@@ -89,7 +81,7 @@ const CheckoutPage = () => {
           // Do not clear cart yet, redirect to payment page
           navigate(`/payment/upi/${newOrder.id}`);
         } else { // For COD
-          clearCart();
+          await clearCart();
           // Pass orderId to the success page
           navigate('/order-success', { state: { orderId: newOrder.id } });
         }
@@ -191,7 +183,7 @@ const CheckoutPage = () => {
           <h2>Order Summary</h2>
           {cartItems.map(item => (
             <div key={item.id} className="summary-item">
-              <span>{item.name} (x{item.quantity})</span>
+              <span>{item.productName || 'N/A'} (x{item.quantity})</span>
               <span>${(item.price * item.quantity).toFixed(2)}</span>
             </div>
           ))}

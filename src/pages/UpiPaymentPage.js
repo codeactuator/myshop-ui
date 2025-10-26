@@ -19,7 +19,7 @@ const UpiPaymentPage = () => {
       });
 
       if (response.ok) {
-        clearCart();
+        await clearCart();
         // Pass orderId to the success page
         navigate('/order-success', { state: { orderId: orderId } });
       } else {
