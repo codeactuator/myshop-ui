@@ -200,7 +200,7 @@ const AdminDashboardPage = () => {
   };
 
   // Protect this route
-  if (!currentUser || currentUser.userType !== 'admin') {
+  if (!currentUser || currentUser.userType?.toLowerCase() !== 'admin') {
     return <Navigate to="/products" />;
   }
 

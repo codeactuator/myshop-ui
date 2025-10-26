@@ -23,7 +23,7 @@ const SellerDashboardPage = () => {
   }, []);
 
   useEffect(() => {
-    if (!currentUser || currentUser.userType !== 'seller') {
+    if (!currentUser || currentUser.userType?.toLowerCase() !== 'seller') {
       setLoading(false);
       return;
     }
@@ -91,7 +91,7 @@ const SellerDashboardPage = () => {
     }
   };
 
-  if (!currentUser || currentUser.userType !== 'seller') {
+  if (!currentUser || currentUser.userType?.toLowerCase() !== 'seller') {
     return <Navigate to="/products" />;
   }
 

@@ -71,7 +71,7 @@ const ProductManagementPage = () => {
     }
   };
 
-  if (!currentUser || currentUser.userType !== 'admin') {
+  if (!currentUser || currentUser.userType?.toLowerCase() !== 'admin') {
     return <Navigate to="/products" />;
   }
 

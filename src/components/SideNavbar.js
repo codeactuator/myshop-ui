@@ -45,13 +45,13 @@ const SideNavbar = ({ isCollapsed }) => {
                 <span>Profile</span>
               </NavLink>
             </li>
-            {currentUser?.userType === 'seller' && (
+            {currentUser?.userType?.toLowerCase() === 'seller' && (
               <>
                 <li><NavLink to="/seller/dashboard" className={({ isActive }) => (isActive ? 'active-link' : '')}><i className="fas fa-tachometer-alt"></i><span>Seller Dashboard</span></NavLink></li>
                 <li><NavLink to="/seller/inventory" className={({ isActive }) => (isActive ? 'active-link' : '')}><i className="fas fa-boxes"></i><span>My Inventory</span></NavLink></li>
               </>
             )}
-            {currentUser?.userType === 'admin' && (
+            {currentUser?.userType?.toLowerCase() === 'admin' && (
               <>
                 <li>
                   <NavLink to="/admin/dashboard" className={({ isActive }) => (isActive ? 'active-link' : '')}>

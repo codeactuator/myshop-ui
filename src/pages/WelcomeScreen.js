@@ -44,11 +44,11 @@ const WelcomeScreen = ({ onNavigate }) => {
           }
 
           closeModal();
-          if (user.userType === 'admin') {
+          if (user.userType?.toLowerCase() === 'admin') {
             navigate('/admin/dashboard');
-          } else if (user.userType === 'delivery_partner') {
+          } else if (user.userType?.toLowerCase() === 'delivery_partner') {
             navigate('/delivery/dashboard');
-          } else if (user.userType === 'seller') {
+          } else if (user.userType?.toLowerCase() === 'seller') {
             navigate('/seller/dashboard');
           } else {
             navigate('/products');

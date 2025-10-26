@@ -15,7 +15,7 @@ const InventoryPage = () => {
 
     const fetchMyProducts = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/products?userId=${currentUser.id}`);
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/products?userId=${String(currentUser.id)}`);
         if (!response.ok) {
           throw new Error('Failed to fetch your products.');
         }
@@ -51,8 +51,8 @@ const InventoryPage = () => {
   };
 
   const handleCardClick = (productId) => {
-    // Navigate to the public product details page for preview
-    navigate(`/products/${productId}`);
+    // Navigate to the seller-specific product details page
+    navigate(`/seller/products/${productId}`);
   };
 
   if (loading) return <div className="page-status">Loading inventory...</div>;

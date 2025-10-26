@@ -15,7 +15,7 @@ const AddProductPage = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!currentUser || currentUser.userType !== 'seller') {
+  if (!currentUser || currentUser.userType?.toLowerCase() !== 'seller') {
     // Redirect non-sellers
     navigate('/products');
     return null;

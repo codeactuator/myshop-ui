@@ -19,7 +19,7 @@ const EditProductPage = () => {
         const data = await response.json();
 
         // Ensure the current user is the owner of the product
-        if (data.userId !== currentUser.id) {
+        if (Number(data.userId) !== currentUser.id) {
           alert('You are not authorized to edit this product.');
           navigate('/seller/inventory');
           return;
