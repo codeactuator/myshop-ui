@@ -30,6 +30,8 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import EditProductPage from './pages/EditProductPage';
 import AddProductPage from './pages/AddProductPage';
 import UpiPaymentPage from './pages/UpiPaymentPage';
+import ShopConfigPage from './pages/ShopConfigPage';
+
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import MainLayout from './components/MainLayout';
@@ -81,6 +83,8 @@ function App() {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/seller/edit-product/:productId" element={<EditProductPage />} />
             <Route path="/seller/add-product" element={<AddProductPage />} />
+            <Route path="/seller/shop-config" element={<ShopConfigPage />} />
+
             <Route path="/payment/upi/:orderId" element={<UpiPaymentPage />} />
             </Route>
 

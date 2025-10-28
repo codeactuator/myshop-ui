@@ -49,6 +49,7 @@ const SideNavbar = ({ isCollapsed }) => {
               <>
                 <li><NavLink to="/seller/dashboard" className={({ isActive }) => (isActive ? 'active-link' : '')}><i className="fas fa-tachometer-alt"></i><span>Seller Dashboard</span></NavLink></li>
                 <li><NavLink to="/seller/inventory" className={({ isActive }) => (isActive ? 'active-link' : '')}><i className="fas fa-boxes"></i><span>My Inventory</span></NavLink></li>
+                <li><NavLink to="/seller/shop-config" className={({ isActive }) => (isActive ? 'active-link' : '')}><i className="fas fa-store-alt"></i><span>Shop Configuration</span></NavLink></li>
               </>
             )}
             {currentUser?.userType?.toLowerCase() === 'admin' && (

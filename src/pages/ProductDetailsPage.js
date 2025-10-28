@@ -19,6 +19,8 @@ const ProductDetailsPage = () => {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [selectedReportOption, setSelectedReportOption] = useState('');
+  const [newReview, setNewReview] = useState({ rating: 0, comment: '' });
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -128,6 +130,53 @@ const ProductDetailsPage = () => {
     'Other'
   ];
 
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (newReview.rating === 0 || !newReview.comment.trim()) {
+      alert('Please provide a rating and a comment.');
+      return;
+    }
+    setIsSubmittingReview(true);
+
+    const reviewPayload = {
+      ...newReview,
+      userId: currentUser.id,
+      productId: productId,
+      date: new Date().toISOString(),
+    };
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reviewPayload),
+      });
+
+      if (response.ok) {
+        const addedReview = await response.json();
+        // Manually add the current user object to the new review to display it immediately
+        addedReview.user = currentUser;
+        setReviews(prevReviews => [addedReview, ...prevReviews]);
+        setNewReview({ rating: 0, comment: '' }); // Reset form
+      } else {
+        throw new Error('Failed to submit review.');
+      }
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
+  const StarRatingInput = ({ rating, setRating }) => (
+    <div className="star-rating-input">
+      {[...Array(5)].map((_, index) => {
+        const ratingValue = index + 1;
+        return <span key={ratingValue} className={ratingValue <= rating ? 'star-filled' : 'star-empty'} onClick={() => setRating(ratingValue)}>&#9733;</span>;
+      })}
+    </div>
+  );
+
   return (
     <div className="product-details-container">
       <Link to="/products" className="back-link">&larr; Back to all products</Link>
@@ -176,6 +225,26 @@ const ProductDetailsPage = () => {
           </button>
         </div>
       </div>
+
+      {currentUser && (
+        <div className="add-review-section">
+          <h3>Write a Review</h3>
+          <form onSubmit={handleReviewSubmit}>
+            <div className="form-group">
+              <label>Your Rating</label>
+              <StarRatingInput rating={newReview.rating} setRating={(rating) => setNewReview({ ...newReview, rating })} />
+            </div>
+            <div className="form-group">
+              <label htmlFor="review-comment">Your Comment</label>
+              <textarea id="review-comment" value={newReview.comment} onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })} required />
+            </div>
+            <button type="submit" className="btn btn-primary" disabled={isSubmittingReview}>
+              {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
+            </button>
+          </form>
+        </div>
+      )}
+
       <div className="details-reviews-section">
         <h2>Customer Reviews</h2>
         {reviews.length > 0 ? (

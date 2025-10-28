@@ -1,0 +1,60 @@
+.shop-page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem 2rem 2rem;
+}
+
+.shop-header {
+    height: 250px;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+    color: white;
+    text-align: center;
+}
+
+.shop-header-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.shop-title {
+    font-size: 2.5rem;
+    margin: 0;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+}
+
+.shop-tagline {
+    font-size: 1.1rem;
+    margin: 10px 0 0 0;
+    font-style: italic;
+}
+
+.shop-verified-badge-large {
+    background-color: rgba(76, 175, 80, 0.8);
+    padding: 5px 12px;
+    border-radius: 15px;
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+.shop-products-title {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1.8rem;
+}
