@@ -16,7 +16,7 @@ const OrderTrackingPage = () => {
     pending: 'Your order has been placed and is awaiting confirmation from the seller.',
     confirmed: 'The seller has confirmed your order.',
     preparing: 'Your items are being prepared for shipment.',
-    ready_for_ship: 'Your order is ready for the rider to pick up.',
+    'ready_for_ship': 'Your order is ready for the rider to pick up.',
     out_for_delivery: 'Your order is out for delivery.',
     delivered: 'Your order has been delivered. Enjoy!'
   };

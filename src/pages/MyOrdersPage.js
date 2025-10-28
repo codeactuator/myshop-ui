@@ -41,7 +41,7 @@ const MyOrdersPage = () => {
 
         // Step 4: Filter out orders where all items are from blocked sellers
         const validOrders = ordersData.filter(order => 
-          order.items.some(item => usersMap.get(item.userId) && !usersMap.get(item.userId).isBlocked)
+          order.items.some(item => usersMap.get(Number(item.userId)) && !usersMap.get(Number(item.userId)).isBlocked)
         );
 
         setOrders(validOrders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate)));

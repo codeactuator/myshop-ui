@@ -35,7 +35,7 @@ const SellerDashboardPage = () => {
         const allOrders = await response.json();
 
         const myOrders = allOrders.filter(order =>
-          order.items && order.items.some(item => item.userId === currentUser.id)
+          order.items && order.items.some(item => Number(item.userId) === currentUser.id)
         ).sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
 
         // Check against localStorage to see if there are new orders
@@ -112,7 +112,7 @@ const SellerDashboardPage = () => {
       )}
       <h2>Your Orders</h2>
       {sellerOrders.length > 0 ? (
-        sellerOrders.map(order => <SellerOrderCard key={order.id} order={order} onUpdate={handleOrderStatusUpdate} />)
+        sellerOrders.map(order => <SellerOrderCard key={order.id} order={order} onUpdateStatus={handleOrderStatusUpdate} />)
       ) : (
         <p>You have no orders yet.</p>
       )}

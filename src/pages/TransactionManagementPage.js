@@ -100,8 +100,8 @@ const TransactionManagementPage = () => {
           <option value="pending">Pending</option>
           <option value="confirmed">Confirmed</option>
           <option value="preparing">Preparing</option>
-          <option value="ready_for_ship">Ready for Ship</option>
-          <option value="out_for_delivery">Out for Delivery</option>
+          <option value="ready_for_ship">Ready For Ship</option>
+          <option value="out_for_delivery">Out For Delivery</option>
           <option value="delivered">Delivered</option>
           <option value="completed">Completed</option>
           <option value="cancelled">Cancelled</option>

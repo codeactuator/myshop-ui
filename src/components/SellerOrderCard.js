@@ -3,12 +3,12 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './SellerOrderCard.css';
 
-const SellerOrderCard = ({ order, onUpdate }) => {
+const SellerOrderCard = ({ order, onUpdateStatus }) => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
   // Filter to show only items by the current seller
-  const sellerItems = order.items.filter(item => item.userId === currentUser.id);
+  const sellerItems = order.items.filter(item => Number(item.userId) === currentUser.id);
 
   const handleMarkAsReady = async () => {
     try {
@@ -18,7 +18,7 @@ const SellerOrderCard = ({ order, onUpdate }) => {
         body: JSON.stringify({ status: 'ready_for_ship' }),
       });
       if (!response.ok) throw new Error('Failed to update order status.');
-      onUpdate(order.id, 'ready_for_ship');
+      onUpdateStatus(order.id, 'ready_for_ship');
     } catch (err) {
       alert(err.message);
     }
@@ -32,7 +32,7 @@ const SellerOrderCard = ({ order, onUpdate }) => {
         body: JSON.stringify({ status: 'confirmed' }),
       });
       if (!response.ok) throw new Error('Failed to confirm order.');
-      onUpdate(order.id, 'confirmed');
+      onUpdateStatus(order.id, 'confirmed');
     } catch (err) {
       alert(err.message);
     }
@@ -46,7 +46,7 @@ const SellerOrderCard = ({ order, onUpdate }) => {
         body: JSON.stringify({ status: 'preparing' }),
       });
       if (!response.ok) throw new Error('Failed to update order status.');
-      onUpdate(order.id, 'preparing');
+      onUpdateStatus(order.id, 'preparing');
     } catch (err) {
       alert(err.message);
     }
@@ -80,9 +80,9 @@ const SellerOrderCard = ({ order, onUpdate }) => {
         </div>
       </div>
       <div className="seller-order-actions">
-        {order.status === 'pending' && (<button className="btn btn-success" onClick={(e) => { e.stopPropagation(); handleConfirmOrder(); }}>Confirm Order</button>)}
-        {order.status === 'confirmed' && (<button className="btn btn-primary" onClick={(e) => { e.stopPropagation(); handleStartPreparing(); }}>Start Preparing</button>)}
-        {order.status === 'preparing' && (<button className="btn btn-primary" onClick={(e) => { e.stopPropagation(); handleMarkAsReady(); }}>Mark as Ready for Ship</button>)}
+        {order.status?.toLowerCase() === 'pending' && (<button className="btn btn-success" onClick={(e) => { e.stopPropagation(); handleConfirmOrder(); }}>Confirm Order</button>)}
+        {order.status?.toLowerCase() === 'confirmed' && (<button className="btn btn-primary" onClick={(e) => { e.stopPropagation(); handleStartPreparing(); }}>Start Preparing</button>)}
+        {order.status?.toLowerCase() === 'preparing' && (<button className="btn btn-primary" onClick={(e) => { e.stopPropagation(); handleMarkAsReady(); }}>Mark as Ready for Ship</button>)}
       </div>
     </div>
   );
