@@ -57,7 +57,7 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = (product) => {
     if (!cart) return;
-    const existingItem = cart.items.find(item => item.product?.id === product.id);
+    const existingItem = cart.items.find(item => item.productId === product.id);
     const quantity = existingItem ? existingItem.quantity + 1 : 1;
     syncCartItem(product.id, quantity);
   };
@@ -100,7 +100,7 @@ export const CartProvider = ({ children }) => {
         method: 'DELETE',
       });
       if (response.ok) {
-        // Reset the cart on the client side after successful server-side deletion
+        // A successful DELETE often returns no content. Reset the cart on the client side.
         setCart({ userId: currentUser.id, items: [], totalAmount: 0 });
       } else {
         throw new Error('Failed to clear cart on server.');
