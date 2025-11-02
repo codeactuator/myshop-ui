@@ -57,10 +57,10 @@ const MyOrdersPage = () => {
 
   const filteredOrders = useMemo(() => {
     if (statusFilter === 'active') {
-      return orders.filter(o => o.status !== 'delivered' && o.status !== 'completed' && o.status !== 'cancelled');
+      return orders.filter(o => o.status?.toLowerCase() !== 'delivered' && o.status?.toLowerCase() !== 'completed' && o.status?.toLowerCase() !== 'cancelled');
     }
     if (statusFilter === 'completed') {
-      return orders.filter(o => o.status === 'delivered' || o.status === 'completed');
+      return orders.filter(o => o.status?.toLowerCase() === 'delivered' || o.status?.toLowerCase() === 'completed');
     }
     // 'all'
     return orders;

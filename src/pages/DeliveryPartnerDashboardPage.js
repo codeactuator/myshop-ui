@@ -21,7 +21,7 @@ const DeliveryPartnerDashboardPage = () => {
   }, []);
   
   useEffect(() => {
-    if (!currentUser || currentUser.userType !== 'delivery_partner') return;
+    if (!currentUser || currentUser.userType?.toLowerCase() !== 'delivery_partner') return;
 
     const fetchData = async () => {
       try {
@@ -67,14 +67,14 @@ const DeliveryPartnerDashboardPage = () => {
 
     // Cleanup interval on component unmount
     return () => clearInterval(interval);
-  }, [currentUser, soundEnabled]);
+  }, [currentUser]);
 
   const activeOrders = useMemo(() => {
-    return assignedOrders.filter(o => ['ready_for_ship', 'out_for_delivery'].includes(o.status));
+    return assignedOrders.filter(o => ['ready_for_ship', 'out_for_delivery'].includes(o.status?.toLowerCase()));
   }, [assignedOrders]);
 
   const completedOrders = useMemo(() => {
-    return assignedOrders.filter(o => o.status === 'delivered' || o.status === 'completed');
+    return assignedOrders.filter(o => o.status?.toLowerCase() === 'delivered' || o.status?.toLowerCase() === 'completed');
   }, [assignedOrders]);
 
   const handleStatusUpdate = async (orderId, newStatus) => {
@@ -95,15 +95,16 @@ const DeliveryPartnerDashboardPage = () => {
   const handleAvailabilityToggle = async () => {
     if (!partnerProfile) return;
 
-    const newAvailability = !partnerProfile.isAvailable;
+    const newAvailability = !partnerProfile.available;
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/deliveryPartners/${partnerProfile.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isAvailable: newAvailability }),
+        body: JSON.stringify({ available: newAvailability }),
       });
       if (!response.ok) throw new Error('Failed to update availability.');
-      setPartnerProfile(prev => ({ ...prev, isAvailable: newAvailability }));
+      const updatedPartner = await response.json();
+      setPartnerProfile(updatedPartner);
     } catch (err) {
       alert(err.message);
     }
@@ -121,7 +122,7 @@ const DeliveryPartnerDashboardPage = () => {
         .catch(e => console.error("Could not enable sound:", e));
     }
   };
-  if (!currentUser || currentUser.userType !== 'delivery_partner') {
+  if (!currentUser || currentUser.userType?.toLowerCase() !== 'delivery_partner') {
     return <Navigate to="/products" />;
   }
 
@@ -134,10 +135,10 @@ const DeliveryPartnerDashboardPage = () => {
         <h1>Delivery Dashboard</h1>
         <div className="dp-header-actions">
           <div className="availability-toggle">
-            <span className={`status-text ${partnerProfile?.isAvailable ? 'available' : 'unavailable'}`}>
-              {partnerProfile?.isAvailable ? 'Available' : 'Unavailable'}
+            <span className={`status-text ${partnerProfile?.available ? 'available' : 'unavailable'}`}>
+              {partnerProfile?.available ? 'Available' : 'Unavailable'}
             </span>
-            <label className="switch"><input type="checkbox" checked={partnerProfile?.isAvailable || false} onChange={handleAvailabilityToggle} /><span className="slider round"></span></label>
+            <label className="switch"><input type="checkbox" checked={partnerProfile?.available || false} onChange={handleAvailabilityToggle} /><span className="slider round"></span></label>
           </div>
         </div>
       </div>
@@ -164,12 +165,12 @@ const DeliveryPartnerDashboardPage = () => {
                   <p><strong>Status:</strong> <span className={`status-badge status-${order.status}`}>{order.status.replace('_', ' ')}</span></p>
                 </div>
               <div className="dp-order-actions">
-                {order.status === 'ready_for_ship' && (
+                {order.status?.toLowerCase() === 'ready_for_ship' && (
                     <button className="btn btn-primary" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleStatusUpdate(order.id, 'out_for_delivery'); }}>
                     Pick Up Order
                   </button>
                 )}
-                {order.status === 'out_for_delivery' && (
+                {order.status?.toLowerCase() === 'out_for_delivery' && (
                     <button className="btn btn-success" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleStatusUpdate(order.id, 'delivered'); }}>
                     Mark as Delivered
                   </button>

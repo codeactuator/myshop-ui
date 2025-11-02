@@ -85,11 +85,16 @@ export const CartProvider = ({ children }) => {
     deleteItem();
   };
 
-  const updateQuantity = (productId, quantity) => {
-    if (quantity < 1) {
-      removeFromCart(productId);
+  const updateQuantity = (productId, newQuantity) => {
+    const item = cart.items.find(i => i.productId === productId);
+    if (!item) return;
+
+    const quantityChange = newQuantity - item.quantity;
+
+    if (newQuantity < 1) {
+      removeFromCart(productId); // If new quantity is 0 or less, remove the item
     } else {
-      syncCartItem(productId, quantity);
+      syncCartItem(productId, quantityChange); // Send the change in quantity, not the new total
     }
   };
 

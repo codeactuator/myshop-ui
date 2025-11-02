@@ -87,11 +87,15 @@ const DeliveryFleetPage = () => {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/deliveryPartners/${partnerId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isAvailable: !currentAvailability }),
+        body: JSON.stringify({ available: !currentAvailability }),
       });
       if (!response.ok) throw new Error('Failed to update partner status.');
       const updatedPartner = await response.json();
-      setPartners(partners.map(p => p.id === partnerId ? updatedPartner : p));
+      // Correctly merge the updated fields into the existing partner object
+      // to preserve the enriched data (like name, phone).
+      setPartners(partners.map(p => 
+        p.id === partnerId ? { ...p, ...updatedPartner } : p
+      ));
     } catch (err) {
       alert(err.message);
     }
@@ -153,7 +157,7 @@ const DeliveryFleetPage = () => {
             >
               <Popup>
                 <strong>{partner.name}</strong><br />
-                Status: {partner.isAvailable ? 'Available' : 'Unavailable'}<br />
+                Status: {partner.available ? 'Available' : 'Unavailable'}<br />
                 Active Deliveries: {orders.filter(o => o.deliveryPartnerId === partner.id && (o.status === 'preparing' || o.status === 'out_for_delivery')).length}
               </Popup>
             </Marker>
@@ -186,9 +190,9 @@ const DeliveryFleetPage = () => {
                 <h3>{partner.name}</h3>
                 <p>Phone: {partner.phone}</p>
                 <p>Active Deliveries: {orders.filter(o => o.deliveryPartnerId === partner.id && (o.status === 'preparing' || o.status === 'out_for_delivery')).length}</p>
-                <p>Status: <span className={partner.isAvailable ? 'status-available' : 'status-unavailable'}>{partner.isAvailable ? 'Available' : 'Unavailable'}</span></p>
+                <p>Status: <span className={partner.available ? 'status-available' : 'status-unavailable'}>{partner.available ? 'Available' : 'Unavailable'}</span></p>
                 <div className="partner-actions">
-                  <button className="btn btn-secondary" onClick={(e) => { e.stopPropagation(); handleToggleAvailability(partner.id, partner.isAvailable); }}>Toggle Availability</button>
+                  <button className="btn btn-secondary" onClick={(e) => { e.stopPropagation(); handleToggleAvailability(partner.id, partner.available); }}>Toggle Availability</button>
                   <button className="btn btn-secondary" onClick={(e) => { e.stopPropagation(); setEditingPartner(partner); }}>Edit</button>
                 </div>
               </div>

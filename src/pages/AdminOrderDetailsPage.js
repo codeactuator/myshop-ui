@@ -52,7 +52,7 @@ const AdminOrderDetailsPage = () => {
   if (error) return <div className="page-status">Error: {error}</div>;
   if (!order) return <div className="page-status">Order not found.</div>;
 
-  const currentStatusIndex = statusSteps.indexOf(order.status);
+  const currentStatusIndex = statusSteps.indexOf(order.status?.toLowerCase());
 
   return (
     <div className="order-tracking-container">

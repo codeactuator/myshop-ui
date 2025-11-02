@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Navigate, Link, Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Navigate, Outlet, NavLink } from 'react-router-dom';
 import './AdminDashboardPage.css';
 
 const AdminDashboardPage = () => {
-  const { currentUser, logout } = useAuth();
+  const { currentUser } = useAuth();
   const [users, setUsers] = useState([]);
-  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [deliveryPartners, setDeliveryPartners] = useState([]);
   const [reports, setReports] = useState([]);
@@ -35,50 +34,9 @@ const AdminDashboardPage = () => {
         const reportsData = await reportsResponse.json();
         const deliveryPartnersData = await deliveryPartnersResponse.json();
 
-        // Enrich products with seller info
-        const usersMap = new Map(usersData.map(u => [u.id, u]));
-        const enrichedProducts = productsData.map(p => ({
-          ...p,
-          seller: usersMap.get(p.userId)
-        }));
-
-        // Step 5: Get all unique seller IDs from all orders
-        const allSellerIdsFromOrders = [...new Set(ordersData.flatMap(order => order.items?.map(item => item.userId).filter(Boolean) || []))];
-
-        // Step 6: Fetch all unique sellers for the orders in a single request
-        let orderSellersMap = new Map();
-        if (allSellerIdsFromOrders.length > 0) {
-          const orderSellersResponse = await fetch(`${process.env.REACT_APP_API_URL}/users?ids=${allSellerIdsFromOrders.join(',')}`);
-          if (!orderSellersResponse.ok) {
-            throw new Error('Failed to fetch seller information for orders.');
-          }
-          const orderSellersData = await orderSellersResponse.json();
-          orderSellersMap = new Map(orderSellersData.map(user => [user.id, user]));
-        }
-
-        const deliveryPartnersMap = new Map(deliveryPartnersData.map(p => [p.id, p]));
-        const dummyPartner = { id: 'dummy', name: 'Unassigned' };
-        const enrichedOrders = ordersData.map(order => {
-          const sellerIds = new Set(order.items?.map(item => item.userId).filter(Boolean));
-          const finalOrder = {
-            ...order,
-            deliveryPartner: deliveryPartnersMap.get(order.deliveryPartnerId),
-            sellers: [...sellerIds].map(id => orderSellersMap.get(id)).filter(Boolean)
-          };
-
-          // If an order has no delivery partner, assign a dummy one for display purposes.
-          if (!finalOrder.deliveryPartner) {
-            finalOrder.deliveryPartner = dummyPartner;
-          }
-
-          return {
-            ...finalOrder
-          }; 
-        });
-
         setUsers(usersData);
-        setOrders(enrichedOrders);
-        setProducts(enrichedProducts);
+        setOrders(ordersData);
+        setProducts(productsData);
         setReports(reportsData);
         setDeliveryPartners(deliveryPartnersData);
       } catch (err) {
@@ -89,13 +47,7 @@ const AdminDashboardPage = () => {
     };
 
     fetchData();
-
-    // Set up polling to refresh data every 15 seconds
-    const interval = setInterval(fetchData, 15000);
-
-    // Cleanup interval on component unmount
-    return () => clearInterval(interval);
-  }, []); // Empty dependency array ensures this runs once on mount and cleans up on unmount
+  }, []);
 
   const totalRevenue = useMemo(() => {
     return orders
@@ -123,31 +75,9 @@ const AdminDashboardPage = () => {
   }, [products]);
 
   const unassignedOrders = useMemo(() => {
-    return orders.filter(order => order.status === 'ready_for_ship' && !order.deliveryPartnerId);
+    return orders.filter(order => order.status === 'pending' && !order.deliveryPartnerId);
   }, [orders]);
 
-  const partnerAvailability = useMemo(() => {
-    return deliveryPartners.reduce((acc, partner) => {
-      if (partner.isAvailable) {
-        acc.available += 1;
-      } else {
-        acc.unavailable += 1;
-      }
-      return acc;
-    }, { available: 0, unavailable: 0 });
-  }, [deliveryPartners]);
-
-  const ordersByStatus = useMemo(() => {
-    const statusCounts = orders.reduce((acc, order) => {
-      const status = order.status || 'unknown';
-      acc[status] = (acc[status] || 0) + 1;
-      return acc;
-    }, {});
-    return {
-      labels: Object.keys(statusCounts).map(s => s.replace('_', ' ')),
-      data: Object.values(statusCounts),
-    };
-  }, [orders]);
   const handleManualAssign = async (orderId, partnerId) => {
     if (!partnerId) {
       alert('Please select a delivery partner.');
@@ -157,7 +87,7 @@ const AdminDashboardPage = () => {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/orders/${orderId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ deliveryPartnerId: partnerId, status: 'out_for_delivery' }),
+        body: JSON.stringify({ deliveryPartnerId: partnerId, status: 'ready_for_ship' }),
       });
       if (!response.ok) throw new Error('Failed to assign order.');
       const updatedOrder = await response.json();
@@ -169,24 +99,15 @@ const AdminDashboardPage = () => {
   };
 
   const handleAutoAssign = (orderId) => {
-    // Simple auto-assign logic: find the available partner with the fewest active deliveries.
-    const availablePartners = deliveryPartners.filter(p => p.isAvailable);
+    const availablePartners = deliveryPartners.filter(p => p.available);
     if (availablePartners.length === 0) {
       alert('No delivery partners are available right now.');
       return;
     }
 
-    // Sort by workload (ascending), then by a random factor to distribute evenly
-    const sortedPartners = [...availablePartners].sort((a, b) => {
-      if (a.activeDeliveries < b.activeDeliveries) return -1;
-      if (a.activeDeliveries > b.activeDeliveries) return 1;
-      return Math.random() - 0.5;
-    });
-
+    const sortedPartners = [...availablePartners].sort((a, b) => a.activeDeliveries - b.activeDeliveries);
     const bestPartner = sortedPartners[0];
 
-    // In a real app, you'd also consider location.
-    // For now, we just assign to the one with the least workload.
     if (bestPartner) {
       handleManualAssign(orderId, bestPartner.id);
     } else {
@@ -194,12 +115,6 @@ const AdminDashboardPage = () => {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/welcome');
-  };
-
-  // Protect this route
   if (!currentUser || currentUser.userType?.toLowerCase() !== 'admin') {
     return <Navigate to="/products" />;
   }
@@ -211,37 +126,27 @@ const AdminDashboardPage = () => {
     <div className="admin-dashboard-container">
       <aside className="admin-sidebar">
         <nav>
-          <NavLink to="/admin/dashboard" end>Home</NavLink>
           <NavLink to="/admin/dashboard/users">Users</NavLink>
-          <NavLink to="/admin/dashboard/products">Products</NavLink>
           <NavLink to="/admin/dashboard/orders">Orders</NavLink>
           <NavLink to="/admin/dashboard/delivery-fleet">Delivery Fleet</NavLink>
           <NavLink to="/admin/dashboard/reports">Reports</NavLink>
         </nav>
       </aside>
       <div className="admin-main-content">
-        <div className="admin-header">
-          <h1>Admin Dashboard</h1>
-          <button onClick={handleLogout} className="btn btn-secondary">Logout</button>
-        </div>
-        <div className="admin-page-content">
-          <Outlet context={{
-            users,
-            orders,
-            setOrders,
-            products,
-            reports,
-            deliveryPartners,
-            unassignedOrders,
-            handleManualAssign,
-            handleAutoAssign,
-            popularCategories,
-            totalRevenue,
-            activeUsersCount,
-            partnerAvailability,
-            ordersByStatus
-          }} />
-        </div>
+        <Outlet context={{
+          users,
+          orders,
+          setOrders,
+          products,
+          reports,
+          deliveryPartners,
+          unassignedOrders,
+          handleManualAssign,
+          handleAutoAssign,
+          popularCategories,
+          totalRevenue,
+          activeUsersCount
+        }} />
       </div>
     </div>
   );

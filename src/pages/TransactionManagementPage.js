@@ -36,7 +36,7 @@ const TransactionManagementPage = () => {
 
     // 1. Filter by status
     if (statusFilter !== 'all') {
-      filtered = filtered.filter(order => order.status === statusFilter);
+      filtered = filtered.filter(order => order.status?.toLowerCase() === statusFilter);
     }
 
     // 2. Filter by search query
@@ -151,11 +151,11 @@ const TransactionManagementPage = () => {
                 <td>
                   {order.deliveryPartnerId ? (
                     deliveryPartners.find(p => p.id === order.deliveryPartnerId)?.name || 'Assigned'
-                  ) : order.status === 'ready_for_ship' ? (
+                  ) : order.status?.toLowerCase() === 'ready_for_ship' ? (
                     <div className="assignment-controls-table">
                       <select id={`partner-select-${order.id}`}>
                         <option value="">Select...</option>
-                        {deliveryPartners.filter(p => p.isAvailable).map(p => (
+                        {deliveryPartners.filter(p => p.available).map(p => (
                           <option key={p.id} value={p.id}>{p.name}</option>
                         ))}
                       </select>

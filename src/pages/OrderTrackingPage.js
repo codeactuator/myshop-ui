@@ -97,7 +97,7 @@ const OrderTrackingPage = () => {
     }
   };
 
-  const currentStatusIndex = statusSteps.indexOf(order.status);
+  const currentStatusIndex = statusSteps.indexOf(order.status?.toLowerCase());
 
   return (
     <div className="order-tracking-container">

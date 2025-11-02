@@ -36,8 +36,8 @@ const SellerOrderDetailsPage = () => {
   if (error) return <div className="page-status">Error: {error}</div>;
   if (!order) return <div className="page-status">Order not found.</div>;
 
-  const currentStatusIndex = statusSteps.indexOf(order.status);
-  const sellerItems = order.items.filter(item => item.userId === currentUser.id);
+  const currentStatusIndex = statusSteps.indexOf(order.status?.toLowerCase());
+  const sellerItems = order.items.filter(item => Number(item.userId) === currentUser.id);
 
   return (
     <div className="order-tracking-container">
