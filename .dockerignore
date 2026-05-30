@@ -1,0 +1,8 @@
+node_modules
+build
+.git
+.env.development
+*.json
+!package.json
+!package-lock.json
+*.md

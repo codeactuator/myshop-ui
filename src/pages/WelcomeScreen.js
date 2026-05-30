@@ -1,124 +1,101 @@
 import React, { useState } from 'react';
 import './WelcomeScreen.css';
-import Modal from '../components/Modal';
-import AuthForm from '../components/AuthForm';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
 
+// Pull the URL from your .env file
+const API_URL = process.env.REACT_APP_API_URL;
 
-const WelcomeScreen = ({ onNavigate }) => {
+const WelcomeScreen = ({ navigation }) => {
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSignUpModalVisible, setIsSignUpModalVisible] = useState(false);
 
- const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+  const handleContinue = async () => {
+    if (!phoneNumber || phoneNumber.length < 10) {
+      alert('Please enter a valid 10-digit phone number.');
+      return;
+    }
 
-  const openModal = (type) => setModalContent(type);
-  const closeModal = () => setModalContent(null);
-  const navigate = useNavigate();
-  const [modalContent, setModalContent] = useState(null); // 'login' or 'signup'
-  const { login } = useAuth();
-  const { addToCart } = useCart();
-  const location = useLocation();
-
-  const handleAuthSubmit = async (formData) => {
-    const formType = modalContent;
+    setIsLoading(true);
     try {
-      const { mobileNumber: phone, ...rest } = formData;
+      // Hitting the backend endpoint that returns 404 if user doesn't exist
+      const response = await fetch(`${API_URL}/users/by-phone/${phoneNumber}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-      if (formType === 'login') {
-        const response = await fetch(`${API_URL}/users/by-phone/${phone}`);
-        if (response.ok) {
-          const user = await response.json();
-          alert(`Welcome back, ${user.name}!`);
-          login(user);
-
-          // Check if a product needs to be added to the cart
-          const productIdToAdd = location.state?.addProductAfterLogin;
-          if (productIdToAdd) {
-            const productResponse = await fetch(`${API_URL}/products/${productIdToAdd}`);
-            if (productResponse.ok) {
-              const productToAdd = await productResponse.json();
-              addToCart(productToAdd);
-              // Clear the state to prevent re-adding
-              navigate(location.pathname, { replace: true, state: {} });
-            }
-          }
-
-          closeModal();
-          if (user.userType?.toLowerCase() === 'admin') {
-            navigate('/admin/dashboard');
-          } else if (user.userType?.toLowerCase() === 'delivery_partner') {
-            navigate('/delivery/dashboard');
-          } else if (user.userType?.toLowerCase() === 'seller') {
-            navigate('/seller/dashboard');
-          } else {
-            navigate('/products');
-          }
-        } else {
-          if (response.status === 404) {
-            alert('No user found with this mobile number. Please sign up.');
-          } else {
-            throw new Error('Login failed. Please try again.');
-          }
-        }
-      } else if (formType === 'signup') {
-        // Create new user
-        const newUser = { phone, ...rest };
-        // Spring Boot expects 'apartmentNumber' not 'apartment'
-        if (newUser.apartment) {
-          newUser.apartmentNumber = newUser.apartment;
-          delete newUser.apartment;
-        }
-          const createResponse = await fetch(`${API_URL}/users`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(newUser),
-          });
-
-          if (createResponse.ok) {
-            const createdUser = await createResponse.json();
-            login(createdUser);
-
-            // Check if a product needs to be added to the cart
-            const productIdToAdd = location.state?.addProductAfterLogin;
-            if (productIdToAdd) {
-              const productResponse = await fetch(`${API_URL}/products/${productIdToAdd}`);
-              if (productResponse.ok) {
-                const productToAdd = await productResponse.json();
-                addToCart(productToAdd);
-              }
-            }
-
-            closeModal();
-            navigate('/products');
-          } else {
-            throw new Error('Failed to create user.');
-          }
+      if (response.ok) {
+        // HTTP 200: User exists
+        const user = await response.json();
+        console.log('User found:', user.name);
+        navigation.navigate('LoginPassword', { user });
+      } 
+      else if (response.status === 404) {
+        // HTTP 404: Trigger signup modal
+        setIsSignUpModalVisible(true);
+      } 
+      else {
+        alert('Server is temporarily unavailable. Please try again later.');
       }
     } catch (error) {
-      console.error('Authentication error:', error);
-      alert('An error occurred. Please try again.');
+      console.error('Connection Error:', error);
+      alert('Network error. Please check your internet connection.');
+    } finally {
+      setIsLoading(false);
     }
   };
-  return (
-    <>
-      <div className="welcome-screen">
-        <div className="welcome-content">
-          <h2>Welcome to My Shop!</h2>
-          <p>The best place for society residents to buy and sell goods.</p>
-          <div className="welcome-actions">
-            <button className="btn btn-primary" onClick={() => openModal('login')}>Login</button>
-            <button className="btn btn-secondary" onClick={() => openModal('signup')}>Sign Up</button>
-          </div>
-          <button className="btn btn-link" onClick={() => onNavigate('intro')}>See How It Works</button>
-        </div>
-      </div>
-      <Modal isOpen={!!modalContent} onClose={closeModal}>
-        {modalContent && <AuthForm formType={modalContent} onSubmit={handleAuthSubmit} />}
-      </Modal>
 
-    </>
+  return (
+    <div className="welcome-container">
+      <h1>MyShop</h1>
+      <p>Enter your phone number to get started</p>
+      
+      <input
+        type="tel"
+        placeholder="e.g. 8264481868"
+        value={phoneNumber}
+        onChange={(e) => setPhoneNumber(e.target.value)}
+        className="phone-input"
+        disabled={isLoading}
+      />
+
+      <button 
+        onClick={handleContinue} 
+        disabled={isLoading} 
+        className="continue-button"
+      >
+        {isLoading ? 'Checking...' : 'Continue'}
+      </button>
+
+      {/* Signup Modal triggered by 404 response */}
+      {isSignUpModalVisible && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Account Not Found</h3>
+            <p>The number <b>{phoneNumber}</b> is not registered yet. Create an account?</p>
+            
+            <div className="modal-actions">
+              <button 
+                onClick={() => {
+                  setIsSignUpModalVisible(false);
+                  navigation.navigate('SignUp', { phone: phoneNumber });
+                }}
+                className="signup-button"
+              >
+                Sign Up
+              </button>
+              <button 
+                onClick={() => setIsSignUpModalVisible(false)} 
+                className="cancel-button"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

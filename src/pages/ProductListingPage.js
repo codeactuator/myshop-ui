@@ -141,6 +141,28 @@ const ProductListingPage = () => {
 
   return (
     <div className="product-listing-container">
+      <style>
+        {`
+          @media (max-width: 600px) {
+            .product-listing-container {
+              padding-left: 0 !important;
+              padding-right: 0 !important;
+              width: 100% !important;
+            }
+            .page-title, .search-bar-container, .view-tabs {
+              padding-left: 15px !important;
+              padding-right: 15px !important;
+            }
+            .product-grid, .shop-grid {
+              grid-template-columns: 1fr !important;
+            }
+            .product-grid > *, .shop-grid > * {
+              width: 100% !important;
+              max-width: 100% !important;
+            }
+          }
+        `}
+      </style>
       <h1 className="page-title">Community Marketplace</h1>
       <div className="search-bar-container" ref={searchContainerRef}>
         <svg xmlns="http://www.w3.org/2000/svg" className="search-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
