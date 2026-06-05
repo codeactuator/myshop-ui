@@ -2,32 +2,64 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 50px;
+    padding: 20px 15px; /* Reduced top padding to make header area feel tighter */
     font-family: Arial, sans-serif;
+    min-height: 80vh;
+    justify-content: center;
+}
+
+.welcome-container h1 {
+    color: #5A189A;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    font-weight: 800;
+}
+
+.phone-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .phone-input {
-    padding: 12px;
+    padding: 14px;
     font-size: 16px;
-    width: 280px;
+    width: 300px;
     margin-bottom: 15px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+    border-radius: 25px;
+    border: 1px solid #e9ecef;
+    background-color: #f8f9fa;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.phone-input:focus {
+    outline: none;
+    border-color: #5A189A;
+    box-shadow: 0 0 8px rgba(90, 24, 154, 0.2);
+    background-color: #fff;
 }
 
 .continue-button {
-    padding: 12px 30px;
+    padding: 14px 40px;
     font-size: 16px;
-    background-color: #007bff;
+    background-color: #5A189A;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 25px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.3s, transform 0.2s;
+    width: 300px;
+    font-weight: 600;
 }
 
 .continue-button:disabled {
     background-color: #ccc;
+}
+
+.continue-button:hover:not(:disabled) {
+    background-color: #3C096C;
+    transform: translateY(-1px);
 }
 
 .modal-overlay {
@@ -46,10 +78,17 @@
 .modal-content {
     background: white;
     padding: 30px;
-    border-radius: 10px;
+    border-radius: 20px;
     max-width: 400px;
+    width: 90%;
     text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .modal-actions {
@@ -59,12 +98,22 @@
 }
 
 .signup-button {
-    padding: 10px 20px;
-    background-color: #28a745;
+    padding: 12px 25px;
+    background-color: #5A189A;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 25px;
     cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.signup-button:hover {
+    background-color: #3C096C;
+}
+
+.signup-button.primary-purple {
+    background-color: #5A189A;
 }
 
 .cancel-button {
@@ -72,6 +121,14 @@
     background-color: #6c757d;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 25px;
     cursor: pointer;
+    font-weight: 600;
+}
+
+.otp-display {
+    letter-spacing: 8px;
+    font-size: 28px !important;
+    font-weight: bold;
+    color: #5A189A;
 }

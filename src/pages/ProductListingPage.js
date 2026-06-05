@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import ProductCard from '../components/ProductCard';
 import ShopCard from '../components/ShopCard';
 import './ProductListingPage.css'; // This import is now correct
@@ -12,12 +14,13 @@ const ProductListingPage = () => {
   const [activeTab, setActiveTab] = useState('products'); // 'products' or 'shops'
   const [error, setError] = useState(null);
   const searchContainerRef = useRef(null);
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // Step 1: Fetch all available products
-        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+        const API_URL = process.env.REACT_APP_API_URL;
         const productsResponse = await fetch(`${API_URL}/products?status=available`);
         if (!productsResponse.ok) {
           throw new Error('Network response was not ok');
@@ -141,29 +144,6 @@ const ProductListingPage = () => {
 
   return (
     <div className="product-listing-container">
-      <style>
-        {`
-          @media (max-width: 600px) {
-            .product-listing-container {
-              padding-left: 0 !important;
-              padding-right: 0 !important;
-              width: 100% !important;
-            }
-            .page-title, .search-bar-container, .view-tabs {
-              padding-left: 15px !important;
-              padding-right: 15px !important;
-            }
-            .product-grid, .shop-grid {
-              grid-template-columns: 1fr !important;
-            }
-            .product-grid > *, .shop-grid > * {
-              width: 100% !important;
-              max-width: 100% !important;
-            }
-          }
-        `}
-      </style>
-      <h1 className="page-title">Community Marketplace</h1>
       <div className="search-bar-container" ref={searchContainerRef}>
         <svg xmlns="http://www.w3.org/2000/svg" className="search-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
           <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />

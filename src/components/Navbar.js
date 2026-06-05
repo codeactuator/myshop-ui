@@ -18,7 +18,7 @@ const Navbar = ({ toggleSideNav }) => {
             </button>
           )}
           <Link to="/products" className="navbar-logo">
-            My Shop
+            hungrynow
           </Link>
         </div>
         <ul className="nav-menu">

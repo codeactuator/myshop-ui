@@ -8,7 +8,7 @@ export const useCart = () => useContext(CartContext);
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(null); // Will hold the entire cart object { id, userId, items, totalAmount }
   const { currentUser } = useAuth();
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+  const API_URL = process.env.REACT_APP_API_URL;
 
   const fetchCart = useCallback(async () => {
     if (currentUser) {

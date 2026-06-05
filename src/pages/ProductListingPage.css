@@ -41,8 +41,8 @@
 
 .product-listing-container .search-input:focus {
   outline: none;
-  border-color: #7B2CBF;
-  box-shadow: 0 0 8px rgba(123, 44, 191, 0.2);
+  border-color: #5A189A;
+  box-shadow: 0 0 8px rgba(90, 24, 154, 0.2);
   background-color: #fff;
 }
 
@@ -111,7 +111,7 @@
 
 .tab-btn.active {
   background-color: #fff;
-  color: #7B2CBF; /* A nice purple to match the search focus */
+  color: #5A189A; /* A darker purple to match the new theme */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -120,4 +120,23 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .product-listing-container {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 100% !important;
+  }
+  .page-title, .search-bar-container, .view-tabs {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+  }
+  .product-grid, .shop-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .product-grid > *, .shop-grid > * {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
 }

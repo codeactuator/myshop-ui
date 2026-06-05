@@ -1,6 +1,6 @@
 .navbar {
-  background: #7B2CBF;
-  height: 80px;
+  background: #5A189A;
+  height: 60px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -14,7 +14,7 @@
 .navbar-container {
   display: flex;
   justify-content: space-between;
-  height: 80px;
+  height: 60px;
   z-index: 1;
   width: 100%;
   padding: 0 24px;
@@ -32,7 +32,7 @@
   justify-self: start;
   cursor: pointer;
   text-decoration: none;
-  font-size: 2rem;
+  font-size: 1.5rem;
   display: flex;
   align-items: center;
   font-family: 'Poppins', sans-serif;
@@ -58,7 +58,7 @@
 }
 
 .nav-item {
-  height: 80px;
+  height: 60px;
 }
 
 .nav-links {
@@ -80,14 +80,14 @@
 
 .nav-button {
   background-color: #fff;
-  color: #7B2CBF !important;
-  padding: 8px 20px !important;
-  border-radius: 5px;
+  color: #5A189A !important;
+  padding: 6px 18px !important;
+  border-radius: 25px;
   font-weight: 700;
 }
 
 .nav-button:hover {
-  background-color: #f3e8ff !important;
+  background-color: #e9d5ff !important;
 }
 
 .nav-links .fa-shopping-cart,
@@ -95,18 +95,48 @@
 .nav-links .fa-store,
 .nav-links .fa-sign-in-alt,
 .nav-links .fa-boxes {
-  font-size: 1.4rem;
+  font-size: 1.1rem;
 }
 
 .cart-badge {
   background-color: #fff;
-  color: #7B2CBF;
+  color: #5A189A;
   border-radius: 50%;
   padding: 3px 7px;
   font-size: 0.7rem;
   position: absolute;
-  top: 18px;
+  top: 12px;
   right: 5px;
   font-weight: 700;
-  border: 1px solid #7B2CBF;
+  border: 1px solid #5A189A;
+}
+
+/* Global Button Theme for hungrynow application */
+.btn-primary, 
+.place-order-btn, 
+.contact-seller-btn, 
+.report-btn,
+.edit-btn,
+.add-review-section button {
+  background-color: #5A189A !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 25px !important;
+  padding: 10px 25px !important;
+  font-weight: 600 !important;
+  transition: background-color 0.3s ease, transform 0.2s ease !important;
+  cursor: pointer;
+  text-decoration: none !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary:hover, 
+.place-order-btn:hover, 
+.contact-seller-btn:hover, 
+.report-btn:hover,
+.edit-btn:hover {
+  background-color: #3C096C !important;
+  transform: translateY(-1px);
 }

@@ -1,27 +1,35 @@
-.splash-screen {
+.splash-container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   height: 100vh;
-  background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url('https://images.unsplash.com/photo-1533900298318-6b8da08a523e?q=80&w=2070');
-  background-size: cover;
-  background-position: center;
-  color: #222222; /* Match heading color */
-  text-align: center;
+  width: 100vw;
+  background-color: #5A189A; /* Updated to follow application dark purple theme */
+  color: white;
+  overflow: hidden;
 }
 
 .splash-logo {
-  height: 20vmin;
-  pointer-events: none;
-  animation: App-logo-spin infinite 20s linear;
+  font-size: 4rem;
+  font-weight: 800;
+  letter-spacing: -2px;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  animation: splashPulse 2s infinite ease-in-out;
+  text-transform: lowercase;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+@keyframes splashPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
   }
-  to {
-    transform: rotate(360deg);
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
   }
 }

@@ -1,95 +1,178 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useMessage } from '../context/MessageContext';
 import './WelcomeScreen.css';
 
-// Pull the URL from your .env file
-const API_URL = process.env.REACT_APP_API_URL;
+const WelcomeScreen = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const { showMessage } = useMessage();
+  const [phone, setPhone] = useState('');
+  const [step, setStep] = useState('phone'); // Steps: 'phone', 'signup', 'otp'
+  const [otp, setOtp] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [userData, setUserData] = useState({ name: '', email: '' });
+  const [isExistingUser, setIsExistingUser] = useState(false);
 
-const WelcomeScreen = ({ navigation }) => {
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSignUpModalVisible, setIsSignUpModalVisible] = useState(false);
+  const API_URL = process.env.REACT_APP_API_URL;
+  console.log("Current API URL:", API_URL);
+  const HARDCODED_OTP = '1111';
 
+  // Step 1: Check if user exists by phone
   const handleContinue = async () => {
-    if (!phoneNumber || phoneNumber.length < 10) {
-      alert('Please enter a valid 10-digit phone number.');
+    if (phone.length < 10) {
+      showMessage('Invalid Phone', 'Please enter a valid 10-digit phone number');
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/users/by-phone/${phone}`);
+      if (response.ok) {
+        setIsExistingUser(true); // User exists, go to OTP for Login
+        setStep('otp');
+      } else if (response.status === 404) {
+        setIsExistingUser(false); // User doesn't exist, go to Signup
+        setStep('signup');
+      } else {
+        showMessage('Server Error', 'Server is temporarily busy. Please try again later.');
+      }
+    } catch (error) {
+      showMessage('Network Error', 'Check your internet connection and try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Step 2 (Optional): Collect registration details if user is new
+  const handleSignupSubmit = (e) => {
+    e.preventDefault();
+    if (!userData.name || !userData.email) {
+      showMessage('Incomplete Data', 'Please enter your name and email address.');
+      return;
+    }
+    setStep('otp');
+  };
+
+  // Step 3: Verify OTP and finalize Login/Signup
+  const handleVerifyOtp = async () => {
+    if (otp !== HARDCODED_OTP) {
+      showMessage('Invalid OTP', 'The code you entered is incorrect. For testing, use 1111.');
       return;
     }
 
-    setIsLoading(true);
+    setLoading(true);
     try {
-      // Hitting the backend endpoint that returns 404 if user doesn't exist
-      const response = await fetch(`${API_URL}/users/by-phone/${phoneNumber}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        // HTTP 200: User exists
+      if (isExistingUser) {
+        // Fetch user info to finalize login
+        const response = await fetch(`${API_URL}/users/by-phone/${phone}`);
         const user = await response.json();
-        console.log('User found:', user.name);
-        navigation.navigate('LoginPassword', { user });
-      } 
-      else if (response.status === 404) {
-        // HTTP 404: Trigger signup modal
-        setIsSignUpModalVisible(true);
-      } 
-      else {
-        alert('Server is temporarily unavailable. Please try again later.');
+        console.log('User Logged In:', user);
+        login(user);
+        showMessage('Welcome', `Welcome back, ${user.name}!`, () => {
+          navigate('/products'); 
+        });
+      } else {
+        // Register new user
+        const response = await fetch(`${API_URL}/users`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            phone,
+            name: userData.name,
+            email: userData.email,
+            userType: 'BUYER',
+          }),
+        });
+
+        if (response.ok) {
+          const newUser = await response.json();
+          console.log('User Registered:', newUser);
+          login(newUser);
+          showMessage('Success', `Account created successfully for ${newUser.name}!`, () => {
+            navigate('/products');
+          });
+        } else {
+          const errorData = await response.json();
+          showMessage('Signup Failed', errorData.error || 'Registration could not be completed.');
+        }
       }
     } catch (error) {
-      console.error('Connection Error:', error);
-      alert('Network error. Please check your internet connection.');
+      showMessage('Auth Error', 'Authentication process failed.');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
     <div className="welcome-container">
-      <h1>MyShop</h1>
-      <p>Enter your phone number to get started</p>
-      
-      <input
-        type="tel"
-        placeholder="e.g. 8264481868"
-        value={phoneNumber}
-        onChange={(e) => setPhoneNumber(e.target.value)}
-        className="phone-input"
-        disabled={isLoading}
-      />
+      <h1>hungrynow</h1>
 
-      <button 
-        onClick={handleContinue} 
-        disabled={isLoading} 
-        className="continue-button"
-      >
-        {isLoading ? 'Checking...' : 'Continue'}
-      </button>
+      {step === 'phone' && (
+        <div className="phone-step">
+          <p style={{ marginBottom: '1.5rem', color: '#666' }}>Get started with your phone number</p>
+          <input
+            className="phone-input"
+            type="tel"
+            placeholder="e.g. 8264481868"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+          <button className="continue-button" onClick={handleContinue} disabled={loading}>
+            {loading ? 'Checking...' : 'Continue'}
+          </button>
+        </div>
+      )}
 
-      {/* Signup Modal triggered by 404 response */}
-      {isSignUpModalVisible && (
+      {step === 'signup' && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h3>Account Not Found</h3>
-            <p>The number <b>{phoneNumber}</b> is not registered yet. Create an account?</p>
-            
+            <h3>Create Account</h3>
+            <p>Tell us a bit about yourself to join the community.</p>
+            <form onSubmit={handleSignupSubmit}>
+              <input
+                className="phone-input"
+                type="text"
+                placeholder="Full Name"
+                value={userData.name}
+                onChange={(e) => setUserData({ ...userData, name: e.target.value })}
+                required
+              />
+              <input
+                className="phone-input"
+                type="email"
+                placeholder="Email Address"
+                value={userData.email}
+                onChange={(e) => setUserData({ ...userData, email: e.target.value })}
+                required
+              />
+              <div className="modal-actions">
+                <button type="button" className="cancel-button" onClick={() => setStep('phone')}>Back</button>
+                <button type="submit" className="signup-button primary-purple">Go to OTP</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {step === 'otp' && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Verification</h3>
+            <p>Enter the 4-digit code sent to {phone}</p>
+            <p><small>(Use 1111 for testing)</small></p>
+            <input
+              className="phone-input otp-display"
+              type="text"
+              maxLength="4"
+              placeholder="0000"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+            />
             <div className="modal-actions">
-              <button 
-                onClick={() => {
-                  setIsSignUpModalVisible(false);
-                  navigation.navigate('SignUp', { phone: phoneNumber });
-                }}
-                className="signup-button"
-              >
-                Sign Up
-              </button>
-              <button 
-                onClick={() => setIsSignUpModalVisible(false)} 
-                className="cancel-button"
-              >
-                Cancel
+              <button className="cancel-button" onClick={() => setStep(isExistingUser ? 'phone' : 'signup')}>Back</button>
+              <button className="signup-button primary-purple" onClick={handleVerifyOtp} disabled={loading}>
+                {loading ? 'Verifying...' : 'Verify & Continue'}
               </button>
             </div>
           </div>
