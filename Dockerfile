@@ -14,14 +14,15 @@ FROM nginx:alpine
 COPY --from=build /app/build /usr/share/nginx/html
 
 # Create a custom Nginx config to handle React Router (SPA) 404s
-RUN echo 'server { \
-    listen 80; \
-    location / { \
-        root /usr/share/nginx/html; \
-        index index.html index.htm; \
-        try_files $uri $uri/ /index.html; \
-    } \
-}' > /etc/nginx/conf.d/default.conf
+RUN printf "server {\n\
+    listen 80;\n\
+    root /usr/share/nginx/html;\n\
+    index index.html index.htm;\n\
+    location / {\n\
+        try_files \$uri \$uri/ /index.html;\n\
+    }\n\
+    location ~* \\.(?:manifest|appcache|html?|xml|json)$ { expires -1; }\n\
+}\n" > /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
-CMD ["sh", "-c", "sed -i 's/listen 80;/listen '\"$PORT\"';/g' /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
+CMD ["sh", "-c", "sed -i \"s/listen 80;/listen $PORT;/\" /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]

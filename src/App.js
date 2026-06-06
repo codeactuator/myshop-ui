@@ -31,10 +31,10 @@ import EditProductPage from './pages/EditProductPage';
 import AddProductPage from './pages/AddProductPage';
 import UpiPaymentPage from './pages/UpiPaymentPage';
 import ShopConfigPage from './pages/ShopConfigPage';
-
-import { CartProvider } from './context/CartContext';
+import ShopPage from './pages/ShopPage';
 import { AuthProvider } from './context/AuthContext';
 import { MessageProvider } from './context/MessageContext';
+import { CartProvider } from './context/CartContext';
 import MainLayout from './components/MainLayout';
 import { useNavigate } from 'react-router-dom';
 
@@ -86,6 +86,7 @@ function App() {
               <Route path="/seller/add-product" element={<AddProductPage />} />
               <Route path="/seller/shop-config" element={<ShopConfigPage />} />
 
+              <Route path="/shops/:sellerId" element={<ShopPage />} />
               <Route path="/payment/upi/:orderId" element={<UpiPaymentPage />} />
               </Route>
 

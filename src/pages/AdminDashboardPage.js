@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useMessage } from '../context/MessageContext';
 import { Navigate, Outlet, NavLink } from 'react-router-dom';
 import './AdminDashboardPage.css';
 
 const AdminDashboardPage = () => {
   const { currentUser } = useAuth();
+  const { showMessage } = useMessage();
   const [users, setUsers] = useState([]);
   const [orders, setOrders] = useState([]);
   const [deliveryPartners, setDeliveryPartners] = useState([]);
@@ -17,22 +19,19 @@ const AdminDashboardPage = () => {
     const fetchData = async () => {
       try {
         const [usersResponse, ordersResponse, productsResponse, reportsResponse, deliveryPartnersResponse] = await Promise.all([
-          fetch(`${process.env.REACT_APP_API_URL}/users`),
-          fetch(`${process.env.REACT_APP_API_URL}/orders`),
-          fetch(`${process.env.REACT_APP_API_URL}/products`),
-          fetch(`${process.env.REACT_APP_API_URL}/reports`),
-          fetch(`${process.env.REACT_APP_API_URL}/deliveryPartners`),
+          fetch(`${process.env.REACT_APP_API_URL}/users`).catch(e => ({ ok: false, error: e })),
+          fetch(`${process.env.REACT_APP_API_URL}/orders`).catch(e => ({ ok: false, error: e })),
+          fetch(`${process.env.REACT_APP_API_URL}/products`).catch(e => ({ ok: false, error: e })),
+          fetch(`${process.env.REACT_APP_API_URL}/reports`).catch(e => ({ ok: false, error: e })),
+          fetch(`${process.env.REACT_APP_API_URL}/delivery/partners`).catch(e => ({ ok: false, error: e })),
         ]);
 
-        if (!usersResponse.ok || !ordersResponse.ok || !productsResponse.ok || !reportsResponse.ok || !deliveryPartnersResponse.ok) {
-          throw new Error('Failed to fetch dashboard data.');
-        }
-
-        const usersData = await usersResponse.json();
-        const ordersData = await ordersResponse.json();
-        const productsData = await productsResponse.json();
-        const reportsData = await reportsResponse.json();
-        const deliveryPartnersData = await deliveryPartnersResponse.json();
+        // Check responses individually or handle partial failures
+        const usersData = usersResponse.ok ? await usersResponse.json() : [];
+        const ordersData = ordersResponse.ok ? await ordersResponse.json() : [];
+        const productsData = productsResponse.ok ? await productsResponse.json() : [];
+        const reportsData = reportsResponse.ok ? await reportsResponse.json() : [];
+        const deliveryPartnersData = deliveryPartnersResponse.ok ? await deliveryPartnersResponse.json() : [];
 
         setUsers(usersData);
         setOrders(ordersData);
@@ -80,7 +79,7 @@ const AdminDashboardPage = () => {
 
   const handleManualAssign = async (orderId, partnerId) => {
     if (!partnerId) {
-      alert('Please select a delivery partner.');
+      showMessage('Selection Required', 'Please select a delivery partner.');
       return;
     }
     try {
@@ -92,16 +91,16 @@ const AdminDashboardPage = () => {
       if (!response.ok) throw new Error('Failed to assign order.');
       const updatedOrder = await response.json();
       setOrders(orders.map(o => o.id === orderId ? updatedOrder : o));
-      alert(`Order ${orderId} assigned to partner ${partnerId}.`);
+      showMessage('Success', `Order ${orderId} assigned to partner ${partnerId}.`);
     } catch (err) {
-      alert(err.message);
+      showMessage('Assignment Error', err.message);
     }
   };
 
   const handleAutoAssign = (orderId) => {
     const availablePartners = deliveryPartners.filter(p => p.available);
     if (availablePartners.length === 0) {
-      alert('No delivery partners are available right now.');
+      showMessage('No Partners', 'No delivery partners are available right now.');
       return;
     }
 
@@ -111,7 +110,7 @@ const AdminDashboardPage = () => {
     if (bestPartner) {
       handleManualAssign(orderId, bestPartner.id);
     } else {
-      alert('Could not determine the best partner to assign.');
+      showMessage('Error', 'Could not determine the best partner to assign.');
     }
   };
 

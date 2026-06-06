@@ -16,7 +16,6 @@ const WelcomeScreen = () => {
   const [isExistingUser, setIsExistingUser] = useState(false);
 
   const API_URL = process.env.REACT_APP_API_URL;
-  console.log("Current API URL:", API_URL);
   const HARDCODED_OTP = '1111';
 
   // Step 1: Check if user exists by phone
@@ -38,7 +37,8 @@ const WelcomeScreen = () => {
         showMessage('Server Error', 'Server is temporarily busy. Please try again later.');
       }
     } catch (error) {
-      showMessage('Network Error', 'Check your internet connection and try again.');
+      // Log the full error to help identify Mixed Content or DNS issues on mobile
+      showMessage('Network Error', `Unable to reach server. Error: ${error.message}. API Path: ${API_URL}`);
     } finally {
       setLoading(false);
     }

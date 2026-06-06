@@ -6,7 +6,7 @@ import './Navbar.css';
  
 const Navbar = ({ toggleSideNav }) => {
   const { cartCount } = useCart();
-  const { currentUser } = useAuth();
+  const { currentUser, logout } = useAuth();
 
   return (
     <nav className="navbar">
@@ -23,16 +23,23 @@ const Navbar = ({ toggleSideNav }) => {
         </div>
         <ul className="nav-menu">
           {currentUser && (
-            <li className="nav-item">
-              <Link to="/cart" className="nav-links">
-                <i className="fas fa-shopping-cart"></i>
-                {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
-              </Link>
-            </li>
+            <>
+              <li className="nav-item">
+                <Link to="/cart" className="nav-links">
+                  <i className="fas fa-shopping-cart"></i>
+                  {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+                </Link>
+              </li>
+              <li className="nav-item">
+                <div className="nav-links" onClick={logout} title="Sign Out">
+                  <i className="fas fa-sign-out-alt"></i>
+                </div>
+              </li>
+            </>
           )}
           {!currentUser && (
             <li className="nav-item">
-              <Link to="/welcome" className="nav-links nav-button">
+              <Link to="/welcome" className="nav-links" title="Sign In">
                 <i className="fas fa-sign-in-alt"></i>
               </Link>
             </li>
