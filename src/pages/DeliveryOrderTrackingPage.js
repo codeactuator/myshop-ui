@@ -30,12 +30,12 @@ const DeliveryOrderTrackingPage = () => {
 
         // If a delivery partner is assigned, fetch its details, then its vehicle
         if (data.deliveryPartnerId) {
-          const partnerResponse = await fetch(`${process.env.REACT_APP_API_URL}/deliveryPartners/${data.deliveryPartnerId}`);
+          const partnerResponse = await fetch(`${process.env.REACT_APP_API_URL}/delivery/partners/${data.deliveryPartnerId}`);
           if (partnerResponse.ok) {
             const partnerData = await partnerResponse.json();
             data.deliveryPartner = partnerData;
             if (partnerData.vehicleId) {
-              const vehicleResponse = await fetch(`${process.env.REACT_APP_API_URL}/deliveryVehicles/${partnerData.vehicleId}`);
+              const vehicleResponse = await fetch(`${process.env.REACT_APP_API_URL}/delivery/vehicles/${partnerData.vehicleId}`);
               if (vehicleResponse.ok) data.deliveryPartner.vehicle = await vehicleResponse.json();
             }
           }

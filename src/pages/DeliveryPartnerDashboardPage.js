@@ -26,7 +26,7 @@ const DeliveryPartnerDashboardPage = () => {
     const fetchData = async () => {
       try {
         // 1. Find the partner profile linked to the current user
-        const partnersResponse = await fetch(`${process.env.REACT_APP_API_URL}/deliveryPartners?userId=${currentUser.id}`);
+        const partnersResponse = await fetch(`${process.env.REACT_APP_API_URL}/delivery/partners?userId=${currentUser.id}`);
         if (!partnersResponse.ok) throw new Error('Could not fetch partner profile.');
         const partnersData = await partnersResponse.json();
         if (partnersData.length === 0) throw new Error('No delivery partner profile found for this user.');
@@ -97,7 +97,7 @@ const DeliveryPartnerDashboardPage = () => {
 
     const newAvailability = !partnerProfile.available;
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/deliveryPartners/${partnerProfile.id}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/delivery/partners/${partnerProfile.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ available: newAvailability }),

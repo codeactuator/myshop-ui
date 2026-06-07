@@ -57,19 +57,19 @@ This document outlines the API endpoints consumed by the `my-shop-ui` React appl
 
 ## 4. Delivery Partners & Fleet
 
-### `GET /deliveryPartners`
+### `GET /delivery/partners`
 
 *   **Description**: Fetches all delivery partner records.
 *   **Query Params**:
     *   `?userId={userId}`: Fetches the partner profile associated with a specific user ID.
 *   **Used In**: `AdminDashboardPage.js`, `DeliveryPartnerDashboardPage.js`
 
-### `GET /deliveryVehicles/{vehicleId}`
+### `GET /delivery/vehicles/{vehicleId}`
 
 *   **Description**: Fetches the details for a specific delivery vehicle.
 *   **Used In**: `AdminOrderDetailsPage.js`, `OrderTrackingPage.js`
 
-### `PATCH /deliveryPartners/{partnerId}`
+### `PATCH /delivery/partners/{partnerId}`
 
 *   **Description**: Updates a delivery partner's profile, typically their `isAvailable` status.
 *   **Used In**: `DeliveryPartnerDashboardPage.js`

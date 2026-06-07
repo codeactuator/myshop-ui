@@ -28,7 +28,7 @@ const DeliveryFleetPage = () => {
     const fetchData = async () => {
       try {
         const [partnersResponse, ordersResponse] = await Promise.all([
-          fetch(`${process.env.REACT_APP_API_URL}/deliveryPartners`),
+          fetch(`${process.env.REACT_APP_API_URL}/delivery/partners`),
           fetch(`${process.env.REACT_APP_API_URL}/orders`)
         ]);
 
@@ -68,7 +68,7 @@ const DeliveryFleetPage = () => {
     };
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/deliveryPartners`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/delivery/partners`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(partnerPayload),
@@ -84,7 +84,7 @@ const DeliveryFleetPage = () => {
 
   const handleToggleAvailability = async (partnerId, currentAvailability) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/deliveryPartners/${partnerId}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/delivery/partners/${partnerId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ available: !currentAvailability }),
@@ -109,7 +109,7 @@ const DeliveryFleetPage = () => {
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/deliveryPartners/${editingPartner.id}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/delivery/partners/${editingPartner.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: editingPartner.name, phone: editingPartner.phone }),
