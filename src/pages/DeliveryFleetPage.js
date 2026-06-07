@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Navigate, Link } from 'react-router-dom';
+import { Navigate, Link, useOutletContext } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './DeliveryFleetPage.css';
@@ -15,38 +15,21 @@ L.Icon.Default.mergeOptions({
 });
 const DeliveryFleetPage = () => {
   const { currentUser } = useAuth();
-  const [partners, setPartners] = useState([]);
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // Use the data already fetched by the AdminDashboardPage
+  const { deliveryPartners, setDeliveryPartners, orders, loading: dashboardLoading } = useOutletContext() || {};
+  
+  const [partners, setPartners] = useState(deliveryPartners || []);
   const [newPartner, setNewPartner] = useState({ name: '', phone: '' });
   const [editingPartner, setEditingPartner] = useState(null);
   const [selectedPartnerId, setSelectedPartnerId] = useState(null);
   const partnerCardRefs = useRef({});
 
+  // Sync local state with context updates
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [partnersResponse, ordersResponse] = await Promise.all([
-          fetch(`${process.env.REACT_APP_API_URL}/delivery/partners`),
-          fetch(`${process.env.REACT_APP_API_URL}/orders`)
-        ]);
-
-        if (!partnersResponse.ok || !ordersResponse.ok) {
-          throw new Error('Failed to fetch delivery fleet data.');
-        }
-        const partnersData = await partnersResponse.json();
-        const ordersData = await ordersResponse.json();
-        setPartners(partnersData);
-        setOrders(ordersData);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+    if (deliveryPartners) {
+      setPartners(deliveryPartners);
+    }
+  }, [deliveryPartners]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -62,7 +45,7 @@ const DeliveryFleetPage = () => {
 
     const partnerPayload = {
       ...newPartner,
-      isAvailable: true,
+      available: true,
       activeDeliveries: 0,
       location: { lat: 12.9716, lng: 77.5946 } // Default location
     };
@@ -75,7 +58,9 @@ const DeliveryFleetPage = () => {
       });
       if (!response.ok) throw new Error('Failed to add partner.');
       const addedPartner = await response.json();
-      setPartners([...partners, addedPartner]);
+      const updatedFleet = [...partners, addedPartner];
+      setPartners(updatedFleet);
+      setDeliveryPartners(updatedFleet);
       setNewPartner({ name: '', phone: '' }); // Reset form
     } catch (err) {
       alert(err.message);
@@ -96,6 +81,7 @@ const DeliveryFleetPage = () => {
       setPartners(partners.map(p => 
         p.id === partnerId ? { ...p, ...updatedPartner } : p
       ));
+      setDeliveryPartners(partners.map(p => p.id === partnerId ? { ...p, ...updatedPartner } : p));
     } catch (err) {
       alert(err.message);
     }
@@ -117,6 +103,7 @@ const DeliveryFleetPage = () => {
       if (!response.ok) throw new Error('Failed to update partner.');
       const updatedPartner = await response.json();
       setPartners(partners.map(p => p.id === editingPartner.id ? updatedPartner : p));
+      setDeliveryPartners(partners.map(p => p.id === editingPartner.id ? updatedPartner : p));
       setEditingPartner(null); // Close modal
     } catch (err) {
       alert(err.message);
@@ -135,8 +122,8 @@ const DeliveryFleetPage = () => {
     return <Navigate to="/products" />;
   }
 
-  if (loading) return <div className="page-status">Loading delivery partners...</div>;
-  if (error) return <div className="page-status">Error: {error}</div>;
+  // If the dashboard is still loading its initial batch of data
+  if (dashboardLoading) return <div className="page-status">Loading fleet data...</div>;
 
   return (
     <div className="delivery-fleet-container">
@@ -149,10 +136,11 @@ const DeliveryFleetPage = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          {partners.map(partner => (
+          {partners.filter(p => p.location).map(partner => (
             <Marker 
               key={partner.id} 
               position={[partner.location.lat, partner.location.lng]}
+              icon={new L.Icon.Default()}
               eventHandlers={{ click: () => handlePartnerSelect(partner.id) }}
             >
               <Popup>
