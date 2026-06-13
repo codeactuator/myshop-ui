@@ -4,20 +4,28 @@
   align-items: center;
   height: 100vh;
   width: 100vw;
-  background-color: #5A189A; /* Updated to follow application dark purple theme */
-  color: white;
+  background-color: white;
+  padding: 0 20px;
+  box-sizing: border-box;
+  color: #5A189A;
   overflow: hidden;
 }
 
 .splash-logo {
   font-size: 4rem;
   font-weight: 800;
-  color: white;
+  color: #5A189A;
   letter-spacing: -2px;
   margin: 0;
   font-family: 'Poppins', sans-serif;
   animation: splashPulse 2s infinite ease-in-out;
   text-transform: lowercase;
+}
+
+@media (max-width: 480px) {
+  .splash-logo {
+    font-size: 3rem;
+  }
 }
 
 @keyframes splashPulse {

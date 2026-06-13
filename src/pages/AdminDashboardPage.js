@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useMessage } from '../context/MessageContext';
-import { Navigate, Outlet, NavLink } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
+import AdminNavbar from '../components/AdminNavbar'; // Keep AdminNavbar for top bar
+import AdminSideNavbar from '../components/AdminSideNavbar';
 import './AdminDashboardPage.css';
 
 const AdminDashboardPage = () => {
@@ -14,6 +16,7 @@ const AdminDashboardPage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,9 +51,24 @@ const AdminDashboardPage = () => {
     fetchData();
   }, []);
 
+  const refreshOrders = async (filters = {}) => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams(filters).toString();
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/orders?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch orders.');
+      const data = await response.json();
+      setOrders(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const totalRevenue = useMemo(() => {
     return orders
-      .filter(order => order.status === 'delivered' || order.status === 'completed')
+      .filter(order => order.status === 'DELIVERED' || order.status === 'COMPLETED')
       .reduce((acc, order) => acc + order.totalAmount, 0);
   }, [orders]);
 
@@ -74,7 +92,7 @@ const AdminDashboardPage = () => {
   }, [products]);
 
   const unassignedOrders = useMemo(() => {
-    return orders.filter(order => order.status === 'pending' && !order.deliveryPartnerId);
+    return orders.filter(order => order.status === 'PENDING' && !order.deliveryPartnerId);
   }, [orders]);
 
   const handleManualAssign = async (orderId, partnerId) => {
@@ -86,7 +104,7 @@ const AdminDashboardPage = () => {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/orders/${orderId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ deliveryPartnerId: partnerId, status: 'ready_for_ship' }),
+        body: JSON.stringify({ deliveryPartnerId: partnerId, status: 'READY_FOR_SHIP' }),
       });
       if (!response.ok) throw new Error('Failed to assign order.');
       const updatedOrder = await response.json();
@@ -122,30 +140,27 @@ const AdminDashboardPage = () => {
   if (error) return <div className="page-status">Error: {error}</div>;
 
   return (
-    <div className="admin-dashboard-container">
-      <aside className="admin-sidebar">
-        <nav>
-          <NavLink to="/admin/dashboard/users">Users</NavLink>
-          <NavLink to="/admin/dashboard/orders">Orders</NavLink>
-          <NavLink to="/admin/dashboard/delivery-fleet">Delivery Fleet</NavLink>
-          <NavLink to="/admin/dashboard/reports">Reports</NavLink>
-        </nav>
-      </aside>
-      <div className="admin-main-content">
-        <Outlet context={{
-          users,
-          orders,
-          setOrders,
-          products,
-          reports,
-          deliveryPartners,
-          unassignedOrders,
-          handleManualAssign,
-          handleAutoAssign,
-          popularCategories,
-          totalRevenue,
-          activeUsersCount
-        }} />
+    <div className="admin-dashboard-layout">
+      <AdminNavbar toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+      <div className="admin-dashboard-container">
+        <AdminSideNavbar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+        <div className="admin-main-content">
+          <Outlet context={{
+            users,
+            orders,
+            setOrders,
+            products,
+            reports,
+            deliveryPartners,
+            unassignedOrders,
+            handleManualAssign,
+            handleAutoAssign,
+            popularCategories,
+            totalRevenue,
+            activeUsersCount,
+            refreshOrders
+          }} />
+        </div>
       </div>
     </div>
   );

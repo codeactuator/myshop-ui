@@ -36,7 +36,7 @@ const TransactionManagementPage = () => {
 
     // 1. Filter by status
     if (statusFilter !== 'all') {
-      filtered = filtered.filter(order => order.status?.toLowerCase() === statusFilter);
+      filtered = filtered.filter(order => order.status === statusFilter);
     }
 
     // 2. Filter by search query
@@ -97,14 +97,14 @@ const TransactionManagementPage = () => {
         />
         <select className="filter-select" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
           <option value="all">All Statuses</option>
-          <option value="pending">Pending</option>
-          <option value="confirmed">Confirmed</option>
-          <option value="preparing">Preparing</option>
-          <option value="ready_for_ship">Ready For Ship</option>
-          <option value="out_for_delivery">Out For Delivery</option>
-          <option value="delivered">Delivered</option>
-          <option value="completed">Completed</option>
-          <option value="cancelled">Cancelled</option>
+          <option value="PENDING">Pending</option>
+          <option value="CONFIRMED">Confirmed</option>
+          <option value="PREPARING">Preparing</option>
+          <option value="READY_FOR_SHIP">Ready For Ship</option>
+          <option value="OUT_FOR_DELIVERY">Out For Delivery</option>
+          <option value="DELIVERED">Delivered</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="CANCELLED">Cancelled</option>
         </select>
       </div>
       <div className="transaction-table-container">
@@ -151,7 +151,7 @@ const TransactionManagementPage = () => {
                 <td>
                   {order.deliveryPartnerId ? (
                     deliveryPartners.find(p => p.id === order.deliveryPartnerId)?.name || 'Assigned'
-                  ) : order.status?.toLowerCase() === 'ready_for_ship' ? (
+                  ) : order.status === 'READY_FOR_SHIP' ? (
                     <div className="assignment-controls-table">
                       <select id={`partner-select-${order.id}`}>
                         <option value="">Select...</option>

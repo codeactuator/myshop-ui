@@ -214,12 +214,12 @@ const ProductDetailsPage = () => {
             <p className="seller-info-phone">
               <strong>Contact:</strong> <a href={`tel:${product.user?.phone}`}>{product.user?.phone || 'N/A'}</a>
             </p>
+            {currentUser && product.user && currentUser.id !== product.user.id && (
+              <button className="report-btn" onClick={() => setIsReportModalOpen(true)} title="Report this seller">
+                <i className="fas fa-flag"></i> Report Seller
+              </button>
+            )}
           </div>
-          {currentUser && product.user && currentUser.id !== product.user.id && (
-            <button className="report-btn" onClick={() => setIsReportModalOpen(true)} title="Report this seller">
-              <i className="fas fa-flag"></i> Report Seller
-            </button>
-          )}
           <button className="btn btn-primary contact-seller-btn" onClick={handleAddToCart}>
             Add to Cart
           </button>
@@ -236,7 +236,15 @@ const ProductDetailsPage = () => {
             </div>
             <div className="form-group">
               <label htmlFor="review-comment">Your Comment</label>
-              <textarea id="review-comment" value={newReview.comment} onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })} required />
+              <textarea
+                id="review-comment"
+                rows="5"
+                style={{ width: '100%', minHeight: '120px', padding: '12px' }}
+                placeholder="Share your experience with this product..."
+                value={newReview.comment}
+                onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+                required
+              />
             </div>
             <button type="submit" className="btn btn-primary" disabled={isSubmittingReview}>
               {isSubmittingReview ? 'Submitting...' : 'Submit Review'}

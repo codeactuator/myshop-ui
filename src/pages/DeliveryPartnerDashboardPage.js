@@ -70,11 +70,11 @@ const DeliveryPartnerDashboardPage = () => {
   }, [currentUser]);
 
   const activeOrders = useMemo(() => {
-    return assignedOrders.filter(o => ['ready_for_ship', 'out_for_delivery'].includes(o.status?.toLowerCase()));
+    return assignedOrders.filter(o => ['READY_FOR_SHIP', 'OUT_FOR_DELIVERY'].includes(o.status));
   }, [assignedOrders]);
 
   const completedOrders = useMemo(() => {
-    return assignedOrders.filter(o => o.status?.toLowerCase() === 'delivered' || o.status?.toLowerCase() === 'completed');
+    return assignedOrders.filter(o => o.status === 'DELIVERED' || o.status === 'COMPLETED');
   }, [assignedOrders]);
 
   const handleStatusUpdate = async (orderId, newStatus) => {
@@ -165,13 +165,13 @@ const DeliveryPartnerDashboardPage = () => {
                   <p><strong>Status:</strong> <span className={`status-badge status-${order.status}`}>{order.status.replace('_', ' ')}</span></p>
                 </div>
               <div className="dp-order-actions">
-                {order.status?.toLowerCase() === 'ready_for_ship' && (
-                    <button className="btn btn-primary" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleStatusUpdate(order.id, 'out_for_delivery'); }}>
+                {order.status === 'READY_FOR_SHIP' && (
+                    <button className="btn btn-primary" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleStatusUpdate(order.id, 'OUT_FOR_DELIVERY'); }}>
                     Pick Up Order
                   </button>
                 )}
-                {order.status?.toLowerCase() === 'out_for_delivery' && (
-                    <button className="btn btn-success" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleStatusUpdate(order.id, 'delivered'); }}>
+                {order.status === 'OUT_FOR_DELIVERY' && (
+                    <button className="btn btn-success" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleStatusUpdate(order.id, 'DELIVERED'); }}>
                     Mark as Delivered
                   </button>
                 )}
@@ -187,8 +187,8 @@ const DeliveryPartnerDashboardPage = () => {
       <div className="dp-orders-list completed-deliveries">
         <div className="completed-header">
           <h2>Completed Deliveries ({completedOrders.length})</h2>
-          <button className="btn-toggle-completed" onClick={() => setShowCompleted(!showCompleted)}>
-            {showCompleted ? 'Hide' : 'Show'}
+          <button className="btn btn-secondary" onClick={() => setShowCompleted(!showCompleted)}>
+            {showCompleted ? 'Hide Completed' : 'Show Completed'}
           </button>
         </div>
         {showCompleted && (

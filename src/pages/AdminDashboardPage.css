@@ -12,6 +12,10 @@
   top: 80px;
 }
 
+.admin-sidebar.collapsed {
+  display: none;
+}
+
 .admin-sidebar nav {
   display: flex;
   flex-direction: column;

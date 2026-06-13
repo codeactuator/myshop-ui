@@ -3,6 +3,9 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './CheckoutPage.css';
+import gpayLogo from '../assets/images/payment/gpay.png';
+import paytmLogo from '../assets/images/payment/paytm.png';
+import phonepeLogo from '../assets/images/payment/phonepe.png';
 
 const CheckoutPage = () => {
   const { cartItems, cartTotal, clearCart } = useCart();
@@ -10,6 +13,7 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
 
   const [paymentMethod, setPaymentMethod] = useState('cod'); // 'cod' or 'upi'
+  const [upiProvider, setUpiProvider] = useState('gpay'); // 'gpay', 'paytm', or 'phonepe'
   const [fulfillmentMethod, setFulfillmentMethod] = useState('delivery'); // 'delivery' or 'pickup'
   const [deliveryOption, setDeliveryOption] = useState('saved'); // 'saved' or 'new'
   const [formData, setFormData] = useState({
@@ -65,6 +69,7 @@ const CheckoutPage = () => {
       },
       fulfillmentMethod: fulfillmentMethod,
       paymentMethod: paymentMethod,
+      upiProvider: paymentMethod === 'upi' ? upiProvider : null,
       items: validItems.map(item => ({ id: item.productId, quantity: item.quantity })),
     };
 
@@ -173,6 +178,30 @@ const CheckoutPage = () => {
               </div>
               {paymentMethod === 'upi' && (
                 <div className="upi-info">
+                  <p>Select your preferred UPI App:</p>
+                  <div className="upi-provider-options">
+                    <div className="radio-group">
+                      <input type="radio" id="gpay" name="upiProvider" value="gpay" checked={upiProvider === 'gpay'} onChange={() => setUpiProvider('gpay')} />
+                      <label htmlFor="gpay">
+                        <img src={gpayLogo} alt="Google Pay" className="upi-logo" />
+                        Google Pay
+                      </label>
+                    </div>
+                    <div className="radio-group">
+                      <input type="radio" id="paytm" name="upiProvider" value="paytm" checked={upiProvider === 'paytm'} onChange={() => setUpiProvider('paytm')} />
+                      <label htmlFor="paytm">
+                        <img src={paytmLogo} alt="Paytm" className="upi-logo" />
+                        Paytm
+                      </label>
+                    </div>
+                    <div className="radio-group">
+                      <input type="radio" id="phonepe" name="upiProvider" value="phonepe" checked={upiProvider === 'phonepe'} onChange={() => setUpiProvider('phonepe')} />
+                      <label htmlFor="phonepe">
+                        <img src={phonepeLogo} alt="PhonePe" className="upi-logo" />
+                        PhonePe
+                      </label>
+                    </div>
+                  </div>
                   <p>After placing the order, you will be shown a QR code to complete the payment.</p>
                 </div>
               )}

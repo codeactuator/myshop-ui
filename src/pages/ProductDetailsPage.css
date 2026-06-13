@@ -109,6 +109,24 @@
   margin: 0.5rem 0;
 }
 
+.report-btn {
+  background: none;
+  border: none;
+  color: #dc3545;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 0.5rem;
+}
+
+.report-btn:hover {
+  text-decoration: underline;
+}
+
 .contact-seller-btn {
   margin-top: auto;
   padding: 12px;
@@ -121,6 +139,10 @@
 }
 
 @media (max-width: 768px) {
+  .product-details-container {
+    margin: 0;
+    padding: 12px;
+  }
   .details-content {
     grid-template-columns: 1fr;
     gap: 2rem;

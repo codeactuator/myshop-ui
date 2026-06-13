@@ -32,3 +32,13 @@
   border-radius: 5px;
   font-size: 1rem;
 }
+
+@media (max-width: 768px) {
+  .profile-container {
+    margin: 0;
+    padding: 1.5rem 1rem;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+}

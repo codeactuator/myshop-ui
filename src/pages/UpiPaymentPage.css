@@ -2,17 +2,19 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 4rem 2rem;
+  padding: 2rem 1rem;
   min-height: 70vh;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .upi-payment-card {
   background-color: #fff;
   border: 1px solid #e9ecef;
   border-radius: 8px;
-  padding: 2rem 2.5rem;
+  padding: 2rem 1.5rem;
   text-align: center;
-  max-width: 600px;
+  max-width: 1000px;
   width: 100%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
@@ -58,4 +60,16 @@
 .no-qr-code {
   color: #dc3545;
   font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .upi-payment-container {
+    padding: 1rem 0;
+  }
+  .upi-payment-card {
+    padding: 2rem 1rem;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
 }

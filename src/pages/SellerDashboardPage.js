@@ -72,9 +72,7 @@ const SellerDashboardPage = () => {
   const handleOrderStatusUpdate = (orderId, newStatus) => {
     setSellerOrders(prevOrders =>
       prevOrders.map(order =>
-        // Ensure status casing is consistent with what might come from the server (e.g., "Pending")
-        // by capitalizing the first letter of the new status.
-        order.id === orderId ? { ...order, status: newStatus.charAt(0).toUpperCase() + newStatus.slice(1) } : order
+        order.id === orderId ? { ...order, status: newStatus.toUpperCase() } : order
       )
     );
   };

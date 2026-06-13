@@ -79,6 +79,13 @@
   }
 }
 
+@media (max-width: 768px) {
+  .checkout-container {
+    padding: 1rem 12px;
+    margin: 0;
+  }
+}
+
 .address-options {
   margin-bottom: 2rem;
 }
@@ -146,4 +153,18 @@
   margin-top: 1rem;
   font-size: 0.9rem;
   text-align: center;
+}
+
+.upi-provider-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.upi-logo {
+  height: 20px;
+  width: auto;
+  margin-right: 10px;
+  vertical-align: middle;
 }

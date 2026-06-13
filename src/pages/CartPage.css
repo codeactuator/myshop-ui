@@ -128,7 +128,8 @@
 
 @media (max-width: 576px) {
   .cart-container {
-    padding: 1rem;
+    padding: 1rem 12px;
+    margin: 0;
   }
 
   .cart-item {

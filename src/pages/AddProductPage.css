@@ -1,7 +1,7 @@
 .add-product-container {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 2rem;
+  width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
 .add-product-form {
@@ -9,6 +9,8 @@
   padding: 2rem;
   border-radius: 8px;
   border: 1px solid #e9ecef;
+  max-width: 1200px;
+  margin: 1rem auto;
 }
 
 .add-product-form .form-group {
@@ -96,4 +98,18 @@
 .submit-product-btn {
   width: 100%;
   padding: 12px;
+}
+
+@media (max-width: 768px) {
+  .add-product-container {
+    padding: 0;
+  }
+
+  .add-product-form {
+    padding: 1.25rem 1rem;
+    margin: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
 }

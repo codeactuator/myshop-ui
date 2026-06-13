@@ -68,9 +68,13 @@ const WelcomeScreen = () => {
         const response = await fetch(`${API_URL}/users/by-phone/${phone}`);
         const user = await response.json();
         console.log('User Logged In:', user);
+
+        // Determine landing page based on role
+        const landingPage = user.userType?.toUpperCase() === 'DELIVERY_PARTNER' ? '/delivery/dashboard' : '/products';
+
         login(user);
         showMessage('Welcome', `Welcome back, ${user.name}!`, () => {
-          navigate('/products'); 
+          navigate(landingPage); 
         });
       } else {
         // Register new user
@@ -88,9 +92,13 @@ const WelcomeScreen = () => {
         if (response.ok) {
           const newUser = await response.json();
           console.log('User Registered:', newUser);
+
+          // Determine landing page based on role
+          const landingPage = newUser.userType?.toUpperCase() === 'DELIVERY_PARTNER' ? '/delivery/dashboard' : '/products';
+
           login(newUser);
           showMessage('Success', `Account created successfully for ${newUser.name}!`, () => {
-            navigate('/products');
+            navigate(landingPage);
           });
         } else {
           const errorData = await response.json();
