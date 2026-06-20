@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, useParams } from 'react-router-dom';
+import Modal from '../components/Modal';
 import './AddProductPage.css'; // Re-using the same styles as the Add Product page
 
 const EditProductPage = () => {
@@ -11,6 +12,11 @@ const EditProductPage = () => {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({});
+  const [alertModal, setAlertModal] = useState({ isOpen: false, message: '', type: 'info', onConfirm: null });
+
+  const showAlert = (message, type = 'info', onConfirm = null) => {
+    setAlertModal({ isOpen: true, message, type, onConfirm });
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -21,8 +27,9 @@ const EditProductPage = () => {
 
         // Ensure the current user is the owner of the product
         if (Number(data.userId) !== currentUser.id) {
-          alert('You are not authorized to edit this product.');
-          navigate('/seller/inventory');
+          showAlert('You are not authorized to edit this product.', 'error', () => {
+            navigate('/seller/inventory');
+          });
           return;
         }
         setProduct(data);
@@ -92,7 +99,7 @@ const EditProductPage = () => {
         }));
       } catch (error) {
         console.error('Error uploading image to GCS:', error);
-        alert('Failed to upload image to Google Cloud Storage. Please try again.');
+        showAlert('Failed to upload image to Google Cloud Storage. Please try again.', 'error');
       } finally {
         setTimeout(() => {
           setUploadProgress(prev => {
@@ -136,14 +143,15 @@ const EditProductPage = () => {
       });
 
       if (response.ok) {
-        alert('Product updated successfully!');
-        navigate('/seller/inventory');
+        showAlert('Product updated successfully!', 'success', () => {
+          navigate('/seller/inventory');
+        });
       } else {
         throw new Error('Failed to update product.');
       }
     } catch (error) {
       console.error('Error updating product:', error);
-      alert('An error occurred. Please try again.');
+      showAlert('An error occurred. Please try again.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -153,6 +161,7 @@ const EditProductPage = () => {
   if (!product) return <div className="page-status">Product not found.</div>;
 
   return (
+    <>
     <div className="add-product-container">
       <h1>Edit Product</h1>
       <form onSubmit={handleSubmit} className="add-product-form">
@@ -238,6 +247,26 @@ const EditProductPage = () => {
         </button>
       </form>
     </div>
+
+    <Modal isOpen={alertModal.isOpen} onClose={() => setAlertModal(prev => ({ ...prev, isOpen: false }))}>
+      <div className="alert-modal-content" style={{ textAlign: 'center' }}>
+        <h2 style={{ color: alertModal.type === 'success' ? '#28a745' : alertModal.type === 'error' ? '#dc3545' : '#333', marginBottom: '1rem' }}>
+          {alertModal.type === 'success' ? 'Success' : alertModal.type === 'error' ? 'Error' : 'Notification'}
+        </h2>
+        <p style={{ marginBottom: '1.5rem', fontSize: '1.1rem', color: '#555' }}>{alertModal.message}</p>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => {
+            setAlertModal(prev => ({ ...prev, isOpen: false }));
+            if (alertModal.onConfirm) alertModal.onConfirm();
+          }}
+        >
+          OK
+        </button>
+      </div>
+    </Modal>
+    </>
   );
 };
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import SafeImage from '../components/SafeImage';
 import './OrderTrackingPage.css'; // Re-using styles
 
 const SellerOrderDetailsPage = () => {
@@ -67,7 +68,7 @@ const SellerOrderDetailsPage = () => {
         <h2>Your Items in this Order</h2>
         {sellerItems.map(item => (
           <div key={item.id} className="order-item-card" onClick={() => navigate(`/seller/products/${item.id}`)}>
-            <img src={item.imageUrls[0]} alt={item.name} className="order-item-image" />
+            <SafeImage src={item.imageUrls[0]} alt={item.name} className="order-item-image" />
             <div className="order-item-info">
               <h4>{item.name}</h4>
               <p>Quantity: {item.quantity}</p>

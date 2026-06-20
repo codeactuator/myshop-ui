@@ -9,6 +9,7 @@
   top: 0;
   z-index: 999;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
 }
 
 .navbar-container {
@@ -94,6 +95,7 @@
 .nav-links .fa-box-open,
 .nav-links .fa-store,
 .nav-links .fa-sign-in-alt,
+.nav-links .fa-power-off,
 .nav-links .fa-sign-out-alt,
 .nav-links .fa-boxes {
   font-size: 1.1rem;

@@ -1,13 +1,16 @@
 .main-layout-container {
   display: flex;
   transition: margin-left 0.3s ease-in-out;
+  width: 100%;
+  max-width: 100%;
 }
 
 .main-content {
   flex-grow: 1;
   padding: 2rem;
   background-color: #fcfdff;
-  min-height: calc(100vh - 80px);
+  min-height: calc(100vh - 60px);
+  min-width: 0; /* Allows content to shrink and prevents horizontal overflow */
 }
 
 .main-content.full-width {

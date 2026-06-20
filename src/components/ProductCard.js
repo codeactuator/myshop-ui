@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import './ProductCard.css';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import SafeImage from './SafeImage';
 
 const ProductCard = ({ product }) => {
   const { id, name, price, imageUrls, user } = product;
@@ -25,7 +26,7 @@ const ProductCard = ({ product }) => {
   return (
     <Link to={`/products/${id}`} className="product-card-link">
       <div className="product-card">
-        <img src={imageUrls[0]} alt={name} className="product-image" />
+        <SafeImage src={imageUrls[0]} alt={name} className="product-image" />
         <div className="product-info">
           <h3 className="product-name">{name}</h3>
           <p className="product-price">${price.toFixed(2)}</p>

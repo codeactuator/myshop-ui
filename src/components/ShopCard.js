@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import SafeImage from './SafeImage';
 import './ShopCard.css';
 
 const ShopCard = ({ seller }) => {
@@ -10,7 +11,7 @@ const ShopCard = ({ seller }) => {
     <Link to={`/shops/${id}`} className="shop-card-link">
       <div className="shop-card">
         {hasImage ?
-          <img src={profileImageUrl} alt={`${shopName || name} storefront`} className="shop-image" /> :
+          <SafeImage src={profileImageUrl} alt={`${shopName || name} storefront`} className="shop-image" fallbackIcon="fa-store" /> :
           <div className="shop-avatar">
             <span>{(shopName || name).charAt(0)}</span>
           </div>

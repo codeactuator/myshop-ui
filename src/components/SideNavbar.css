@@ -2,13 +2,13 @@
   width: 250px;
   background-color: #f8f9fa;
   border-right: 1px solid #e9ecef;
-  height: calc(100vh - 80px); /* Full height minus top navbar */
+  height: calc(100vh - 60px); /* Full height minus top navbar */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 1rem 0;
   position: sticky;
-  top: 80px; /* Stick below top navbar */
+  top: 60px; /* Stick below top navbar */
   transition: width 0.3s ease-in-out;
 }
 

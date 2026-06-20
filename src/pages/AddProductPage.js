@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import Modal from '../components/Modal';
 import './AddProductPage.css';
 
 const AddProductPage = () => {
@@ -16,6 +17,11 @@ const AddProductPage = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({});
+  const [alertModal, setAlertModal] = useState({ isOpen: false, message: '', type: 'info', onConfirm: null });
+
+  const showAlert = (message, type = 'info', onConfirm = null) => {
+    setAlertModal({ isOpen: true, message, type, onConfirm });
+  };
 
   if (!currentUser || currentUser.userType?.toLowerCase() !== 'seller') {
     // Redirect non-sellers
@@ -75,7 +81,7 @@ const AddProductPage = () => {
         }));
       } catch (error) {
         console.error('Error uploading image to GCS:', error);
-        alert('Failed to upload image to Google Cloud Storage. Please try again.');
+        showAlert('Failed to upload image to Google Cloud Storage. Please try again.', 'error');
       } finally {
         setTimeout(() => {
           setUploadProgress(prev => {
@@ -120,20 +126,22 @@ const AddProductPage = () => {
       });
 
       if (response.ok) {
-        alert('Product added successfully!');
-        navigate('/seller/dashboard');
+        showAlert('Product added successfully!', 'success', () => {
+          navigate('/seller/dashboard');
+        });
       } else {
         throw new Error('Failed to add product.');
       }
     } catch (error) {
       console.error('Error adding product:', error);
-      alert('An error occurred. Please try again.');
+      showAlert('An error occurred. Please try again.', 'error');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
+    <>
     <div className="add-product-container">
       <h1>Add New Product</h1>
       <form onSubmit={handleSubmit} className="add-product-form">
@@ -219,6 +227,26 @@ const AddProductPage = () => {
         </button>
       </form>
     </div>
+
+    <Modal isOpen={alertModal.isOpen} onClose={() => setAlertModal(prev => ({ ...prev, isOpen: false }))}>
+      <div className="alert-modal-content" style={{ textAlign: 'center' }}>
+        <h2 style={{ color: alertModal.type === 'success' ? '#28a745' : alertModal.type === 'error' ? '#dc3545' : '#333', marginBottom: '1rem' }}>
+          {alertModal.type === 'success' ? 'Success' : alertModal.type === 'error' ? 'Error' : 'Notification'}
+        </h2>
+        <p style={{ marginBottom: '1.5rem', fontSize: '1.1rem', color: '#555' }}>{alertModal.message}</p>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => {
+            setAlertModal(prev => ({ ...prev, isOpen: false }));
+            if (alertModal.onConfirm) alertModal.onConfirm();
+          }}
+        >
+          OK
+        </button>
+      </div>
+    </Modal>
+    </>
   );
 };
 

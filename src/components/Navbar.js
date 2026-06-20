@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
@@ -7,6 +7,12 @@ import './Navbar.css';
 const Navbar = ({ toggleSideNav }) => {
   const { cartCount } = useCart();
   const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/products');
+  };
 
   return (
     <nav className="navbar">
@@ -22,7 +28,7 @@ const Navbar = ({ toggleSideNav }) => {
           </Link>
         </div>
         <ul className="nav-menu">
-          {currentUser && (
+          {currentUser ? (
             <>
               <li className="nav-item">
                 <Link to="/cart" className="nav-links">
@@ -31,13 +37,12 @@ const Navbar = ({ toggleSideNav }) => {
                 </Link>
               </li>
               <li className="nav-item">
-                <div className="nav-links" onClick={logout} title="Sign Out">
-                  <i className="fas fa-sign-out-alt"></i>
+                <div className="nav-links" onClick={handleLogout} title="Sign Out">
+                  <i className="fas fa-power-off"></i>
                 </div>
               </li>
             </>
-          )}
-          {!currentUser && (
+          ) : (
             <li className="nav-item">
               <Link to="/welcome" className="nav-links" title="Sign In">
                 <i className="fas fa-sign-in-alt"></i>

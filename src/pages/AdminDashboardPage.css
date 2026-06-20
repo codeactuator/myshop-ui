@@ -1,5 +1,7 @@
 .admin-dashboard-container {
   display: flex;
+  width: 100%;
+  max-width: 100%;
 }
 
 .admin-sidebar {
@@ -7,9 +9,9 @@
   background-color: #fff;
   border-right: 1px solid #e9ecef;
   padding: 2rem 0;
-  height: calc(100vh - 80px);
+  height: calc(100vh - 60px);
   position: sticky;
-  top: 80px;
+  top: 60px;
 }
 
 .admin-sidebar.collapsed {
@@ -37,6 +39,7 @@
 .admin-main-content {
   flex-grow: 1;
   background-color: #f8f9fa;
+  min-width: 0; /* Prevents the admin panel from overflowing the viewport */
 }
 
 .admin-header {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import SafeImage from '../components/SafeImage';
 import './OrderTrackingPage.css'; // Re-using styles
 import './DeliveryOrderTrackingPage.css'; // For specific overrides
 
@@ -98,7 +99,7 @@ const DeliveryOrderTrackingPage = () => {
         <h2>Items in this Order</h2>
         {order.items.map(item => (
           <div key={item.id} className="order-item-card">
-            <img src={item.imageUrls[0]} alt={item.name} className="order-item-image" />
+            <SafeImage src={item.imageUrls[0]} alt={item.name} className="order-item-image" />
             <div className="order-item-info">
               <h4>{item.name} (x{item.quantity})</h4>
             </div>

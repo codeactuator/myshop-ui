@@ -1,6 +1,7 @@
 import React from 'react';
 import { useCart } from '../context/CartContext';
 import { Link, useNavigate } from 'react-router-dom';
+import SafeImage from '../components/SafeImage';
 import './CartPage.css';
 
 const CartPage = () => {
@@ -24,7 +25,7 @@ const CartPage = () => {
         <div className="cart-items">
           {cartItems.map(item => (
             <div key={item.id} className="cart-item">
-              <img src={item.imageUrl} alt={item.productName} className="cart-item-image" />
+              <SafeImage src={item.imageUrl} alt={item.productName} className="cart-item-image" />
               <div className="cart-item-details">
                 <h3>{item.productName}</h3>
                 <p>${item.price.toFixed(2)}</p>

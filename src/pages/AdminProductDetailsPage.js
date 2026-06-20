@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import './ProductDetailsPage.css'; // Re-using styles
 import Review from '../components/Review';
+import SafeImage from '../components/SafeImage';
 
 const AdminProductDetailsPage = () => {
   const { productId } = useParams();
@@ -70,10 +71,10 @@ const AdminProductDetailsPage = () => {
       <Link to="/admin/dashboard/products" className="back-link">&larr; Back to Product Management</Link>
       <div className="details-content">
         <div className="details-image-container">
-          <img src={selectedImage} alt={product.name} className="details-image-main" />
+          <SafeImage src={selectedImage} alt={product.name} className="details-image-main" />
           <div className="details-thumbnails">
             {product.imageUrls.map((url, index) => (
-              <img
+              <SafeImage
                 key={index}
                 src={url}
                 alt={`${product.name} thumbnail ${index + 1}`}

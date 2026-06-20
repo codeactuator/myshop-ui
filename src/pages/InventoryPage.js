@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
+import SafeImage from '../components/SafeImage';
 import './InventoryPage.css';
 
 const InventoryPage = () => {
@@ -72,7 +73,7 @@ const InventoryPage = () => {
         <div className="inventory-list">
           {myProducts.map(product => (
             <div key={product.id} className="inventory-item-card" onClick={() => handleCardClick(product.id)}>
-              <img src={product.imageUrls[0]} alt={product.name} className="inventory-item-image" />
+              <SafeImage src={product.imageUrls[0]} alt={product.name} className="inventory-item-image" />
               <div className="inventory-item-info">
                 <span className="inventory-item-name">{product.name}</span>
                 <div className="inventory-item-actions" onClick={(e) => e.stopPropagation()}>
