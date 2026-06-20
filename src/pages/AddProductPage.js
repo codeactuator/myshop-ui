@@ -11,9 +11,11 @@ const AddProductPage = () => {
     description: '',
     price: '',
     category: '',
+    stock: '',
     imageUrls: [''],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({});
 
   if (!currentUser || currentUser.userType?.toLowerCase() !== 'seller') {
     // Redirect non-sellers
@@ -26,18 +28,63 @@ const AddProductPage = () => {
     setProduct(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleImageFileChange = (index, file) => {
+  const uploadFileWithProgress = (file, onProgress) => {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${process.env.REACT_APP_API_URL}/products/upload-image`);
+
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = Math.round((event.loaded / event.total) * 100);
+          onProgress(percentComplete);
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            resolve(JSON.parse(xhr.responseText));
+          } catch (e) {
+            reject(new Error('Failed to parse upload response.'));
+          }
+        } else {
+          reject(new Error(`Upload failed with status ${xhr.status}`));
+        }
+      };
+
+      xhr.onerror = () => reject(new Error('Network error during upload.'));
+
+      const formData = new FormData();
+      formData.append('file', file);
+      xhr.send(formData);
+    });
+  };
+
+  const handleImageFileChange = async (index, file) => {
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
+      setUploadProgress(prev => ({ ...prev, [index]: 0 }));
+      try {
+        const data = await uploadFileWithProgress(file, (progress) => {
+          setUploadProgress(prev => ({ ...prev, [index]: progress }));
+        });
         const newImageUrls = [...product.imageUrls];
-        newImageUrls[index] = reader.result; // reader.result contains the base64 data URL
+        newImageUrls[index] = data.imageUrl; // Store GCS public URL in state
         setProduct(prev => ({
           ...prev,
           imageUrls: newImageUrls,
         }));
-      };
-      reader.readAsDataURL(file);
+      } catch (error) {
+        console.error('Error uploading image to GCS:', error);
+        alert('Failed to upload image to Google Cloud Storage. Please try again.');
+      } finally {
+        setTimeout(() => {
+          setUploadProgress(prev => {
+            const updated = { ...prev };
+            delete updated[index];
+            return updated;
+          });
+        }, 1000);
+      }
     }
   };
 
@@ -59,6 +106,7 @@ const AddProductPage = () => {
     const newProduct = {
       ...product,
       price: parseFloat(product.price),
+      stock: parseInt(product.stock, 10) || 0,
       userId: currentUser.id,
       status: 'available',
       postedDate: new Date().toISOString(),
@@ -102,6 +150,10 @@ const AddProductPage = () => {
           <input type="number" id="price" name="price" value={product.price} onChange={handleInputChange} required min="0" step="0.01" />
         </div>
         <div className="form-group">
+          <label htmlFor="stock">Stock</label>
+          <input type="number" id="stock" name="stock" value={product.stock} onChange={handleInputChange} required min="0" />
+        </div>
+        <div className="form-group">
           <label htmlFor="category">Category</label>
           <input type="text" id="category" name="category" value={product.category} onChange={handleInputChange} required />
         </div>
@@ -109,17 +161,51 @@ const AddProductPage = () => {
           <label>Image URLs</label>
           {product.imageUrls.map((url, index) => (
             <div key={index} className="image-url-field">
-              <div className="image-upload-wrapper">
+          <div className="image-upload-wrapper" style={{ position: 'relative' }}>
                 <input
                   type="file"
                   id={`image-upload-${index}`}
                   className="image-file-input"
                   accept="image/png, image/jpeg, image/webp"
                   onChange={(e) => handleImageFileChange(index, e.target.files[0])}
+              disabled={uploadProgress[index] !== undefined}
                 />
                 <label htmlFor={`image-upload-${index}`} className="image-file-label">
                   {url ? <img src={url} alt="Preview" className="image-preview" /> : <span>+ Click to upload</span>}
                 </label>
+            {uploadProgress[index] !== undefined && (
+              <div style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                background: 'rgba(0,0,0,0.7)',
+                padding: '4px',
+                borderRadius: '0 0 8px 8px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                zIndex: 10
+              }}>
+                <div style={{
+                  width: '100%',
+                  backgroundColor: '#e0e0e0',
+                  borderRadius: '4px',
+                  height: '8px',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    width: `${uploadProgress[index]}%`,
+                    backgroundColor: '#5A189A',
+                    height: '100%',
+                    transition: 'width 0.2s ease-in-out'
+                  }}></div>
+                </div>
+                <span style={{ color: '#fff', fontSize: '10px', marginTop: '2px', fontWeight: 'bold' }}>
+                  Uploading... {uploadProgress[index]}%
+                </span>
+              </div>
+            )}
               </div>
               {product.imageUrls.length > 1 && (
                 <button type="button" className="remove-image-btn" onClick={() => removeImageUrlField(index)}>&times;</button>
