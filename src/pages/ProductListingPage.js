@@ -184,7 +184,10 @@ const ProductListingPage = () => {
         </div>
       ) : (
         <div className="shop-grid">
-          {filteredShops.map((seller) => <ShopCard key={seller.id} seller={seller} />)}
+          {filteredShops.map((seller) => {
+            const sellerProducts = products.filter(p => Number(p.userId) === seller.id);
+            return <ShopCard key={seller.id} seller={seller} products={sellerProducts} />;
+          })}
         </div>
       )}
     </div>

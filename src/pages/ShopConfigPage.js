@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import Modal from '../components/Modal';
 import './AddProductPage.css'; // Re-using form styles
 
 const ShopConfigPage = () => {
@@ -13,6 +14,12 @@ const ShopConfigPage = () => {
     bannerImageUrl: ''
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(null);
+  const [alertModal, setAlertModal] = useState({ isOpen: false, message: '', type: 'info', onConfirm: null });
+
+  const showAlert = (message, type = 'info', onConfirm = null) => {
+    setAlertModal({ isOpen: true, message, type, onConfirm });
+  };
 
   useEffect(() => {
     if (currentUser) {
@@ -32,16 +39,57 @@ const ShopConfigPage = () => {
     setUpiSettings(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleBannerChange = (file) => {
+  const uploadFileWithProgress = (file, onProgress) => {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${process.env.REACT_APP_API_URL}/products/upload-image`);
+
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = Math.round((event.loaded / event.total) * 100);
+          onProgress(percentComplete);
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            resolve(JSON.parse(xhr.responseText));
+          } catch (e) {
+            reject(new Error('Failed to parse upload response.'));
+          }
+        } else {
+          reject(new Error(`Upload failed with status ${xhr.status}`));
+        }
+      };
+
+      xhr.onerror = () => reject(new Error('Network error during upload.'));
+
+      const formData = new FormData();
+      formData.append('file', file);
+      xhr.send(formData);
+    });
+  };
+
+  const handleBannerChange = async (file) => {
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
+      setUploadProgress(0);
+      try {
+        const data = await uploadFileWithProgress(file, (progress) => {
+          setUploadProgress(progress);
+        });
         setUpiSettings(prev => ({
           ...prev,
-          bannerImageUrl: reader.result
+          bannerImageUrl: data.imageUrl
         }));
-      };
-      reader.readAsDataURL(file);
+      } catch (error) {
+        console.error('Error uploading banner to GCS:', error);
+        showAlert('Failed to upload banner image to Google Cloud Storage. Please try again.', 'error');
+      } finally {
+        setTimeout(() => {
+          setUploadProgress(null);
+        }, 1000);
+      }
     }
   };
 
@@ -59,19 +107,20 @@ const ShopConfigPage = () => {
       if (response.ok) {
         const updatedUser = await response.json();
         login(updatedUser); // Update local auth context
-        alert('Payment settings updated successfully!');
+        showAlert('Payment settings updated successfully!', 'success');
       } else {
         throw new Error('Failed to update settings.');
       }
     } catch (error) {
       console.error('Error updating shop config:', error);
-      alert('An error occurred. Please try again.');
+      showAlert('An error occurred. Please try again.', 'error');
     } finally {
       setIsSaving(false);
     }
   };
 
   return (
+    <>
     <div className="add-product-container">
       <h1>Shop Payment Configuration</h1>
       <p>Configure your UPI IDs to receive payments from buyers.</p>
@@ -89,17 +138,51 @@ const ShopConfigPage = () => {
 
         <div className="form-group">
           <label>Shop Banner Image</label>
-          <div className="image-upload-wrapper">
+          <div className="image-upload-wrapper" style={{ position: 'relative' }}>
             <input
               type="file"
               id="banner-upload"
               className="image-file-input"
               accept="image/png, image/jpeg, image/webp"
               onChange={(e) => handleBannerChange(e.target.files[0])}
+              disabled={uploadProgress !== null}
             />
             <label htmlFor="banner-upload" className="image-file-label" style={{ height: '200px' }}>
               {upiSettings.bannerImageUrl ? <img src={upiSettings.bannerImageUrl} alt="Banner Preview" className="image-preview" /> : <span>+ Upload Shop Banner</span>}
             </label>
+            {uploadProgress !== null && (
+              <div style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                background: 'rgba(0,0,0,0.7)',
+                padding: '4px',
+                borderRadius: '0 0 8px 8px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                zIndex: 10
+              }}>
+                <div style={{
+                  width: '100%',
+                  backgroundColor: '#e0e0e0',
+                  borderRadius: '4px',
+                  height: '8px',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    width: `${uploadProgress}%`,
+                    backgroundColor: '#5A189A',
+                    height: '100%',
+                    transition: 'width 0.2s ease-in-out'
+                  }}></div>
+                </div>
+                <span style={{ color: '#fff', fontSize: '10px', marginTop: '2px', fontWeight: 'bold' }}>
+                  Uploading... {uploadProgress}%
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -134,6 +217,26 @@ const ShopConfigPage = () => {
         </button>
       </form>
     </div>
+
+    <Modal isOpen={alertModal.isOpen} onClose={() => setAlertModal(prev => ({ ...prev, isOpen: false }))}>
+      <div className="alert-modal-content" style={{ textAlign: 'center' }}>
+        <h2 style={{ color: alertModal.type === 'success' ? '#28a745' : alertModal.type === 'error' ? '#dc3545' : '#333', marginBottom: '1rem' }}>
+          {alertModal.type === 'success' ? 'Success' : alertModal.type === 'error' ? 'Error' : 'Notification'}
+        </h2>
+        <p style={{ marginBottom: '1.5rem', fontSize: '1.1rem', color: '#555' }}>{alertModal.message}</p>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => {
+            setAlertModal(prev => ({ ...prev, isOpen: false }));
+            if (alertModal.onConfirm) alertModal.onConfirm();
+          }}
+        >
+          OK
+        </button>
+      </div>
+    </Modal>
+    </>
   );
 };
 
