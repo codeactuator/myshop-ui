@@ -139,7 +139,36 @@ const ProductListingPage = () => {
     );
   }, [sellers, searchQuery]);
 
-  if (loading) return <div className="page-status">Loading products...</div>;
+  if (loading) {
+    return (
+      <div className="page-status-container" style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '60vh',
+        fontFamily: "'Poppins', sans-serif"
+      }}>
+        <style>{`
+          @keyframes page-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+        <div className="page-loading-spinner" style={{
+          width: '50px',
+          height: '50px',
+          border: '4px solid #f3f3f3',
+          borderTop: '4px solid #5A189A',
+          borderRadius: '50%',
+          animation: 'page-spin 1s linear infinite',
+          marginBottom: '1.5rem'
+        }}></div>
+        <h3 style={{ color: '#5A189A', fontWeight: '600', margin: 0 }}>Gathering fresh products...</h3>
+        <p style={{ color: '#6c757d', fontSize: '0.9rem', marginTop: '0.5rem' }}>Please wait while we set up the storefront.</p>
+      </div>
+    );
+  }
   if (error) return <div className="page-status">Error: {error}</div>;
 
   return (

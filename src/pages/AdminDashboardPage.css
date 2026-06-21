@@ -166,3 +166,16 @@
 .order-assignment-card .admin-list {
   margin-top: 1rem;
 }
+
+@media (max-width: 768px) {
+  .admin-page-content {
+    padding: 0.75rem;
+  }
+  .dashboard-summary {
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+  }
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}

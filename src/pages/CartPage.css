@@ -126,6 +126,13 @@
   }
 }
 
+@media (max-width: 768px) {
+  .cart-container {
+    padding: 0.75rem;
+    margin: 0;
+  }
+}
+
 @media (max-width: 576px) {
   .cart-container {
     padding: 1rem 12px;

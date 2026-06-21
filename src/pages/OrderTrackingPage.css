@@ -132,6 +132,13 @@
 }
 
 @media (max-width: 768px) {
+  .order-tracking-container {
+    margin: 0;
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
   .order-summary-header {
     flex-direction: column;
     gap: 0.5rem;
