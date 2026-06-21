@@ -25,7 +25,8 @@ const ShopPage = () => {
         
         const shopFrontData = await shopFrontResponse.json();
         const userData = await userResponse.json();
-        const sellerData = { ...userData, ...shopFrontData }; // Combine both data sources
+        const shopFrontObj = Array.isArray(shopFrontData) ? shopFrontData[0] : shopFrontData;
+        const sellerData = { ...shopFrontObj, ...userData }; // Combine both data sources, prioritizing updated user details
         setSeller(sellerData);
 
         // Step 2: Fetch available products for this seller
@@ -53,7 +54,26 @@ const ShopPage = () => {
 
   return (
     <div className="shop-page-container">
-      <div className="shop-header" style={{ backgroundImage: `url(${seller.bannerImageUrl || '/default-banner.jpg'})` }}>
+      <style>{`
+        @media (max-width: 768px) {
+          .shop-page-container {
+            padding: 0.5rem !important;
+            margin: 0 !important;
+          }
+          .shop-header {
+            margin: -0.5rem -0.5rem 1.5rem -0.5rem !important;
+            border-radius: 0 !important;
+          }
+          .shop-title {
+            font-size: 1.8rem !important;
+          }
+          .shop-products-title {
+            font-size: 1.3rem !important;
+            margin-left: 0.25rem !important;
+          }
+        }
+      `}</style>
+      <div className="shop-header" style={{ backgroundImage: `url("${seller.bannerImageUrl || '/default-banner.jpg'}")` }}>
         <div className="shop-header-overlay">
           <h1 className="shop-title">{seller.shopName || seller.name}</h1>
           {seller.shopTagline && <p className="shop-tagline">{seller.shopTagline}</p>}

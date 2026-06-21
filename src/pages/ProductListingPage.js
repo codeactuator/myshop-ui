@@ -51,7 +51,7 @@ const ProductListingPage = () => {
             shopFrontsMap = new Map(shopFrontsData.map(sf => [sf.sellerId, sf]));
           }
 
-          const enrichedSellers = usersData.map(user => ({ ...user, ...shopFrontsMap.get(user.id) }));
+          const enrichedSellers = usersData.map(user => ({ ...shopFrontsMap.get(user.id), ...user }));
           setSellers(enrichedSellers.filter(u => !u.isBlocked));
 
           // Step 4: Combine products with seller info and filter out products from blocked or non-existent sellers
