@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import Modal from '../components/Modal';
 import './OrderTrackingPage.css';
 
 const OrderTrackingPage = () => {
@@ -9,6 +10,11 @@ const OrderTrackingPage = () => {
   const navigate = useNavigate();
   const [error, setError] = useState(null);
   const [soundEnabled, setSoundEnabled] = useState(false);
+  const [alertModal, setAlertModal] = useState({ isOpen: false, message: '', type: 'info', onConfirm: null });
+
+  const showAlert = (message, type = 'info', onConfirm = null) => {
+    setAlertModal({ isOpen: true, message, type, onConfirm });
+  };
   const notificationSound = useRef(null);
 
   const statusSteps = ['pending', 'confirmed', 'preparing', 'ready_for_ship', 'out_for_delivery', 'delivered'];
@@ -73,11 +79,14 @@ const OrderTrackingPage = () => {
 
     fetchOrder();
 
-    // Set up polling to refresh data every 10 seconds
-    const interval = setInterval(fetchOrder, 10000);
+    const handleSseNotification = () => {
+      fetchOrder();
+    };
 
-    // Cleanup interval on component unmount
-    return () => clearInterval(interval);
+    window.addEventListener('sse-notification', handleSseNotification);
+    return () => {
+      window.removeEventListener('sse-notification', handleSseNotification);
+    };
   }, [orderId, soundEnabled]); // Re-run effect if orderId or soundEnabled changes
 
   if (loading) return <div className="page-status">Loading order details...</div>;
@@ -91,7 +100,7 @@ const OrderTrackingPage = () => {
         .then(() => {
           notificationSound.current.muted = false;
           setSoundEnabled(true);
-          alert('Sound notifications for status updates are enabled!');
+          showAlert('Sound notifications for status updates are enabled!', 'success');
         })
         .catch(e => console.error("Could not enable sound:", e));
     }
@@ -100,6 +109,7 @@ const OrderTrackingPage = () => {
   const currentStatusIndex = statusSteps.indexOf(order.status?.toLowerCase());
 
   return (
+    <>
     <div className="order-tracking-container">
       <Link to="/my-orders" className="back-link">&larr; Back to My Orders</Link>
       <h1>Order Details</h1>
@@ -156,6 +166,26 @@ const OrderTrackingPage = () => {
         ))}
       </div>
     </div>
+
+    <Modal isOpen={alertModal.isOpen} onClose={() => setAlertModal(prev => ({ ...prev, isOpen: false }))}>
+      <div className="alert-modal-content" style={{ textAlign: 'center' }}>
+        <h2 style={{ color: alertModal.type === 'success' ? '#28a745' : alertModal.type === 'error' ? '#dc3545' : '#333', marginBottom: '1rem' }}>
+          {alertModal.type === 'success' ? 'Success' : alertModal.type === 'error' ? 'Error' : 'Notification'}
+        </h2>
+        <p style={{ marginBottom: '1.5rem', fontSize: '1.1rem', color: '#555' }}>{alertModal.message}</p>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => {
+            setAlertModal(prev => ({ ...prev, isOpen: false }));
+            if (alertModal.onConfirm) alertModal.onConfirm();
+          }}
+        >
+          OK
+        </button>
+      </div>
+    </Modal>
+    </>
   );
 };
 

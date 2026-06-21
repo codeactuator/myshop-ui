@@ -51,6 +51,15 @@ const DeliveryOrderTrackingPage = () => {
     };
 
     fetchOrder();
+
+    const handleSseNotification = () => {
+      fetchOrder();
+    };
+
+    window.addEventListener('sse-notification', handleSseNotification);
+    return () => {
+      window.removeEventListener('sse-notification', handleSseNotification);
+    };
   }, [orderId]);
 
   if (loading) return <div className="page-status">Loading order details...</div>;

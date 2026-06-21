@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Navigate, Link } from 'react-router-dom';
+import Modal from '../components/Modal';
 import './DeliveryPartnerDashboardPage.css';
 
 const DeliveryPartnerDashboardPage = () => {
@@ -11,7 +12,13 @@ const DeliveryPartnerDashboardPage = () => {
   const [partnerProfile, setPartnerProfile] = useState(null);
   const [showCompleted, setShowCompleted] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
+  const [alertModal, setAlertModal] = useState({ isOpen: false, message: '', type: 'info', onConfirm: null });
+
+  const showAlert = (message, type = 'info', onConfirm = null) => {
+    setAlertModal({ isOpen: true, message, type, onConfirm });
+  };
   const notificationSound = useRef(null);
+  const isInitialLoad = useRef(true);
 
   // Initialize the audio object once
   useEffect(() => {
@@ -40,12 +47,13 @@ const DeliveryPartnerDashboardPage = () => {
 
         // Check for new orders to trigger notification
         setAssignedOrders(prevOrders => {
-          if (ordersData.length > prevOrders.length && prevOrders.length > 0) { // Check if it's not the initial load
+          if (!isInitialLoad.current && ordersData.length > prevOrders.length) { // Check if it's not the initial load
             if (soundEnabled) {
               notificationSound.current.play().catch(e => console.error("Error playing sound:", e));
             }
-            alert('A new order has been assigned to you!');
+            showAlert('A new order has been assigned to you!', 'success');
           }
+          isInitialLoad.current = false;
           return ordersData.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
         });
 
@@ -62,11 +70,15 @@ const DeliveryPartnerDashboardPage = () => {
     };
 
     fetchData();
-    // Set up polling to refresh data every 15 seconds
-    const interval = setInterval(fetchData, 15000);
 
-    // Cleanup interval on component unmount
-    return () => clearInterval(interval);
+    const handleSseNotification = () => {
+      fetchData();
+    };
+
+    window.addEventListener('sse-notification', handleSseNotification);
+    return () => {
+      window.removeEventListener('sse-notification', handleSseNotification);
+    };
   }, [currentUser]);
 
   const activeOrders = useMemo(() => {
@@ -88,7 +100,7 @@ const DeliveryPartnerDashboardPage = () => {
       const updatedOrder = await response.json();
       setAssignedOrders(orders => orders.map(o => o.id === orderId ? updatedOrder : o));
     } catch (err) {
-      alert(err.message);
+      showAlert(err.message, 'error');
     }
   };
 
@@ -106,7 +118,7 @@ const DeliveryPartnerDashboardPage = () => {
       const updatedPartner = await response.json();
       setPartnerProfile(updatedPartner);
     } catch (err) {
-      alert(err.message);
+      showAlert(err.message, 'error');
     }
   };
 
@@ -117,7 +129,7 @@ const DeliveryPartnerDashboardPage = () => {
         .then(() => {
           notificationSound.current.muted = false;
           setSoundEnabled(true);
-          alert('Sound notifications enabled!');
+          showAlert('Sound notifications enabled!', 'success');
         })
         .catch(e => console.error("Could not enable sound:", e));
     }
@@ -130,6 +142,7 @@ const DeliveryPartnerDashboardPage = () => {
   if (error) return <div className="page-status">Error: {error}</div>;
 
   return (
+    <>
     <div className="dp-dashboard-container">
       <div className="dp-dashboard-header">
         <h1>Delivery Dashboard</h1>
@@ -207,6 +220,26 @@ const DeliveryPartnerDashboardPage = () => {
         )}
       </div>
     </div>
+
+    <Modal isOpen={alertModal.isOpen} onClose={() => setAlertModal(prev => ({ ...prev, isOpen: false }))}>
+      <div className="alert-modal-content" style={{ textAlign: 'center' }}>
+        <h2 style={{ color: alertModal.type === 'success' ? '#28a745' : alertModal.type === 'error' ? '#dc3545' : '#333', marginBottom: '1rem' }}>
+          {alertModal.type === 'success' ? 'Success' : alertModal.type === 'error' ? 'Error' : 'Notification'}
+        </h2>
+        <p style={{ marginBottom: '1.5rem', fontSize: '1.1rem', color: '#555' }}>{alertModal.message}</p>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => {
+            setAlertModal(prev => ({ ...prev, isOpen: false }));
+            if (alertModal.onConfirm) alertModal.onConfirm();
+          }}
+        >
+          OK
+        </button>
+      </div>
+    </Modal>
+    </>
   );
 };
 

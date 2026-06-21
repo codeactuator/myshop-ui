@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Navigate, Link } from 'react-router-dom';
 import SellerOrderCard from '../components/SellerOrderCard';
+import Modal from '../components/Modal';
 import './SellerDashboardPage.css';
 
 const SellerDashboardPage = () => {
@@ -10,6 +11,11 @@ const SellerDashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [soundEnabled, setSoundEnabled] = useState(false);
+  const [alertModal, setAlertModal] = useState({ isOpen: false, message: '', type: 'info', onConfirm: null });
+
+  const showAlert = (message, type = 'info', onConfirm = null) => {
+    setAlertModal({ isOpen: true, message, type, onConfirm });
+  };
   const notificationSound = useRef(null);
 
   // Initialize the audio object once
@@ -46,8 +52,7 @@ const SellerDashboardPage = () => {
           if (soundEnabled) {
             notificationSound.current.play().catch(e => console.error("Error playing sound:", e));
           }
-          alert(`You have ${newOrders.length} new order(s)!`);
-
+          
           // Update notified orders in localStorage
           const newNotifiedIds = [...notifiedOrders, ...newOrders.map(o => o.id)];
           localStorage.setItem(`notifiedOrders_${currentUser.id}`, JSON.stringify(newNotifiedIds));
@@ -63,10 +68,14 @@ const SellerDashboardPage = () => {
 
     checkForNewOrders(); // Initial fetch
 
-    const interval = setInterval(checkForNewOrders, 15000); // Poll every 15 seconds
+    const handleSseNotification = () => {
+      checkForNewOrders();
+    };
 
-    return () => clearInterval(interval); // Cleanup on unmount
-
+    window.addEventListener('sse-notification', handleSseNotification);
+    return () => {
+      window.removeEventListener('sse-notification', handleSseNotification);
+    };
   }, [currentUser]);
 
   const handleOrderStatusUpdate = (orderId, newStatus) => {
@@ -85,6 +94,7 @@ const SellerDashboardPage = () => {
         .then(() => {
           notificationSound.current.muted = false;
           setSoundEnabled(true);
+          showAlert('Sound notifications enabled!', 'success');
           // Sound is enabled, no need for an alert unless there's an error.
         })
         .catch(e => console.error("Could not enable sound:", e));
@@ -99,6 +109,7 @@ const SellerDashboardPage = () => {
   if (error) return <div className="page-status">Error: {error}</div>;
 
   return (
+    <>
     <div className="seller-dashboard-container">
       <div className="dashboard-header">
         <h1>Seller Dashboard</h1>
@@ -117,6 +128,26 @@ const SellerDashboardPage = () => {
         <p>You have no orders yet.</p>
       )}
     </div>
+
+    <Modal isOpen={alertModal.isOpen} onClose={() => setAlertModal(prev => ({ ...prev, isOpen: false }))}>
+      <div className="alert-modal-content" style={{ textAlign: 'center' }}>
+        <h2 style={{ color: alertModal.type === 'success' ? '#28a745' : alertModal.type === 'error' ? '#dc3545' : '#333', marginBottom: '1rem' }}>
+          {alertModal.type === 'success' ? 'Success' : alertModal.type === 'error' ? 'Error' : 'Notification'}
+        </h2>
+        <p style={{ marginBottom: '1.5rem', fontSize: '1.1rem', color: '#555' }}>{alertModal.message}</p>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => {
+            setAlertModal(prev => ({ ...prev, isOpen: false }));
+            if (alertModal.onConfirm) alertModal.onConfirm();
+          }}
+        >
+          OK
+        </button>
+      </div>
+    </Modal>
+    </>
   );
 };
 

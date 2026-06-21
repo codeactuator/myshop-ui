@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useMessage } from '../context/MessageContext';
 import { Navigate, Outlet } from 'react-router-dom';
@@ -18,38 +18,47 @@ const AdminDashboardPage = () => {
   const [error, setError] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
+  const fetchData = useCallback(async () => {
+    try {
+      const [usersResponse, ordersResponse, productsResponse, reportsResponse, deliveryPartnersResponse] = await Promise.all([
+        fetch(`${process.env.REACT_APP_API_URL}/users`).catch(e => ({ ok: false, error: e })),
+        fetch(`${process.env.REACT_APP_API_URL}/orders`).catch(e => ({ ok: false, error: e })),
+        fetch(`${process.env.REACT_APP_API_URL}/products`).catch(e => ({ ok: false, error: e })),
+        fetch(`${process.env.REACT_APP_API_URL}/reports`).catch(e => ({ ok: false, error: e })),
+        fetch(`${process.env.REACT_APP_API_URL}/delivery/partners`).catch(e => ({ ok: false, error: e })),
+      ]);
+
+      // Check responses individually or handle partial failures
+      const usersData = usersResponse.ok ? await usersResponse.json() : [];
+      const ordersData = ordersResponse.ok ? await ordersResponse.json() : [];
+      const productsData = productsResponse.ok ? await productsResponse.json() : [];
+      const reportsData = reportsResponse.ok ? await reportsResponse.json() : [];
+      const deliveryPartnersData = deliveryPartnersResponse.ok ? await deliveryPartnersResponse.json() : [];
+
+      setUsers(usersData);
+      setOrders(ordersData);
+      setProducts(productsData);
+      setReports(reportsData);
+      setDeliveryPartners(deliveryPartnersData);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [usersResponse, ordersResponse, productsResponse, reportsResponse, deliveryPartnersResponse] = await Promise.all([
-          fetch(`${process.env.REACT_APP_API_URL}/users`).catch(e => ({ ok: false, error: e })),
-          fetch(`${process.env.REACT_APP_API_URL}/orders`).catch(e => ({ ok: false, error: e })),
-          fetch(`${process.env.REACT_APP_API_URL}/products`).catch(e => ({ ok: false, error: e })),
-          fetch(`${process.env.REACT_APP_API_URL}/reports`).catch(e => ({ ok: false, error: e })),
-          fetch(`${process.env.REACT_APP_API_URL}/delivery/partners`).catch(e => ({ ok: false, error: e })),
-        ]);
+    fetchData();
 
-        // Check responses individually or handle partial failures
-        const usersData = usersResponse.ok ? await usersResponse.json() : [];
-        const ordersData = ordersResponse.ok ? await ordersResponse.json() : [];
-        const productsData = productsResponse.ok ? await productsResponse.json() : [];
-        const reportsData = reportsResponse.ok ? await reportsResponse.json() : [];
-        const deliveryPartnersData = deliveryPartnersResponse.ok ? await deliveryPartnersResponse.json() : [];
-
-        setUsers(usersData);
-        setOrders(ordersData);
-        setProducts(productsData);
-        setReports(reportsData);
-        setDeliveryPartners(deliveryPartnersData);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+    const handleSseNotification = () => {
+      fetchData();
     };
 
-    fetchData();
-  }, []);
+    window.addEventListener('sse-notification', handleSseNotification);
+    return () => {
+      window.removeEventListener('sse-notification', handleSseNotification);
+    };
+  }, [fetchData]);
 
   const refreshOrders = async (filters = {}) => {
     setLoading(true);
