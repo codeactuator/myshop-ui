@@ -4,7 +4,7 @@ import SafeImage from './SafeImage';
 import './ShopCard.css';
 
 const ShopCard = ({ seller, products = [] }) => {
-  const { id, name, shopName, isVerified, profileImageUrl } = seller;
+  const { id, name, shopName, isVerified, profileImageUrl, bannerImageUrl } = seller;
   const navigate = useNavigate();
   const hasImage = profileImageUrl && profileImageUrl.length > 0;
 
@@ -40,6 +40,26 @@ const ShopCard = ({ seller, products = [] }) => {
           display: flex;
           align-items: center;
           gap: 1rem;
+      position: relative;
+    }
+    .shop-banner-wrapper {
+      margin: -1.5rem -1.5rem 0.5rem -1.5rem;
+      height: 100px;
+      overflow: hidden;
+      border-top-left-radius: 7px;
+      border-top-right-radius: 7px;
+    }
+    .shop-card-banner {
+      width: 100%;
+      height: 100%;
+    }
+    .shop-card .shop-image,
+    .shop-card .shop-avatar {
+      margin-top: -2.5rem;
+      border: 3px solid #fff !important;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+      background: #fff;
+      z-index: 2;
         }
         .shop-products-count {
           font-size: 0.85rem;
@@ -94,6 +114,9 @@ const ShopCard = ({ seller, products = [] }) => {
         }
       `}</style>
       <div className="shop-card">
+    <div className="shop-banner-wrapper">
+      <SafeImage src={bannerImageUrl || '/default-banner.jpg'} alt={`${shopName || name} banner`} className="shop-card-banner" fallbackIcon="fa-image" />
+    </div>
         <div className="shop-main-info">
           {hasImage ? (
             <SafeImage src={profileImageUrl} alt={`${shopName || name} storefront`} className="shop-image" fallbackIcon="fa-store" />

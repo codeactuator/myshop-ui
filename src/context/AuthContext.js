@@ -18,8 +18,14 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (userData) => {
-    setCurrentUser(userData);
-    localStorage.setItem('hungrynow_user', JSON.stringify(userData));
+    // Only update if the user data has actually changed to prevent unnecessary re-renders
+    // A simple stringify comparison is often sufficient for DTO-like objects
+    if (JSON.stringify(currentUser) !== JSON.stringify(userData)) {
+      setCurrentUser(userData);
+      localStorage.setItem('hungrynow_user', JSON.stringify(userData));
+    } else {
+      // console.log("User data is identical, skipping state update.");
+    }
   };
 
   const logout = () => {

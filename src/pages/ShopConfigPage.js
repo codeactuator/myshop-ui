@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Modal from '../components/Modal';
 import './AddProductPage.css'; // Re-using form styles
+import SafeImage from '../components/SafeImage';
 
 const ShopConfigPage = () => {
   const { currentUser, login } = useAuth();
@@ -22,17 +23,31 @@ const ShopConfigPage = () => {
   };
 
   useEffect(() => {
-    if (currentUser) {
-      setUpiSettings({
-        shopName: currentUser.shopName || '',
-        shopTagline: currentUser.shopTagline || '',
-        gpayId: currentUser.gpayId || '',
-        paytmId: currentUser.paytmId || '',
-        phonepeId: currentUser.phonepeId || '',
-        bannerImageUrl: currentUser.bannerImageUrl || ''
-      });
-    }
-  }, [currentUser]);
+    const fetchFreshShopConfig = async () => {
+      if (!currentUser?.id) return;
+      try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/shop-front?sellerId=${currentUser.id}`);
+        if (response.ok) {
+          const sfData = await response.json();
+          const sfObj = Array.isArray(sfData) ? sfData[0] : sfData;
+          if (sfObj) {
+          setUpiSettings({
+              shopName: sfObj.shopName || currentUser.shopName || '',
+              shopTagline: sfObj.shopTagline || '',
+              gpayId: sfObj.gpayId || '',
+              paytmId: sfObj.paytmId || '',
+              phonepeId: sfObj.phonepeId || '',
+              bannerImageUrl: sfObj.bannerImageUrl || ''
+          });
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching fresh shop configuration:', error);
+      }
+    };
+
+    fetchFreshShopConfig();
+  }, [currentUser?.id, currentUser?.shopName]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -42,7 +57,7 @@ const ShopConfigPage = () => {
   const uploadFileWithProgress = (file, onProgress) => {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', `${process.env.REACT_APP_API_URL}/products/upload-image`);
+      xhr.open('POST', `${process.env.REACT_APP_API_URL}/shop-front/upload-banner`);
 
       xhr.upload.onprogress = (event) => {
         if (event.lengthComputable) {
@@ -101,11 +116,39 @@ const ShopConfigPage = () => {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/users/${currentUser.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(upiSettings),
+        body: JSON.stringify({ shopName: upiSettings.shopName }),
       });
 
       if (response.ok) {
         const updatedUser = await response.json();
+
+        // Save the updated configuration to the ShopFront record
+        try {
+          const sfRes = await fetch(`${process.env.REACT_APP_API_URL}/shop-front?sellerId=${currentUser.id}`);
+          if (sfRes.ok) {
+            const sfData = await sfRes.json();
+            const sfObj = Array.isArray(sfData) ? sfData[0] : sfData;
+
+            if (sfObj) {
+              await fetch(`${process.env.REACT_APP_API_URL}/shop-front?sellerId=${currentUser.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  ...sfObj,
+                  shopName: upiSettings.shopName,
+                  shopTagline: upiSettings.shopTagline,
+                  gpayId: upiSettings.gpayId,
+                  paytmId: upiSettings.paytmId,
+                  phonepeId: upiSettings.phonepeId,
+                  bannerImageUrl: upiSettings.bannerImageUrl
+                }),
+              });
+            }
+          }
+        } catch (sfErr) {
+          console.warn("ShopFront real-time database synchronization bypassed:", sfErr);
+        }
+
         login(updatedUser); // Update local auth context
         showAlert('Payment settings updated successfully!', 'success');
       } else {
@@ -148,7 +191,7 @@ const ShopConfigPage = () => {
               disabled={uploadProgress !== null}
             />
             <label htmlFor="banner-upload" className="image-file-label" style={{ height: '200px' }}>
-              {upiSettings.bannerImageUrl ? <img src={upiSettings.bannerImageUrl} alt="Banner Preview" className="image-preview" /> : <span>+ Upload Shop Banner</span>}
+              {upiSettings.bannerImageUrl ? <SafeImage src={upiSettings.bannerImageUrl} alt="Banner Preview" className="image-preview" /> : <span>+ Upload Shop Banner</span>}
             </label>
             {uploadProgress !== null && (
               <div style={{

@@ -51,7 +51,16 @@ const ProductListingPage = () => {
             shopFrontsMap = new Map(shopFrontsData.map(sf => [sf.sellerId, sf]));
           }
 
-          const enrichedSellers = usersData.map(user => ({ ...shopFrontsMap.get(user.id), ...user }));
+          // Safely merge user and shop-front details to prevent null fields in user profile from wiping out valid shopFront metadata
+          const enrichedSellers = usersData.map(user => {
+            const sf = shopFrontsMap.get(user.id) || {};
+            return {
+              ...user,
+              ...sf,
+              shopName: sf.shopName || user.shopName || user.name,
+              profileImageUrl: user.profileImageUrl || sf.profileImageUrl
+            };
+          });
           setSellers(enrichedSellers.filter(u => !u.isBlocked));
 
           // Step 4: Combine products with seller info and filter out products from blocked or non-existent sellers

@@ -25,9 +25,19 @@ const UpiPaymentPage = () => {
         // 2. Fetch Seller details (using userId from the first item in the order)
         if (orderData.items && orderData.items.length > 0) {
           const sellerId = orderData.items[0].userId;
-          const sellerRes = await fetch(`${process.env.REACT_APP_API_URL}/users/${sellerId}`);
+          const [sellerRes, shopFrontRes] = await Promise.all([
+            fetch(`${process.env.REACT_APP_API_URL}/users/${sellerId}`),
+            fetch(`${process.env.REACT_APP_API_URL}/shop-front?sellerId=${sellerId}`)
+          ]);
+
           if (sellerRes.ok) {
-            setSeller(await sellerRes.json());
+            const sellerData = await sellerRes.json();
+            let shopFrontData = {};
+            if (shopFrontRes.ok) {
+              const sfData = await shopFrontRes.json();
+              shopFrontData = Array.isArray(sfData) ? sfData[0] : sfData;
+            }
+            setSeller({ ...sellerData, ...shopFrontData });
           }
         }
       } catch (err) {

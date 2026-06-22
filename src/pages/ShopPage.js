@@ -26,7 +26,14 @@ const ShopPage = () => {
         const shopFrontData = await shopFrontResponse.json();
         const userData = await userResponse.json();
         const shopFrontObj = Array.isArray(shopFrontData) ? shopFrontData[0] : shopFrontData;
-        const sellerData = { ...shopFrontObj, ...userData }; // Combine both data sources, prioritizing updated user details
+        
+        // Safely merge user and shop-front details to prevent null fields in user profile from wiping out valid shopFront metadata
+        const sellerData = {
+          ...userData,
+          ...shopFrontObj,
+          shopName: shopFrontObj.shopName || userData.shopName || userData.name,
+          profileImageUrl: userData.profileImageUrl || shopFrontObj.profileImageUrl
+        };
         setSeller(sellerData);
 
         // Step 2: Fetch available products for this seller

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
+import SafeImage from '../components/SafeImage';
 import './AddProductPage.css';
 
 const AddProductPage = () => {
@@ -179,7 +180,7 @@ const AddProductPage = () => {
               disabled={uploadProgress[index] !== undefined}
                 />
                 <label htmlFor={`image-upload-${index}`} className="image-file-label">
-                  {url ? <img src={url} alt="Preview" className="image-preview" /> : <span>+ Click to upload</span>}
+                  {url ? <SafeImage src={url} alt="Preview" className="image-preview" /> : <span>+ Click to upload</span>}
                 </label>
             {uploadProgress[index] !== undefined && (
               <div style={{
