@@ -7,7 +7,7 @@ import './AdminNavbar.css';
  * Top navigation bar specifically for the Admin Dashboard.
  * Includes branding and the primary logout action.
  */
-const AdminNavbar = ({ toggleSidebar }) => {
+const AdminNavbar = ({ toggleSidebar, onRefresh }) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -27,7 +27,12 @@ const AdminNavbar = ({ toggleSidebar }) => {
           hungrynow <span>admin</span>
         </Link>
       </div>
-      <div className="admin-nav-right">
+      <div className="admin-nav-right" style={{ display: 'flex', alignItems: 'center' }}>
+        {onRefresh && (
+          <button onClick={onRefresh} className="admin-refresh-action" title="Refresh data" style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', marginRight: '15px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
+            <i className="fas fa-sync fa-lg"></i>
+          </button>
+        )}
         <button onClick={handleLogout} className="admin-logout-action">
           <i className="fas fa-sign-out-alt"></i> Logout
         </button>

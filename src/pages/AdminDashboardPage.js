@@ -150,7 +150,7 @@ const AdminDashboardPage = () => {
 
   return (
     <div className="admin-dashboard-layout">
-      <AdminNavbar toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+      <AdminNavbar toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} onRefresh={fetchData} />
       <div className="admin-dashboard-container">
         <AdminSideNavbar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
         <div className="admin-main-content">
@@ -167,7 +167,8 @@ const AdminDashboardPage = () => {
             popularCategories,
             totalRevenue,
             activeUsersCount,
-            refreshOrders
+            refreshOrders,
+            fetchData
           }} />
         </div>
       </div>

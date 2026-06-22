@@ -65,8 +65,6 @@ function App() {
               <Route path="/" element={<Navigate to={initialRoute} replace />} />
               <Route path="/welcome" element={<WelcomeScreen />} />
               <Route path="/intro" element={<AppIntroScreenWrapper />} />
-              <Route path="/delivery/dashboard" element={<DeliveryPartnerDashboardPage />} />
-              <Route path="/delivery/orders/:orderId" element={<DeliveryOrderTrackingPage />} />
 
               {/* Routes with the main navbar */}
               <Route element={<MainLayout />}>
@@ -79,6 +77,8 @@ function App() {
               <Route path="/seller/products/:productId" element={<SellerProductDetailsPage />} />
               <Route path="/seller/orders/:orderId" element={<SellerOrderDetailsPage />} />
               <Route path="/orders/:orderId" element={<OrderTrackingPage />} />
+              <Route path="/delivery/dashboard" element={<DeliveryPartnerDashboardPage />} />
+              <Route path="/delivery/orders/:orderId" element={<DeliveryOrderTrackingPage />} />
               <Route path="/seller/dashboard" element={<SellerDashboardPage />} />
               <Route path="/seller/inventory" element={<InventoryPage />} />
               <Route path="/profile" element={<ProfilePage />} />

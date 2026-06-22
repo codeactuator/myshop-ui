@@ -120,6 +120,11 @@
 .contact-seller-btn, 
 .report-btn,
 .edit-btn,
+.add-to-cart-btn,
+.continue-button,
+.signup-button,
+.open-app-btn,
+.confirm-payment-btn,
 .add-review-section button {
   background-color: #5A189A !important;
   color: white !important;
@@ -139,7 +144,92 @@
 .place-order-btn:hover, 
 .contact-seller-btn:hover, 
 .report-btn:hover,
-.edit-btn:hover {
+.edit-btn:hover,
+.add-to-cart-btn:hover,
+.continue-button:hover,
+.signup-button:hover,
+.open-app-btn:hover,
+.confirm-payment-btn:hover,
+.add-review-section button:hover {
   background-color: #3C096C !important;
   transform: translateY(-1px);
+}
+
+/* Secondary / Outlined Theme Buttons */
+.btn-secondary,
+.cancel-button {
+  background-color: transparent !important;
+  color: #5A189A !important;
+  border: 2px solid #5A189A !important;
+  border-radius: 25px !important;
+  padding: 8px 23px !important; /* Adjusted for border thickness */
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer;
+  text-decoration: none !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-secondary:hover,
+.cancel-button:hover {
+  background-color: #5A189A !important;
+  color: white !important;
+  transform: translateY(-1px);
+}
+
+/* Success / Green Theme Buttons */
+.btn-success {
+  background-color: #28a745 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 25px !important;
+  padding: 10px 25px !important;
+  font-weight: 600 !important;
+  transition: background-color 0.3s ease, transform 0.2s ease !important;
+  cursor: pointer;
+  text-decoration: none !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-success:hover {
+  background-color: #218838 !important;
+  transform: translateY(-1px);
+}
+
+/* Danger / Red Theme Buttons */
+.btn-danger,
+.block-btn,
+.delete-vehicle-btn {
+  background-color: #dc3545 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 25px !important;
+  padding: 10px 25px !important;
+  font-weight: 600 !important;
+  transition: background-color 0.3s ease, transform 0.2s ease !important;
+  cursor: pointer;
+  text-decoration: none !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-danger:hover,
+.block-btn:hover,
+.delete-vehicle-btn:hover {
+  background-color: #c82333 !important;
+  transform: translateY(-1px);
+}
+
+/* Specific Block Toggle Exception for Unblocking */
+.block-btn.unblock {
+  background-color: #28a745 !important;
+}
+
+.block-btn.unblock:hover {
+  background-color: #218838 !important;
 }

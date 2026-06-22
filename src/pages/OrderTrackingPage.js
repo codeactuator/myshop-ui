@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
+import SafeImage from '../components/SafeImage';
 import './OrderTrackingPage.css';
 
 const OrderTrackingPage = () => {
@@ -34,49 +35,49 @@ const OrderTrackingPage = () => {
     notificationSound.current = audio;
   }, []);
 
-  useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        // Step 1: Fetch the basic order first
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/orders/${orderId}`);
-        if (!response.ok) {
-          throw new Error('Order not found.');
-        }
-        let data = await response.json();
-
-        // Step 2: If a delivery partner is assigned, fetch its details
-        if (data.deliveryPartnerId) {
-          const partnerResponse = await fetch(`${process.env.REACT_APP_API_URL}/delivery/partners/${data.deliveryPartnerId}`);
-          if (partnerResponse.ok) {
-            const partnerData = await partnerResponse.json();
-            data.deliveryPartner = partnerData;
-
-            // Step 3: If the partner has a vehicle, fetch its details
-            if (partnerData.vehicleId) {
-              const vehicleResponse = await fetch(`${process.env.REACT_APP_API_URL}/delivery/vehicles/${partnerData.vehicleId}`);
-              if (vehicleResponse.ok) {
-                data.deliveryPartner.vehicle = await vehicleResponse.json();
-              }
-            }
-          }
-        }
-
-        setOrder(prevOrder => {
-          // Play sound if status has changed and it's not the initial load
-          if (prevOrder && prevOrder.status !== data.status) {
-            if (soundEnabled) {
-              notificationSound.current.play().catch(e => console.error("Error playing sound:", e));
-            }
-          }
-          return data; // Return the new state
-        });
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+  const fetchOrder = useCallback(async () => {
+    try {
+      // Step 1: Fetch the basic order first
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/orders/${orderId}`);
+      if (!response.ok) {
+        throw new Error('Order not found.');
       }
-    };
+      let data = await response.json();
 
+      // Step 2: If a delivery partner is assigned, fetch its details
+      if (data.deliveryPartnerId) {
+        const partnerResponse = await fetch(`${process.env.REACT_APP_API_URL}/delivery/partners/${data.deliveryPartnerId}`);
+        if (partnerResponse.ok) {
+          const partnerData = await partnerResponse.json();
+          data.deliveryPartner = partnerData;
+
+          // Step 3: If the partner has a vehicle, fetch its details
+          if (partnerData.vehicleId) {
+            const vehicleResponse = await fetch(`${process.env.REACT_APP_API_URL}/delivery/vehicles/${partnerData.vehicleId}`);
+            if (vehicleResponse.ok) {
+              data.deliveryPartner.vehicle = await vehicleResponse.json();
+            }
+          }
+        }
+      }
+
+      setOrder(prevOrder => {
+        // Play sound if status has changed and it's not the initial load
+        if (prevOrder && prevOrder.status !== data.status) {
+          if (soundEnabled) {
+            notificationSound.current.play().catch(e => console.error("Error playing sound:", e));
+          }
+        }
+        return data; // Return the new state
+      });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [orderId, soundEnabled]);
+
+  useEffect(() => {
     fetchOrder();
 
     const handleSseNotification = () => {
@@ -87,7 +88,7 @@ const OrderTrackingPage = () => {
     return () => {
       window.removeEventListener('sse-notification', handleSseNotification);
     };
-  }, [orderId, soundEnabled]); // Re-run effect if orderId or soundEnabled changes
+  }, [fetchOrder]); // Re-run effect if fetchOrder changes
 
   if (loading) return <div className="page-status">Loading order details...</div>;
   if (error) return <div className="page-status">Error: {error}</div>;
@@ -112,7 +113,12 @@ const OrderTrackingPage = () => {
     <>
     <div className="order-tracking-container">
       <Link to="/my-orders" className="back-link">&larr; Back to My Orders</Link>
-      <h1>Order Details</h1>
+      <h1 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        Order Details
+        <button onClick={fetchOrder} title="Refresh status" style={{ background: 'none', border: 'none', color: '#5A189A', cursor: 'pointer', display: 'inline-flex', padding: 0 }}>
+          <i className="fas fa-sync fa-lg"></i>
+        </button>
+      </h1>
       <div className="order-summary-header">
         <p><strong>Order ID:</strong> {order.id}</p>
         <p><strong>Date:</strong> {new Date(order.orderDate).toLocaleDateString()}</p>
@@ -156,7 +162,7 @@ const OrderTrackingPage = () => {
         <h2>Items in this Order</h2>
         {order.items.map(item => (
           <div key={item.id} className="order-item-card" onClick={() => navigate(`/products/${item.id}`)}>
-            <img src={item.imageUrls[0]} alt={item.name} className="order-item-image" />
+            <SafeImage src={item.imageUrls && item.imageUrls[0]} alt={item.name} className="order-item-image" />
             <div className="order-item-info">
               <h4>{item.name}</h4>
               <p>Quantity: {item.quantity}</p>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Navigate, Link } from 'react-router-dom';
 import SellerOrderCard from '../components/SellerOrderCard';
@@ -28,43 +28,43 @@ const SellerDashboardPage = () => {
     notificationSound.current = audio;
   }, []);
 
+  const checkForNewOrders = useCallback(async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/orders`);
+      if (!response.ok) throw new Error('Failed to fetch orders.');
+      const allOrders = await response.json();
+
+      const myOrders = allOrders.filter(order =>
+        order.items && order.items.some(item => Number(item.userId) === currentUser.id)
+      ).sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+
+      // Check against localStorage to see if there are new orders
+      const notifiedOrders = JSON.parse(localStorage.getItem(`notifiedOrders_${currentUser.id}`) || '[]');
+      const newOrders = myOrders.filter(order => !notifiedOrders.includes(order.id));
+
+      if (newOrders.length > 0) {
+        if (soundEnabled) {
+          notificationSound.current.play().catch(e => console.error("Error playing sound:", e));
+        }
+        
+        // Update notified orders in localStorage
+        const newNotifiedIds = [...notifiedOrders, ...newOrders.map(o => o.id)];
+        localStorage.setItem(`notifiedOrders_${currentUser.id}`, JSON.stringify(newNotifiedIds));
+      }
+
+      setSellerOrders(myOrders);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentUser, soundEnabled]);
+
   useEffect(() => {
     if (!currentUser || currentUser.userType?.toLowerCase() !== 'seller') {
       setLoading(false);
       return;
     }
-
-    const checkForNewOrders = async () => {
-      try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/orders`);
-        if (!response.ok) throw new Error('Failed to fetch orders.');
-        const allOrders = await response.json();
-
-        const myOrders = allOrders.filter(order =>
-          order.items && order.items.some(item => Number(item.userId) === currentUser.id)
-        ).sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
-
-        // Check against localStorage to see if there are new orders
-        const notifiedOrders = JSON.parse(localStorage.getItem(`notifiedOrders_${currentUser.id}`) || '[]');
-        const newOrders = myOrders.filter(order => !notifiedOrders.includes(order.id));
-
-        if (newOrders.length > 0) {
-          if (soundEnabled) {
-            notificationSound.current.play().catch(e => console.error("Error playing sound:", e));
-          }
-          
-          // Update notified orders in localStorage
-          const newNotifiedIds = [...notifiedOrders, ...newOrders.map(o => o.id)];
-          localStorage.setItem(`notifiedOrders_${currentUser.id}`, JSON.stringify(newNotifiedIds));
-        }
-
-        setSellerOrders(myOrders);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
 
     checkForNewOrders(); // Initial fetch
 
@@ -76,7 +76,7 @@ const SellerDashboardPage = () => {
     return () => {
       window.removeEventListener('sse-notification', handleSseNotification);
     };
-  }, [currentUser]);
+  }, [currentUser, checkForNewOrders]);
 
   const handleOrderStatusUpdate = (orderId, newStatus) => {
     setSellerOrders(prevOrders =>
@@ -112,8 +112,12 @@ const SellerDashboardPage = () => {
     <>
     <div className="seller-dashboard-container">
       <div className="dashboard-header">
-        <h1>Seller Dashboard</h1>
-        <Link to="/seller/inventory" className="btn btn-secondary">Manage Inventory</Link>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          Seller Dashboard
+          <button onClick={checkForNewOrders} title="Refresh status" style={{ background: 'none', border: 'none', color: '#5A189A', cursor: 'pointer', display: 'inline-flex', padding: 0 }}>
+            <i className="fas fa-sync fa-lg"></i>
+          </button>
+        </h1>
       </div>
       {!soundEnabled && (
         <div className="sound-enable-banner">
