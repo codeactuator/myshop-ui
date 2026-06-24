@@ -16,6 +16,8 @@ const CheckoutPage = () => {
   const [upiProvider, setUpiProvider] = useState('gpay'); // 'gpay', 'paytm', or 'phonepe'
   const [fulfillmentMethod, setFulfillmentMethod] = useState('delivery'); // 'delivery' or 'pickup'
   const [deliveryOption, setDeliveryOption] = useState('saved'); // 'saved' or 'new'
+  const [sellerShopFront, setSellerShopFront] = useState(null);
+  const [checkingPaymentOptions, setCheckingPaymentOptions] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     apartmentNumber: '',
@@ -35,6 +37,59 @@ const CheckoutPage = () => {
       setFormData({ name: '', apartmentNumber: '', phone: '' });
     }
   }, [currentUser, deliveryOption]);
+
+  useEffect(() => {
+    const getSellerPaymentInfo = async () => {
+      if (cartItems.length === 0) {
+        setCheckingPaymentOptions(false);
+        return;
+      }
+      try {
+        const firstItem = cartItems[0];
+        // Fetch product details to identify the seller's user ID
+        const productRes = await fetch(`${process.env.REACT_APP_API_URL}/products/${firstItem.productId}`);
+        if (productRes.ok) {
+          const productData = await productRes.json();
+          const sellerId = productData.userId;
+
+          // Retrieve the ShopFront credentials for this seller
+          const sfRes = await fetch(`${process.env.REACT_APP_API_URL}/shop-front?sellerId=${sellerId}`);
+          if (sfRes.ok) {
+            const sfData = await sfRes.json();
+            const sfObj = Array.isArray(sfData) ? sfData[0] : sfData;
+            setSellerShopFront(sfObj);
+
+            if (sfObj) {
+              if (sfObj.gpayId || sfObj.upiId) {
+                setUpiProvider('gpay');
+              } else if (sfObj.paytmId) {
+                setUpiProvider('paytm');
+              } else if (sfObj.phonepeId) {
+                setUpiProvider('phonepe');
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching seller payment configuration:", err);
+      } finally {
+        setCheckingPaymentOptions(false);
+      }
+    };
+
+    getSellerPaymentInfo();
+  }, [cartItems]);
+
+  const hasGpay = !!(sellerShopFront?.gpayId || sellerShopFront?.upiId);
+  const hasPaytm = !!(sellerShopFront?.paytmId || sellerShopFront?.upiId);
+  const hasPhonepe = !!(sellerShopFront?.phonepeId || sellerShopFront?.upiId);
+  const hasAnyUpi = hasGpay || hasPaytm || hasPhonepe;
+
+  useEffect(() => {
+    if (!checkingPaymentOptions && !hasAnyUpi && paymentMethod === 'upi') {
+      setPaymentMethod('cod');
+    }
+  }, [checkingPaymentOptions, hasAnyUpi, paymentMethod]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -164,48 +219,60 @@ const CheckoutPage = () => {
               </div>
             )}
 
-            <div className="payment-method-container">
-              <h2>Payment Method</h2>
-              <div className="payment-options">
-                <div className="radio-group">
-                  <input type="radio" id="cod" name="paymentMethod" value="cod" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} />
-                  <label htmlFor="cod">Cash on Delivery (COD)</label>
-                </div>
-                <div className="radio-group">
-                  <input type="radio" id="upi" name="paymentMethod" value="upi" checked={paymentMethod === 'upi'} onChange={() => setPaymentMethod('upi')} />
-                  <label htmlFor="upi">UPI</label>
-                </div>
-              </div>
-              {paymentMethod === 'upi' && (
-                <div className="upi-info">
-                  <p>Select your preferred UPI App:</p>
-                  <div className="upi-provider-options">
-                    <div className="radio-group">
-                      <input type="radio" id="gpay" name="upiProvider" value="gpay" checked={upiProvider === 'gpay'} onChange={() => setUpiProvider('gpay')} />
-                      <label htmlFor="gpay">
-                        <img src={gpayLogo} alt="Google Pay" className="upi-logo" />
-                        Google Pay
-                      </label>
-                    </div>
-                    <div className="radio-group">
-                      <input type="radio" id="paytm" name="upiProvider" value="paytm" checked={upiProvider === 'paytm'} onChange={() => setUpiProvider('paytm')} />
-                      <label htmlFor="paytm">
-                        <img src={paytmLogo} alt="Paytm" className="upi-logo" />
-                        Paytm
-                      </label>
-                    </div>
-                    <div className="radio-group">
-                      <input type="radio" id="phonepe" name="upiProvider" value="phonepe" checked={upiProvider === 'phonepe'} onChange={() => setUpiProvider('phonepe')} />
-                      <label htmlFor="phonepe">
-                        <img src={phonepeLogo} alt="PhonePe" className="upi-logo" />
-                        PhonePe
-                      </label>
-                    </div>
+            {checkingPaymentOptions ? (
+              <div className="payment-method-container"><p>Checking available payment options...</p></div>
+            ) : (
+              <div className="payment-method-container">
+                <h2>Payment Method</h2>
+                <div className="payment-options">
+                  <div className="radio-group">
+                    <input type="radio" id="cod" name="paymentMethod" value="cod" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} />
+                    <label htmlFor="cod">Cash on Delivery (COD)</label>
                   </div>
-                  <p>After placing the order, you will be shown a QR code to complete the payment.</p>
+                  {hasAnyUpi && (
+                    <div className="radio-group">
+                      <input type="radio" id="upi" name="paymentMethod" value="upi" checked={paymentMethod === 'upi'} onChange={() => setPaymentMethod('upi')} />
+                      <label htmlFor="upi">UPI</label>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+                {paymentMethod === 'upi' && hasAnyUpi && (
+                  <div className="upi-info">
+                    <p>Select your preferred UPI App:</p>
+                    <div className="upi-provider-options">
+                      {hasGpay && (
+                        <div className="radio-group">
+                          <input type="radio" id="gpay" name="upiProvider" value="gpay" checked={upiProvider === 'gpay'} onChange={() => setUpiProvider('gpay')} />
+                          <label htmlFor="gpay">
+                            <img src={gpayLogo} alt="Google Pay" className="upi-logo" />
+                            Google Pay
+                          </label>
+                        </div>
+                      )}
+                      {hasPaytm && (
+                        <div className="radio-group">
+                          <input type="radio" id="paytm" name="upiProvider" value="paytm" checked={upiProvider === 'paytm'} onChange={() => setUpiProvider('paytm')} />
+                          <label htmlFor="paytm">
+                            <img src={paytmLogo} alt="Paytm" className="upi-logo" />
+                            Paytm
+                          </label>
+                        </div>
+                      )}
+                      {hasPhonepe && (
+                        <div className="radio-group">
+                          <input type="radio" id="phonepe" name="upiProvider" value="phonepe" checked={upiProvider === 'phonepe'} onChange={() => setUpiProvider('phonepe')} />
+                          <label htmlFor="phonepe">
+                            <img src={phonepeLogo} alt="PhonePe" className="upi-logo" />
+                            PhonePe
+                          </label>
+                        </div>
+                      )}
+                    </div>
+                    <p>After placing the order, you will be shown a QR code to complete the payment.</p>
+                  </div>
+                )}
+              </div>
+            )}
           </form>
         </div>
         <div className="checkout-summary-container">
@@ -213,12 +280,12 @@ const CheckoutPage = () => {
           {cartItems.map(item => (
             <div key={item.id} className="summary-item">
               <span>{item.productName || 'N/A'} (x{item.quantity})</span>
-              <span>${(item.price * item.quantity).toFixed(2)}</span>
+              <span>₹{(item.price * item.quantity).toFixed(2)}</span>
             </div>
           ))}
           <div className="summary-total">
             <strong>Total</strong>
-            <strong>${cartTotal.toFixed(2)}</strong>
+            <strong>₹{cartTotal.toFixed(2)}</strong>
           </div>
           <button type="submit" form="checkout-form" className="btn btn-primary place-order-btn">Place Order</button>
         </div>

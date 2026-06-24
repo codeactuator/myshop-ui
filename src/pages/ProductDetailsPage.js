@@ -291,7 +291,7 @@ const ProductDetailsPage = () => {
         </div>
         <div className="details-info-container">
           <h1 className="details-name">{product.name}</h1>
-          <p className="details-price">${product.price.toFixed(2)}</p>
+          <p className="details-price">₹{product.price.toFixed(2)}</p>
           <p className="details-category">Category: <span>{product.category}</span></p>
           <div className="details-description">
             <h3>Description</h3>

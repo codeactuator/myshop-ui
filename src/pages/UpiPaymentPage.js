@@ -52,16 +52,21 @@ const UpiPaymentPage = () => {
 
   const getTargetVpa = () => {
     if (!seller || !order) return 'platform@upi';
-    if (order.upiProvider === 'gpay') return seller.gpayId || seller.paytmId || seller.phonepeId;
-    if (order.upiProvider === 'paytm') return seller.paytmId || seller.gpayId || seller.phonepeId;
-    if (order.upiProvider === 'phonepe') return seller.phonepeId || seller.gpayId || seller.paytmId;
-    return 'platform@upi';
+    const upiProviderLower = order.upiProvider?.toLowerCase();
+    const providers = {
+      gpay: [seller.gpayId, seller.paytmId, seller.phonepeId],
+      paytm: [seller.paytmId, seller.gpayId, seller.phonepeId],
+      phonepe: [seller.phonepeId, seller.gpayId, seller.paytmId]
+    };
+    const priorityList = providers[upiProviderLower] || [seller.gpayId, seller.paytmId, seller.phonepeId];
+    const resolvedVpa = priorityList.find(id => id && id.trim() !== '');
+    return resolvedVpa || 'platform@upi';
   };
 
   const vpa = getTargetVpa();
   const amount = order?.totalAmount || 0;
-  const upiUrl = `upi://pay?pa=${vpa}&pn=${encodeURIComponent(seller?.shopName || 'Seller')}&am=${amount}&cu=INR&tn=${encodeURIComponent('Order ' + orderId)}`;
-
+  const upiUrl = `upi://pay?pa=${vpa}&pn=${encodeURIComponent(seller?.payeeName || seller?.shopName || 'Seller')}&am=${amount}&cu=INR&tn=${encodeURIComponent('Order ' + orderId)}`;
+  console.log(upiUrl);
   const handleOpenApp = () => {
     window.location.href = upiUrl;
   };
@@ -101,13 +106,13 @@ const UpiPaymentPage = () => {
           <div className="mobile-payment-section">
             <p>Click the button below to open <strong>{order?.upiProvider?.toUpperCase()}</strong> and complete your payment.</p>
             <button className="btn btn-primary open-app-btn" onClick={handleOpenApp}>
-              {order?.upiProvider === 'gpay' && <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png" alt="" className="btn-upi-logo" />}
-              {order?.upiProvider === 'paytm' && <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/512px-Paytm_Logo_%28standalone%29.svg.png" alt="" className="btn-upi-logo" />}
-              {order?.upiProvider === 'phonepe' && <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/PhonePe_Logo.svg/512px-PhonePe_Logo.svg.png" alt="" className="btn-upi-logo" />}
+              {order?.upiProvider?.toLowerCase() === 'gpay' && <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png" alt="" className="btn-upi-logo" />}
+              {order?.upiProvider?.toLowerCase() === 'paytm' && <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/512px-Paytm_Logo_%28standalone%29.svg.png" alt="" className="btn-upi-logo" />}
+              {order?.upiProvider?.toLowerCase() === 'phonepe' && <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/PhonePe_Logo.svg/512px-PhonePe_Logo.svg.png" alt="" className="btn-upi-logo" />}
               <span>
-                Pay with {order?.upiProvider === 'gpay' ? 'Google Pay' : 
-                          order?.upiProvider === 'paytm' ? 'Paytm' : 
-                          order?.upiProvider === 'phonepe' ? 'PhonePe' : 'UPI App'}
+                Pay with {order?.upiProvider?.toLowerCase() === 'gpay' ? 'Google Pay' : 
+                          order?.upiProvider?.toLowerCase() === 'paytm' ? 'Paytm' : 
+                          order?.upiProvider?.toLowerCase() === 'phonepe' ? 'PhonePe' : 'UPI App'}
               </span>
             </button>
           </div>

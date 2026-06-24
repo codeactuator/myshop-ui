@@ -150,7 +150,7 @@ const ShopCard = ({ seller, products = [] }) => {
                     alt={product.name} 
                     className="preview-image" 
                   />
-                  <span className="preview-price">${product.price.toFixed(2)}</span>
+                  <span className="preview-price">₹{product.price.toFixed(2)}</span>
                 </div>
               ))}
             </div>

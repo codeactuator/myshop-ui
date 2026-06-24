@@ -81,7 +81,7 @@ const SellerOrderDetailsPage = () => {
             <div className="order-item-info">
               <h4>{item.name}</h4>
               <p>Quantity: {item.quantity}</p>
-              <p>Price: ${item.price.toFixed(2)}</p>
+              <p>Price: ₹{item.price.toFixed(2)}</p>
             </div>
           </div>
         ))}

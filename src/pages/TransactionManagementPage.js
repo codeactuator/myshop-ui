@@ -136,7 +136,7 @@ const TransactionManagementPage = () => {
                       : 'N/A'}
                 </td>
                 <td>{new Date(order.orderDate).toLocaleDateString()}</td>
-                <td>${order.totalAmount.toFixed(2)}</td>
+                <td>₹{order.totalAmount.toFixed(2)}</td>
                 <td>{order.paymentMethod?.toUpperCase() || 'N/A'}</td>
                 <td><span className={`status-badge status-${order.status}`}>{order.status?.replace('_', ' ')}</span></td>
                 <td>

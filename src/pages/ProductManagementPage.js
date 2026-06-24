@@ -110,7 +110,7 @@ const ProductManagementPage = () => {
               <tr key={product.id}>
                 <td><Link to={`/admin/dashboard/products/${product.id}`}>{product.name}</Link></td>
                 <td>{product.seller?.shopName || product.seller?.name || 'N/A'}</td>
-                <td>${product.price.toFixed(2)}</td>
+                <td>₹{product.price.toFixed(2)}</td>
                 <td>
                   <label className="switch">
                     <input type="checkbox" checked={product.status === 'available'} onChange={() => handleStatusToggle(product.id, product.status)} />

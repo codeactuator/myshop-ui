@@ -91,7 +91,7 @@ const MyOrdersPage = () => {
                   <span>{new Date(order.orderDate).toLocaleDateString()}</span>
                 </div>
                 <div className="order-card-body">
-                  <p>Total: <strong>${order.totalAmount.toFixed(2)}</strong></p>
+                  <p>Total: <strong>₹{order.totalAmount.toFixed(2)}</strong></p>
                   <p>Status: <span className={`status-badge status-${order.status || 'pending'}`}>{(order.status || 'pending').replace('_', ' ')}</span></p>
                 </div>
               </div>

@@ -72,7 +72,7 @@ const AdminOrderDetailsPage = () => {
         <p><strong>Order ID:</strong> {order.id}</p>
         <p><strong>Buyer:</strong> {order.buyerInfo?.name || 'N/A'}</p>
         <p><strong>Date:</strong> {new Date(order.orderDate).toLocaleDateString()}</p>
-        <p><strong>Total:</strong> ${order.totalAmount.toFixed(2)}</p>
+        <p><strong>Total:</strong> ₹{order.totalAmount.toFixed(2)}</p>
       </div>
 
       {order.deliveryPartner && (
@@ -108,7 +108,7 @@ const AdminOrderDetailsPage = () => {
             <div className="order-item-info">
               <h4>{item.name}</h4>
               <p>Quantity: {item.quantity}</p>
-              <p>Price: ${item.price.toFixed(2)}</p>
+              <p>Price: ₹{item.price.toFixed(2)}</p>
             </div>
           </div>
         ))}

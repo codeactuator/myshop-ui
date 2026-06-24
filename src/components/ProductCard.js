@@ -29,7 +29,7 @@ const ProductCard = ({ product }) => {
         <SafeImage src={imageUrls[0]} alt={name} className="product-image" />
         <div className="product-info">
           <h3 className="product-name">{name}</h3>
-          <p className="product-price">${price.toFixed(2)}</p>
+          <p className="product-price">₹{price.toFixed(2)}</p>
           <div className="product-seller-info">
             <span className="seller-name">
               Sold by: {user ? (user.shopName || user.name) : 'Unknown Seller'}

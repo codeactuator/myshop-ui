@@ -73,7 +73,7 @@ const DashboardHomePage = () => {
         <div className="summary-card"><h3>Available Partners</h3><p>{partnerAvailability?.available || 0}</p></div>
         <div className="summary-card"><h3>Unavailable Partners</h3><p>{partnerAvailability?.unavailable || 0}</p></div>
         <div className="summary-card"><h3>Total Orders</h3><p>{orders?.length || 0}</p></div>
-        <div className="summary-card"><h3>Total Revenue</h3><p>${totalRevenue?.toFixed(2) || '0.00'}</p></div>
+        <div className="summary-card"><h3>Total Revenue</h3><p>₹{totalRevenue?.toFixed(2) || '0.00'}</p></div>
         <div className="summary-card"><h3>Open Reports</h3><p>{reports?.length || 0}</p></div>
       </div>
       <div className="dashboard-grid">

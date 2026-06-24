@@ -28,7 +28,7 @@ const CartPage = () => {
               <SafeImage src={item.imageUrl} alt={item.productName} className="cart-item-image" />
               <div className="cart-item-details">
                 <h3>{item.productName}</h3>
-                <p>${item.price.toFixed(2)}</p>
+                <p>₹{item.price.toFixed(2)}</p>
               </div>
               <div className="cart-item-actions">
                 <div className="quantity-selector">
@@ -49,7 +49,7 @@ const CartPage = () => {
           <h2>Order Summary</h2>
           <div className="summary-row">
             <span>Subtotal</span>
-            <span>${cartTotal.toFixed(2)}</span>
+            <span>₹{cartTotal.toFixed(2)}</span>
           </div>
           <div className="summary-row">
             <span>Shipping</span>
@@ -57,7 +57,7 @@ const CartPage = () => {
           </div>
           <div className="summary-total">
             <span>Total</span>
-            <span>${cartTotal.toFixed(2)}</span>
+            <span>₹{cartTotal.toFixed(2)}</span>
           </div>
           <button className="btn btn-primary checkout-btn" onClick={() => navigate('/checkout')}>Proceed to Checkout</button>
         </div>

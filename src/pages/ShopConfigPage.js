@@ -8,6 +8,7 @@ const ShopConfigPage = () => {
   const { currentUser, login } = useAuth();
   const [upiSettings, setUpiSettings] = useState({
     shopName: '',
+    payeeName: '',
     shopTagline: '',
     gpayId: '',
     paytmId: '',
@@ -33,6 +34,7 @@ const ShopConfigPage = () => {
           if (sfObj) {
           setUpiSettings({
               shopName: sfObj.shopName || currentUser.shopName || '',
+              payeeName: sfObj.payeeName || '',
               shopTagline: sfObj.shopTagline || '',
               gpayId: sfObj.gpayId || '',
               paytmId: sfObj.paytmId || '',
@@ -136,6 +138,7 @@ const ShopConfigPage = () => {
                 body: JSON.stringify({
                   ...sfObj,
                   shopName: upiSettings.shopName,
+                  payeeName: upiSettings.payeeName,
                   shopTagline: upiSettings.shopTagline,
                   gpayId: upiSettings.gpayId,
                   paytmId: upiSettings.paytmId,
@@ -172,6 +175,11 @@ const ShopConfigPage = () => {
         <div className="form-group">
           <label htmlFor="shopName">Shop Name</label>
           <input type="text" id="shopName" name="shopName" value={upiSettings.shopName} onChange={handleInputChange} placeholder="Your Business Name" required />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="payeeName">Bank Account Holder Name (Payee Name)</label>
+          <input type="text" id="payeeName" name="payeeName" value={upiSettings.payeeName} onChange={handleInputChange} placeholder="Legal name registered with your bank" required />
         </div>
 
         <div className="form-group">
