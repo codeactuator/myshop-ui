@@ -13,6 +13,28 @@ const UpiPaymentPage = () => {
 
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
+  // Checks order status to see if the backend has updated it (via webhook/IPN callback)
+  const checkOrderStatus = async () => {
+    try {
+      const orderRes = await fetch(`${process.env.REACT_APP_API_URL}/orders/${orderId}`);
+      if (orderRes.ok) {
+        const orderData = await orderRes.json();
+        setOrder(orderData);
+        
+        const activeStatuses = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY_FOR_SHIP', 'OUT_FOR_DELIVERY', 'DELIVERED', 'COMPLETED'];
+        if (activeStatuses.includes(orderData.status?.toUpperCase())) {
+          await clearCart();
+          navigate(`/orders/${orderId}`);
+        } else if (orderData.status?.toUpperCase() === 'CANCELLED') {
+          alert('This payment session has expired or the order was cancelled.');
+          navigate('/products');
+        }
+      }
+    } catch (err) {
+      console.error("Error verifying payment status:", err);
+    }
+  };
+
   useEffect(() => {
     const fetchPaymentDetails = async () => {
       try {
@@ -48,6 +70,20 @@ const UpiPaymentPage = () => {
     };
 
     fetchPaymentDetails();
+
+    // 1. Listen for real-time changes via Server-Sent Events (SSE)
+    const handleSseNotification = () => {
+      checkOrderStatus();
+    };
+    window.addEventListener('sse-notification', handleSseNotification);
+
+    // 2. Fallback polling (every 4 seconds) in case mobile browser suspends background connections
+    const pollInterval = setInterval(checkOrderStatus, 4000);
+
+    return () => {
+      window.removeEventListener('sse-notification', handleSseNotification);
+      clearInterval(pollInterval);
+    };
   }, [orderId]);
 
   const getTargetVpa = () => {
