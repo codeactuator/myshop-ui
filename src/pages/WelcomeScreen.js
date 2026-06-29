@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useMessage } from '../context/MessageContext';
 import './WelcomeScreen.css';
-import SocietySelection from '../components/SocietySelection';
+import SocietySelection from '../components/SocietySelection.js';
 
 const WelcomeScreen = () => {
   const navigate = useNavigate();
