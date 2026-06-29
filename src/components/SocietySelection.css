@@ -1,0 +1,76 @@
+.society-selection-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.society-search-input {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box; /* Ensures padding doesn't affect width */
+}
+
+.society-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+.society-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+    background-color: #f9f9f9;
+}
+
+.society-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-color: #A4508B;
+}
+
+.society-card.selected {
+    border-color: #A4508B;
+    background-color: #f3e5f1;
+}
+
+.society-card-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 0.5rem;
+    color: #A4508B;
+}
+
+.society-card-name {
+    font-size: 0.875rem;
+    text-align: center;
+    font-weight: 500;
+}
+
+.society-card-checkmark {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 20px;
+    height: 20px;
+    background-color: #A4508B;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

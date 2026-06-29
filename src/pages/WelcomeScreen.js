@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useMessage } from '../context/MessageContext';
 import './WelcomeScreen.css';
+import SocietySelection from '../components/SocietySelection';
 
 const WelcomeScreen = () => {
   const navigate = useNavigate();
@@ -12,11 +13,31 @@ const WelcomeScreen = () => {
   const [step, setStep] = useState('phone'); // Steps: 'phone', 'signup', 'otp'
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
-  const [userData, setUserData] = useState({ name: '', email: '' });
+  const [userData, setUserData] = useState({ name: '', email: '', societyId: '' });
   const [isExistingUser, setIsExistingUser] = useState(false);
+  const [societies, setSocieties] = useState([]);
 
   const API_URL = process.env.REACT_APP_API_URL;
   const HARDCODED_OTP = '1111';
+
+  useEffect(() => {
+    if (step === 'signup') {
+      const fetchSocieties = async () => {
+        try {
+          const response = await fetch(`${API_URL}/societies`);
+          if (response.ok) {
+            const data = await response.json();
+            setSocieties(data);
+          } else {
+            showMessage('Error', 'Could not load the list of societies.');
+          }
+        } catch (error) {
+          showMessage('Network Error', 'Unable to fetch societies.');
+        }
+      };
+      fetchSocieties();
+    }
+  }, [step, API_URL, showMessage]);
 
   // Step 1: Check if user exists by phone
   const handleContinue = async () => {
@@ -47,11 +68,15 @@ const WelcomeScreen = () => {
   // Step 2 (Optional): Collect registration details if user is new
   const handleSignupSubmit = (e) => {
     e.preventDefault();
-    if (!userData.name || !userData.email) {
-      showMessage('Incomplete Data', 'Please enter your name and email address.');
+    if (!userData.name || !userData.email || !userData.societyId) {
+      showMessage('Incomplete Data', 'Please fill out all fields, including your society.');
       return;
     }
     setStep('otp');
+  };
+
+  const handleSocietySelection = (societyId) => {
+    setUserData({ ...userData, societyId });
   };
 
   // Step 3: Verify OTP and finalize Login/Signup
@@ -86,6 +111,7 @@ const WelcomeScreen = () => {
             name: userData.name,
             email: userData.email,
             userType: 'BUYER',
+            societyId: userData.societyId,
           }),
         });
 
@@ -153,6 +179,11 @@ const WelcomeScreen = () => {
                 value={userData.email}
                 onChange={(e) => setUserData({ ...userData, email: e.target.value })}
                 required
+              />
+              <SocietySelection
+                societies={societies}
+                selectedSocietyId={userData.societyId}
+                onSocietySelect={handleSocietySelection}
               />
               <div className="modal-actions">
                 <button type="button" className="cancel-button" onClick={() => setStep('phone')}>Back</button>

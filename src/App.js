@@ -32,6 +32,7 @@ import AddProductPage from './pages/AddProductPage';
 import UpiPaymentPage from './pages/UpiPaymentPage';
 import ShopConfigPage from './pages/ShopConfigPage';
 import ShopPage from './pages/ShopPage';
+import SocietyManagementPage from './pages/SocietyManagementPage';
 import { AuthProvider } from './context/AuthContext';
 import { MessageProvider } from './context/MessageContext';
 import { CartProvider } from './context/CartContext';
@@ -100,6 +101,7 @@ function App() {
                 <Route path="orders" element={<TransactionManagementPage />} />
                 <Route path="delivery-fleet" element={<DeliveryFleetPage />} />
                 <Route path="reports" element={<ReportsPage />} />
+                <Route path="societies" element={<SocietyManagementPage />} />
               </Route>
             </Routes>
           </Router>

@@ -24,6 +24,9 @@ const AdminSideNavbar = ({ isOpen, onClose }) => {
         <NavLink to="/admin/dashboard/products" className={({ isActive }) => isActive ? 'active' : ''} onClick={handleItemClick}>
           <i className="fas fa-boxes"></i> Products
         </NavLink>
+        <NavLink to="/admin/dashboard/societies" className={({ isActive }) => isActive ? 'active' : ''} onClick={handleItemClick}>
+          <i className="fas fa-building"></i> Societies
+        </NavLink>
         <NavLink to="/admin/dashboard/delivery-fleet" className={({ isActive }) => isActive ? 'active' : ''} onClick={handleItemClick}>
           <i className="fas fa-truck"></i> Delivery Fleet
         </NavLink>
