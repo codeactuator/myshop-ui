@@ -4,10 +4,14 @@ import './ProfilePage.css';
 
 const ProfilePage = () => {
   const { currentUser, login } = useAuth();
+  const [name, setName] = useState(currentUser?.name || '');
+  const [email, setEmail] = useState(currentUser?.email || '');
+  const [apartmentNumber, setApartmentNumber] = useState(currentUser?.apartmentNumber || '');
   const [shopName, setShopName] = useState(currentUser?.shopName || '');
   const [societies, setSocieties] = useState([]);
-  const [selectedSocietyId, setSelectedSocietyId] = useState(currentUser?.society?.id || '');
+  const [selectedSocietyIds, setSelectedSocietyIds] = useState([]);
   const [isLoadingSocieties, setIsLoadingSocieties] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchSocieties = async () => {
@@ -16,8 +20,8 @@ const ProfilePage = () => {
         if (response.ok) {
           const data = await response.json();
           setSocieties(data);
-          if (currentUser?.society?.id) {
-            setSelectedSocietyId(currentUser.society.id);
+          if (currentUser?.serviceSocieties) {
+            setSelectedSocietyIds(currentUser.serviceSocieties.map(s => Number(s.id)));
           }
         } else {
           console.error('Failed to fetch societies');
@@ -30,7 +34,14 @@ const ProfilePage = () => {
     };
 
     fetchSocieties();
-  }, [currentUser?.society?.id]);
+  }, [currentUser?.id]);
+
+  // Reactively sync selected societies when the currentUser context updates
+  useEffect(() => {
+    if (currentUser?.serviceSocieties) {
+      setSelectedSocietyIds(currentUser.serviceSocieties.map(s => Number(s.id)));
+    }
+  }, [currentUser?.serviceSocieties]);
 
   if (!currentUser) {
     return <div className="page-status">Please log in to view your profile.</div>;
@@ -64,43 +75,167 @@ const ProfilePage = () => {
     }
   };
 
-  const handleSaveSociety = () => {
-    // TODO: Implement backend API call to update user's society
-    console.log('Selected society to save:', selectedSocietyId);
-    alert('Society selection saving is not implemented yet.');
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    if (!name.trim()) {
+      alert('Name cannot be empty.');
+      return;
+    }
+    if (!email.trim()) {
+      alert('Email cannot be empty.');
+      return;
+    }
+
+    try {
+      const payload = {
+        name,
+        email,
+        apartmentNumber,
+        serviceSocieties: selectedSocietyIds.map(id => ({ id }))
+      };
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/${currentUser.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        const updatedUser = await response.json();
+        login(updatedUser);
+        alert('Profile updated successfully!');
+      } else {
+        throw new Error('Failed to update profile.');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('An error occurred while saving your profile. Please try again.');
+    }
   };
+
+  // Handle toggle selection for sellers
+  const handleSocietyCardClick = (id) => {
+    if (currentUser.userType === 'seller') {
+      setSelectedSocietyIds(prev => 
+        prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+      );
+    } else {
+      setSelectedSocietyIds([id]);
+    }
+  };
+
+  // Filter societies based on the search query input (checks name and area description)
+  const filteredSocieties = societies.filter((society) => {
+    const query = searchQuery.toLowerCase();
+    return (society.name?.toLowerCase().includes(query) || 
+            (society.area && society.area.toLowerCase().includes(query)));
+  });
 
   return (
     <div className="profile-container">
       <h1>My Profile</h1>
-      <p><strong>Name:</strong> {currentUser.name}</p>
-      <p><strong>Email:</strong> {currentUser.email}</p>
-      <p><strong>Phone:</strong> {currentUser.phone}</p>
-      <p><strong>Apartment:</strong> {currentUser.apartmentNumber}</p>
-      {currentUser.society && <p><strong>Society:</strong> {currentUser.society.name}</p>}
 
-      <div className="society-selection-section">
+      <form onSubmit={handleUpdateProfile} className="profile-edit-form">
+        <div className="form-group mb-3">
+          <label><strong>Phone Number (Registered):</strong></label>
+          <input
+            type="text"
+            className="form-control"
+            value={currentUser.phone}
+            disabled
+            style={{ backgroundColor: '#f0f0f0', cursor: 'not-allowed' }}
+          />
+          <small className="form-text text-muted">Phone number cannot be changed.</small>
+        </div>
+
+        <div className="form-group mb-3">
+          <label htmlFor="profile-name"><strong>Name:</strong></label>
+          <input
+            id="profile-name"
+            type="text"
+            className="form-control"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="form-group mb-3">
+          <label htmlFor="profile-email"><strong>Email:</strong></label>
+          <input
+            id="profile-email"
+            type="email"
+            className="form-control"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="form-group mb-3">
+          <label htmlFor="profile-apartment"><strong>Apartment Number:</strong></label>
+          <input
+            id="profile-apartment"
+            type="text"
+            className="form-control"
+            value={apartmentNumber}
+            onChange={(e) => setApartmentNumber(e.target.value)}
+          />
+        </div>
+
+        {currentUser.serviceSocieties && currentUser.serviceSocieties.length > 0 && (
+          <p><strong>Current Active Society:</strong> {currentUser.serviceSocieties.map(s => s.name).join(', ')}</p>
+        )}
+
+        <div className="society-selection-section">
         <h3>Select Your Society</h3>
+        <div className="society-search-wrapper" style={{ marginBottom: '1rem' }}>
+          <input
+            type="text"
+            placeholder="Search societies by name or location description..."
+            className="form-control society-search-input"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
         {isLoadingSocieties ? (
           <p>Loading societies...</p>
         ) : (
           <div className="society-form">
-            <select
-              value={selectedSocietyId}
-              onChange={(e) => setSelectedSocietyId(e.target.value)}
-              className="society-select"
-            >
-              <option value="">-- Select a Society --</option>
-              {societies.map((society) => (
-                <option key={society.id} value={society.id}>
-                  {society.name}
-                </option>
-              ))}
-            </select>
-            <button onClick={handleSaveSociety} className="btn btn-secondary">Save Society</button>
+            <div className="society-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem', marginBottom: '1rem', maxHeight: '300px', overflowY: 'auto', padding: '0.25rem' }}>
+              {filteredSocieties.length > 0 ? (
+                filteredSocieties.map((society) => {
+                  const isSelected = selectedSocietyIds.includes(society.id);
+                  return (
+                    <div
+                      key={society.id}
+                      className={`society-card ${isSelected ? 'selected' : ''}`}
+                      onClick={() => handleSocietyCardClick(society.id)}
+                      style={{ border: isSelected ? '2px solid #5A189A' : '1px solid #ccc', borderRadius: '8px', padding: '1rem', cursor: 'pointer', backgroundColor: isSelected ? '#f5eeff' : '#fff', transition: 'all 0.2s ease-in-out', position: 'relative' }}
+                    >
+                      {isSelected && (
+                        <div className="selection-tickmark" style={{ position: 'absolute', top: '8px', right: '12px', backgroundColor: '#5A189A', color: '#fff', width: '20px', height: '20px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                          ✓
+                        </div>
+                      )}
+                      <h4 style={{ margin: '0 0 0.5rem 0', color: isSelected ? '#5A189A' : '#333' }}>{society.name}</h4>
+                      <p style={{ margin: 0, fontSize: '0.85rem', color: '#666' }}>{society.area || 'No location description available'}</p>
+                    </div>
+                  );
+                })
+              ) : (
+                <p style={{ gridColumn: '1 / -1', color: '#888' }}>No societies found matching your search.</p>
+              )}
+            </div>
           </div>
         )}
       </div>
+
+        <button type="submit" className="btn btn-primary mt-3" style={{ width: '100%' }}>
+          Save Changes
+        </button>
+      </form>
 
       {currentUser.userType === 'seller' && currentUser.shopName && (
         <p><strong>Shop Name:</strong> {currentUser.shopName}</p>

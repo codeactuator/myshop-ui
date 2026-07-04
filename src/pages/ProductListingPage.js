@@ -14,14 +14,22 @@ const ProductListingPage = () => {
   const [activeTab, setActiveTab] = useState('products'); // 'products' or 'shops'
   const [error, setError] = useState(null);
   const searchContainerRef = useRef(null);
-  const { isAuthenticated, logout } = useAuth();
+  const { currentUser, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const API_URL = process.env.REACT_APP_API_URL;
-        const productsResponse = await fetch(`${API_URL}/products?status=available`);
+        
+        // Extract the user's active society ID if logged in
+        let url = `${API_URL}/products?status=available`;
+        if (currentUser?.serviceSocieties && currentUser.serviceSocieties.length > 0) {
+          const activeSocietyId = currentUser.serviceSocieties[0].id;
+          url += `&societyId=${activeSocietyId}`;
+        }
+
+        const productsResponse = await fetch(url);
         if (!productsResponse.ok) {
           throw new Error('Network response was not ok');
         }
@@ -84,7 +92,7 @@ const ProductListingPage = () => {
     };
 
     fetchProducts();
-  }, []);
+  }, [currentUser]);
 
   // Handle clicks outside the search container to close suggestions
   useEffect(() => {
@@ -126,7 +134,17 @@ const ProductListingPage = () => {
 
   // Filter products based on the search query
   const filteredProducts = useMemo(() => {
-    const filtered = products.filter(product => {
+    // 1. First, filter products by the logged-in user's active society
+    let societyFiltered = products;
+    if (currentUser?.serviceSocieties && currentUser.serviceSocieties.length > 0) {
+      const activeSocietyId = Number(currentUser.serviceSocieties[0].id);
+      societyFiltered = products.filter(product => 
+        product.serviceSocieties?.some(soc => Number(soc.id) === activeSocietyId)
+      );
+    }
+
+    // 2. Second, apply the search query on top of the filtered list
+    return societyFiltered.filter(product => {
       const lowerCaseQuery = searchQuery.toLowerCase();
       return (
         product.name.toLowerCase().includes(lowerCaseQuery) ||
@@ -135,18 +153,27 @@ const ProductListingPage = () => {
         (product.user?.shopName?.toLowerCase().includes(lowerCaseQuery))
       );
     });
-    return filtered;
   }, [products, searchQuery]);
 
   // Filter shops based on the search query
   const filteredShops = useMemo(() => {
-    if (!searchQuery) return sellers;
+    // 1. First, filter sellers/shops by the logged-in user's active society
+    let societyFilteredSellers = sellers;
+    if (currentUser?.serviceSocieties && currentUser.serviceSocieties.length > 0) {
+      const activeSocietyId = Number(currentUser.serviceSocieties[0].id);
+      societyFilteredSellers = sellers.filter(seller =>
+        seller.serviceSocieties?.some(soc => Number(soc.id) === activeSocietyId)
+      );
+    }
+
+    // 2. Second, apply the search query on top of the filtered list
+    if (!searchQuery) return societyFilteredSellers;
     const lowerCaseQuery = searchQuery.toLowerCase();
-    return sellers.filter(seller =>
+    return societyFilteredSellers.filter(seller =>
       (seller.name?.toLowerCase().includes(lowerCaseQuery)) ||
       (seller.shopName?.toLowerCase().includes(lowerCaseQuery))
     );
-  }, [sellers, searchQuery]);
+  }, [sellers, searchQuery, currentUser]);
 
   if (loading) {
     return (
