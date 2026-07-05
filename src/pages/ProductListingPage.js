@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ProductCard from '../components/ProductCard';
 import ShopCard from '../components/ShopCard';
@@ -11,59 +11,79 @@ const ProductListingPage = () => {
   const [searchQuery, setSearchQuery] = useState(''); // This import is now correct
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [isFallbackMode, setIsFallbackMode] = useState(false);
   const [activeTab, setActiveTab] = useState('products'); // 'products' or 'shops'
   const [error, setError] = useState(null);
   const searchContainerRef = useRef(null);
-  const { currentUser, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+  const loadMoreRef = useRef(null);
+  const { currentUser } = useAuth();
+
+  useEffect(() => {
+    setProducts([]);
+    setPage(0);
+    setHasMore(true);
+    setIsFallbackMode(false);
+  }, [currentUser]);
 
   useEffect(() => {
     const fetchProducts = async () => {
+      if (!hasMore) return;
       try {
+        if (page === 0) setLoading(true);
+        else setLoadingMore(true);
+
         const API_URL = process.env.REACT_APP_API_URL;
-        
-        let url = `${API_URL}/products?status=available`;
-        
-        // Check if buyer has selected/registered under a specific society
         const activeSocietyId = currentUser?.buyerSociety?.id || currentUser?.societyId;
-        if (activeSocietyId) {
-          url += `&societyId=${activeSocietyId}`;
-        } else {
-          // Fallback: If no society selected, prevent displaying products from other regions
-          url += `&societyId=0`;
+        let targetSocietyId = activeSocietyId || 0;
+
+        // If we previously entered fallback mode, keep loading page updates from the fallback list (societyId=0)
+        if (isFallbackMode) {
+          targetSocietyId = 0;
         }
 
-        const productsResponse = await fetch(url);
+        let url = `${API_URL}/products?status=available&page=${page}&size=10&societyId=${targetSocietyId}`;
+
+        let productsResponse = await fetch(url);
         if (!productsResponse.ok) {
           throw new Error('Network response was not ok');
         }
-        const productsData = await productsResponse.json();
-        console.log(productsData);
+        let productsData = await productsResponse.json();
         
-        // Step 2: Get all unique seller IDs from the products
+        // Fallback Trigger: If the user's chosen society has no products, fetch from other societies (societyId=0)
+        if (productsData.length === 0 && page === 0 && activeSocietyId) {
+          setIsFallbackMode(true);
+          const fallbackUrl = `${API_URL}/products?status=available&page=0&size=10&societyId=0`;
+          const fallbackResponse = await fetch(fallbackUrl);
+          if (fallbackResponse.ok) {
+            productsData = await fallbackResponse.json();
+          }
+        }
+        
+        if (productsData.length < 10) {
+          setHasMore(false);
+        }
+
         const sellerIds = [...new Set(productsData.map(p => p.userId).filter(id => id))];
-        console.log(sellerIds);
 
         if (sellerIds.length > 0) {
-          // Step 3: Fetch all unique sellers in a single request
-          const usersResponse = await fetch(`${API_URL}/users?ids=${sellerIds.join(',')}`);
+          const usersResponse = await fetch(`${process.env.REACT_APP_API_URL}/users?ids=${sellerIds.join(',')}`);
           if (!usersResponse.ok) {
-            console.error('Failed to fetch seller information, displaying products without seller details.');
-            setProducts(productsData); // Fallback: show products without seller info
+            setProducts(prev => [...prev, ...productsData]);
             return;
           }
           const usersData = await usersResponse.json();
           const usersMap = new Map(usersData.map(user => [user.id, user]));
 
-          // Step 3.5: Fetch shop front data for these sellers
-          const shopFrontsResponse = await fetch(`${API_URL}/shop-front/batch?sellerIds=${sellerIds.join(',')}`);
+          const shopFrontsResponse = await fetch(`${process.env.REACT_APP_API_URL}/shop-front/batch?sellerIds=${sellerIds.join(',')}`);
           let shopFrontsMap = new Map();
           if (shopFrontsResponse.ok) {
             const shopFrontsData = await shopFrontsResponse.json();
             shopFrontsMap = new Map(shopFrontsData.map(sf => [sf.sellerId, sf]));
           }
 
-          // Safely merge user and shop-front details to prevent null fields in user profile from wiping out valid shopFront metadata
           const enrichedSellers = usersData.map(user => {
             const sf = shopFrontsMap.get(user.id) || {};
             return {
@@ -73,30 +93,64 @@ const ProductListingPage = () => {
               profileImageUrl: user.profileImageUrl || sf.profileImageUrl
             };
           });
-          setSellers(enrichedSellers.filter(u => !u.isBlocked));
+          setSellers(prev => {
+            const merged = [...prev, ...enrichedSellers].filter(u => !u.isBlocked);
+            const uniqueMap = new Map(merged.map(item => [item.id, item]));
+            return Array.from(uniqueMap.values());
+          });
 
-          // Step 4: Combine products with seller info and filter out products from blocked or non-existent sellers
           const productsWithSellers = productsData
             .map(product => ({
               ...product,
-              user: usersMap.get(Number(product.userId))
+              user: usersMap.get(Number(product.userId)) || product.seller || (product.userId ? { id: Number(product.userId), name: 'Local Seller' } : null),
+              hideAddToCart: isFallbackMode || !activeSocietyId,
+              isFallback: isFallbackMode
             }))
-            .filter(product => product.user && !product.user.isBlocked); // Ensure user exists and is not blocked
+            .filter(product => product.user && !product.user.isBlocked);
 
-          setProducts(productsWithSellers);
+          setProducts(prev => [...prev, ...productsWithSellers]);
         } else {
-          // If there are no sellers to fetch, just set the products
-          setProducts(productsData);
+          setProducts(prev => [...prev, ...productsData.map(p => ({ 
+            ...p, 
+            user: p.seller || { name: 'Local Seller' },
+            hideAddToCart: isFallbackMode || !activeSocietyId, 
+            isFallback: isFallbackMode 
+          }))]);
         }
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
+        setLoadingMore(false);
       }
     };
 
     fetchProducts();
-  }, [currentUser]);
+  }, [currentUser, page, isFallbackMode, hasMore]);
+
+  useEffect(() => {
+    if (loading || !hasMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loadingMore) {
+          setPage((prevPage) => prevPage + 1);
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    const currentLoadMoreRef = loadMoreRef.current;
+    if (currentLoadMoreRef) {
+      observer.observe(currentLoadMoreRef);
+    }
+
+    return () => {
+      if (currentLoadMoreRef) {
+        observer.unobserve(currentLoadMoreRef);
+      }
+    };
+  }, [loading, hasMore, loadingMore]);
 
   // Handle clicks outside the search container to close suggestions
   useEffect(() => {
@@ -194,6 +248,70 @@ const ProductListingPage = () => {
 
   return (
     <div className="product-listing-container">
+      {/* Mobile-first Responsive CSS Injection for 2 columns on Mobile screens */}
+      <style>{`
+        @media (max-width: 767px) {
+          .product-grid {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 10px !important;
+            padding: 5px !important;
+            align-items: stretch !important;
+          }
+          .product-card {
+            display: flex !important;
+            flex-direction: column !important;
+            height: 100% !important;
+            margin-bottom: 0 !important;
+            padding: 0 !important;
+          }
+          .product-card .product-info {
+            flex-grow: 1 !important;
+            padding: 8px !important;
+            display: flex !important;
+            flex-direction: column !important;
+          }
+          .product-card .product-name {
+            font-size: 0.9rem !important;
+          }
+          .product-card .product-price,
+          .product-card .seller-info {
+            margin-top: 2px !important;
+            margin-bottom: 2px !important;
+          }
+          .product-card .add-to-cart-btn,
+          .product-card .contact-seller-btn {
+            display: none !important;
+          }
+        }
+      `}</style>
+
+      {/* 1. Call to Action Banner if user has not selected their society */}
+      {(!currentUser?.buyerSociety?.id && !currentUser?.societyId) && (
+        <div className="society-warning-banner" style={{
+          backgroundColor: '#FFF3CD',
+          color: '#856404',
+          padding: '12px 16px',
+          borderRadius: '8px',
+          marginBottom: '1rem',
+          border: '1px solid #FFEBAA',
+          fontSize: '0.95rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <span>Please select your residential society to view delivery-supported products near you.</span>
+          <Link to="/profile" style={{
+            color: '#5A189A',
+            fontWeight: 'bold',
+            textDecoration: 'underline',
+            marginLeft: '8px'
+          }}>
+            Go to Profile
+          </Link>
+        </div>
+      )}
+
       <div className="search-bar-container" ref={searchContainerRef}>
         <svg xmlns="http://www.w3.org/2000/svg" className="search-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
           <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
@@ -217,6 +335,23 @@ const ProductListingPage = () => {
         )}
       </div>
 
+      {/* 2. Warning message below the search field if the chosen society has no products */}
+      {isFallbackMode && (
+        <div className="fallback-warning-message" style={{
+          backgroundColor: '#E2E3E5',
+          color: '#383D41',
+          padding: '10px 14px',
+          borderRadius: '6px',
+          marginBottom: '1.5rem',
+          fontSize: '0.9rem',
+          borderLeft: '4px solid #5A189A',
+          fontWeight: '500'
+        }}>
+          <i className="fas fa-info-circle" style={{ marginRight: '8px', color: '#5A189A' }}></i>
+          There are no products listed in your society yet. Showing items from other societies in read-only mode.
+        </div>
+      )}
+
       <div className="view-tabs">
         <button className={`tab-btn ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>
           Products
@@ -229,7 +364,12 @@ const ProductListingPage = () => {
       {activeTab === 'products' ? (
         <div className="product-grid">
           {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <div
+              key={product.id}
+              className={product.isFallback ? "fallback-readonly-wrapper" : ""}
+            >
+              <ProductCard product={product} />
+            </div>
           ))}
         </div>
       ) : (
@@ -238,6 +378,12 @@ const ProductListingPage = () => {
             const sellerProducts = products.filter(p => Number(p.userId) === seller.id);
             return <ShopCard key={seller.id} seller={seller} products={sellerProducts} />;
           })}
+        </div>
+      )}
+
+      {hasMore && (
+        <div ref={loadMoreRef} className="load-more-trigger" style={{ height: '20px', margin: '20px 0' }}>
+          {loadingMore && <p style={{ textAlign: 'center', color: '#5A189A' }}>Loading more amazing products...</p>}
         </div>
       )}
     </div>

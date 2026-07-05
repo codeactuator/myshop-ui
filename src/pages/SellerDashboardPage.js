@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Navigate, Link } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import SellerOrderCard from '../components/SellerOrderCard';
 import Modal from '../components/Modal';
 import './SellerDashboardPage.css';

@@ -138,6 +138,13 @@ const ProductDetailsPage = () => {
     }
   };
 
+  // Check if the current user's society is supported by the seller's service societies
+  const activeSocietyId = currentUser?.buyerSociety?.id || currentUser?.societyId;
+  const isSupportedSociety = product.user?.serviceSocieties && Array.from(product.user.serviceSocieties).some(
+    (soc) => Number(soc.id) === Number(activeSocietyId)
+  );
+  const showAddToCart = activeSocietyId && isSupportedSociety;
+
   const handleReportSubmit = async (e) => {
     e.preventDefault();
     const finalReason = selectedReportOption === 'Other' ? reportReason.trim() : selectedReportOption;
@@ -314,9 +321,15 @@ const ProductDetailsPage = () => {
               </button>
             )}
           </div>
-          <button className="btn btn-primary contact-seller-btn" onClick={handleAddToCart}>
-            Add to Cart
-          </button>
+          {showAddToCart ? (
+            <button className="btn btn-primary contact-seller-btn" onClick={handleAddToCart}>
+              Add to Cart
+            </button>
+          ) : (
+            <div className="readonly-badge" style={{ padding: '10px', backgroundColor: '#e2e3e5', color: '#383d41', borderRadius: '6px', textAlign: 'center', fontWeight: '500', fontSize: '0.9rem' }}>
+              Not deliverable to your society (Read-Only)
+            </div>
+          )}
         </div>
       </div>
 

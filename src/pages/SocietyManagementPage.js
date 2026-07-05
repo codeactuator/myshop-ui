@@ -8,7 +8,6 @@ const SocietyManagementPage = () => {
     const [error, setError] = useState(null);
     const [newSocietyName, setNewSocietyName] = useState('');
     const [newSocietyArea, setNewSocietyArea] = useState('');
-    const { currentUser } = useAuth();
 
     useEffect(() => {
         fetchSocieties();

@@ -5,7 +5,7 @@ import './ProductManagementPage.css';
 
 const ProductManagementPage = () => {
   const { currentUser } = useAuth();
-  const { products: allProducts, popularCategories } = useOutletContext();
+  const { products: allProducts } = useOutletContext();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

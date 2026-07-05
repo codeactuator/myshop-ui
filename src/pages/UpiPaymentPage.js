@@ -84,7 +84,7 @@ const UpiPaymentPage = () => {
       window.removeEventListener('sse-notification', handleSseNotification);
       clearInterval(pollInterval);
     };
-  }, [orderId]);
+  }, [orderId, checkOrderStatus]);
 
   const getTargetVpa = () => {
     if (!seller || !order) return 'platform@upi';

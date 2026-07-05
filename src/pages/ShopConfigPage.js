@@ -75,7 +75,7 @@ const ShopConfigPage = () => {
     };
 
     fetchFreshShopConfig();
-  }, [currentUser?.id, currentUser?.shopName]);
+  }, [currentUser?.id, currentUser?.shopName, currentUser?.serviceSocieties]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

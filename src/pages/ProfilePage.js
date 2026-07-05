@@ -41,7 +41,7 @@ const ProfilePage = () => {
     if (currentUser?.buyerSociety) {
       setSelectedSocietyId(Number(currentUser.buyerSociety.id));
     }
-  }, [currentUser?.buyerSociety]);
+  }, [currentUser?.buyerSociety, currentUser]);
 
   if (!currentUser) {
     return <div className="page-status">Please log in to view your profile.</div>;
