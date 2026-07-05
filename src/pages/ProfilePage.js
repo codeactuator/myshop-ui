@@ -9,7 +9,7 @@ const ProfilePage = () => {
   const [apartmentNumber, setApartmentNumber] = useState(currentUser?.apartmentNumber || '');
   const [shopName, setShopName] = useState(currentUser?.shopName || '');
   const [societies, setSocieties] = useState([]);
-  const [selectedSocietyIds, setSelectedSocietyIds] = useState([]);
+  const [selectedSocietyId, setSelectedSocietyId] = useState(currentUser?.buyerSociety?.id || '');
   const [isLoadingSocieties, setIsLoadingSocieties] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -20,8 +20,8 @@ const ProfilePage = () => {
         if (response.ok) {
           const data = await response.json();
           setSocieties(data);
-          if (currentUser?.serviceSocieties) {
-            setSelectedSocietyIds(currentUser.serviceSocieties.map(s => Number(s.id)));
+          if (currentUser?.buyerSociety) {
+            setSelectedSocietyId(Number(currentUser.buyerSociety.id));
           }
         } else {
           console.error('Failed to fetch societies');
@@ -38,10 +38,10 @@ const ProfilePage = () => {
 
   // Reactively sync selected societies when the currentUser context updates
   useEffect(() => {
-    if (currentUser?.serviceSocieties) {
-      setSelectedSocietyIds(currentUser.serviceSocieties.map(s => Number(s.id)));
+    if (currentUser?.buyerSociety) {
+      setSelectedSocietyId(Number(currentUser.buyerSociety.id));
     }
-  }, [currentUser?.serviceSocieties]);
+  }, [currentUser?.buyerSociety]);
 
   if (!currentUser) {
     return <div className="page-status">Please log in to view your profile.</div>;
@@ -91,7 +91,7 @@ const ProfilePage = () => {
         name,
         email,
         apartmentNumber,
-        serviceSocieties: selectedSocietyIds.map(id => ({ id }))
+        buyerSociety: selectedSocietyId ? { id: Number(selectedSocietyId) } : null
       };
 
       const response = await fetch(`${process.env.REACT_APP_API_URL}/users/${currentUser.id}`, {
@@ -115,13 +115,7 @@ const ProfilePage = () => {
 
   // Handle toggle selection for sellers
   const handleSocietyCardClick = (id) => {
-    if (currentUser.userType === 'seller') {
-      setSelectedSocietyIds(prev => 
-        prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-      );
-    } else {
-      setSelectedSocietyIds([id]);
-    }
+    setSelectedSocietyId(id);
   };
 
   // Filter societies based on the search query input (checks name and area description)
@@ -184,7 +178,7 @@ const ProfilePage = () => {
         </div>
 
         {currentUser.serviceSocieties && currentUser.serviceSocieties.length > 0 && (
-          <p><strong>Current Active Society:</strong> {currentUser.serviceSocieties.map(s => s.name).join(', ')}</p>
+          <p><strong>Current Home Address:</strong> {currentUser.buyerSociety?.name || 'Not set'}</p>
         )}
 
         <div className="society-selection-section">
@@ -206,7 +200,7 @@ const ProfilePage = () => {
             <div className="society-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem', marginBottom: '1rem', maxHeight: '300px', overflowY: 'auto', padding: '0.25rem' }}>
               {filteredSocieties.length > 0 ? (
                 filteredSocieties.map((society) => {
-                  const isSelected = selectedSocietyIds.includes(society.id);
+                  const isSelected = Number(selectedSocietyId) === Number(society.id);
                   return (
                     <div
                       key={society.id}

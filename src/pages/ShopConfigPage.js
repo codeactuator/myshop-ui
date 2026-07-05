@@ -15,6 +15,10 @@ const ShopConfigPage = () => {
     phonepeId: '',
     bannerImageUrl: ''
   });
+  const [societies, setSocieties] = useState([]);
+  const [selectedSocietyIds, setSelectedSocietyIds] = useState([]);
+  const [isLoadingSocieties, setIsLoadingSocieties] = useState(true);
+  const [societySearchQuery, setSocietySearchQuery] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(null);
   const [alertModal, setAlertModal] = useState({ isOpen: false, message: '', type: 'info', onConfirm: null });
@@ -22,6 +26,25 @@ const ShopConfigPage = () => {
   const showAlert = (message, type = 'info', onConfirm = null) => {
     setAlertModal({ isOpen: true, message, type, onConfirm });
   };
+
+  useEffect(() => {
+    const fetchSocieties = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/societies`);
+        if (response.ok) {
+          const data = await response.json();
+          setSocieties(data);
+        } else {
+          console.error('Failed to fetch societies');
+        }
+      } catch (error) {
+        console.error('Error fetching societies:', error);
+      } finally {
+        setIsLoadingSocieties(false);
+      }
+    };
+    fetchSocieties();
+  }, []);
 
   useEffect(() => {
     const fetchFreshShopConfig = async () => {
@@ -41,6 +64,9 @@ const ShopConfigPage = () => {
               phonepeId: sfObj.phonepeId || '',
               bannerImageUrl: sfObj.bannerImageUrl || ''
           });
+          if (currentUser?.serviceSocieties) {
+            setSelectedSocietyIds(currentUser.serviceSocieties.map(s => Number(s.id)));
+          }
           }
         }
       } catch (error) {
@@ -54,6 +80,14 @@ const ShopConfigPage = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUpiSettings(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSocietyCardClick = (id) => {
+    setSelectedSocietyIds(prev =>
+      prev.includes(id)
+        ? prev.filter(item => item !== id)
+        : [...prev, id]
+    );
   };
 
   const uploadFileWithProgress = (file, onProgress) => {
@@ -115,14 +149,24 @@ const ShopConfigPage = () => {
     setIsSaving(true);
 
     try {
+      const userPayload = {
+        shopName: upiSettings.shopName,
+        serviceSocieties: selectedSocietyIds.map(id => ({ id }))
+      };
+
       const response = await fetch(`${process.env.REACT_APP_API_URL}/users/${currentUser.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ shopName: upiSettings.shopName }),
+        body: JSON.stringify(userPayload),
       });
 
       if (response.ok) {
         const updatedUser = await response.json();
+
+        // Force sync local state with the saved response
+        if (updatedUser?.serviceSocieties) {
+          setSelectedSocietyIds(updatedUser.serviceSocieties.map(s => Number(s.id)));
+        }
 
         // Save the updated configuration to the ShopFront record
         try {
@@ -164,6 +208,11 @@ const ShopConfigPage = () => {
       setIsSaving(false);
     }
   };
+
+  const filteredSocieties = societies.filter((society) => {
+    const query = societySearchQuery.toLowerCase();
+    return (society.name?.toLowerCase().includes(query) || (society.area && society.area.toLowerCase().includes(query)));
+  });
 
   return (
     <>
@@ -236,6 +285,42 @@ const ShopConfigPage = () => {
             )}
           </div>
         </div>
+
+        <h2 style={{ marginTop: '2rem', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>Service Areas (Societies)</h2>
+        <p style={{ color: '#6c757d', fontSize: '0.9rem', marginBottom: '1rem' }}>Select the societies where you can deliver products or provide services.</p>
+        
+        <div className="form-group">
+          <input
+            type="text"
+            placeholder="Search societies by name or location..."
+            className="form-control society-search-input"
+            value={societySearchQuery}
+            onChange={(e) => setSocietySearchQuery(e.target.value)}
+          />
+        </div>
+
+        {isLoadingSocieties ? (
+          <p>Loading service areas...</p>
+        ) : (
+          <div className="society-form" style={{ marginBottom: '2rem' }}>
+            <div className="society-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem', maxHeight: '250px', overflowY: 'auto', padding: '0.25rem' }}>
+              {filteredSocieties.map((society) => {
+                const isSelected = selectedSocietyIds.includes(society.id);
+                return (
+                  <div
+                    key={society.id}
+                    className={`society-card ${isSelected ? 'selected' : ''}`}
+                    onClick={() => handleSocietyCardClick(society.id)}
+                    style={{ border: isSelected ? '2px solid #5A189A' : '1px solid #ccc', borderRadius: '8px', padding: '1rem', cursor: 'pointer', backgroundColor: isSelected ? '#f5eeff' : '#fff', transition: 'all 0.2s ease-in-out', position: 'relative' }}
+                  >
+                    <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', color: isSelected ? '#5A189A' : '#333' }}>{society.name}</h4>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#666' }}>{society.area || 'No location description available'}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <h2 style={{ marginTop: '2rem', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>Payment IDs</h2>
 

@@ -22,11 +22,15 @@ const ProductListingPage = () => {
       try {
         const API_URL = process.env.REACT_APP_API_URL;
         
-        // Extract the user's active society ID if logged in
         let url = `${API_URL}/products?status=available`;
-        if (currentUser?.serviceSocieties && currentUser.serviceSocieties.length > 0) {
-          const activeSocietyId = currentUser.serviceSocieties[0].id;
+        
+        // Check if buyer has selected/registered under a specific society
+        const activeSocietyId = currentUser?.buyerSociety?.id || currentUser?.societyId;
+        if (activeSocietyId) {
           url += `&societyId=${activeSocietyId}`;
+        } else {
+          // Fallback: If no society selected, prevent displaying products from other regions
+          url += `&societyId=0`;
         }
 
         const productsResponse = await fetch(url);
@@ -134,17 +138,7 @@ const ProductListingPage = () => {
 
   // Filter products based on the search query
   const filteredProducts = useMemo(() => {
-    // 1. First, filter products by the logged-in user's active society
-    let societyFiltered = products;
-    if (currentUser?.serviceSocieties && currentUser.serviceSocieties.length > 0) {
-      const activeSocietyId = Number(currentUser.serviceSocieties[0].id);
-      societyFiltered = products.filter(product => 
-        product.serviceSocieties?.some(soc => Number(soc.id) === activeSocietyId)
-      );
-    }
-
-    // 2. Second, apply the search query on top of the filtered list
-    return societyFiltered.filter(product => {
+    return products.filter(product => {
       const lowerCaseQuery = searchQuery.toLowerCase();
       return (
         product.name.toLowerCase().includes(lowerCaseQuery) ||
@@ -157,23 +151,14 @@ const ProductListingPage = () => {
 
   // Filter shops based on the search query
   const filteredShops = useMemo(() => {
-    // 1. First, filter sellers/shops by the logged-in user's active society
-    let societyFilteredSellers = sellers;
-    if (currentUser?.serviceSocieties && currentUser.serviceSocieties.length > 0) {
-      const activeSocietyId = Number(currentUser.serviceSocieties[0].id);
-      societyFilteredSellers = sellers.filter(seller =>
-        seller.serviceSocieties?.some(soc => Number(soc.id) === activeSocietyId)
-      );
-    }
-
-    // 2. Second, apply the search query on top of the filtered list
-    if (!searchQuery) return societyFilteredSellers;
+    // Let the database handle society boundaries. We only perform text search here.
+    if (!searchQuery) return sellers;
     const lowerCaseQuery = searchQuery.toLowerCase();
-    return societyFilteredSellers.filter(seller =>
+    return sellers.filter(seller =>
       (seller.name?.toLowerCase().includes(lowerCaseQuery)) ||
       (seller.shopName?.toLowerCase().includes(lowerCaseQuery))
     );
-  }, [sellers, searchQuery, currentUser]);
+  }, [sellers, searchQuery]);
 
   if (loading) {
     return (
