@@ -17,6 +17,7 @@ const ProductListingPage = () => {
   const [isFallbackMode, setIsFallbackMode] = useState(false);
   const [activeTab, setActiveTab] = useState('products'); // 'products' or 'shops'
   const [error, setError] = useState(null);
+  const [loadingShops, setLoadingShops] = useState(false);
   const searchContainerRef = useRef(null);
   const loadMoreRef = useRef(null);
   const { currentUser } = useAuth();
@@ -28,10 +29,21 @@ const ProductListingPage = () => {
     setIsFallbackMode(false);
   }, [currentUser]);
 
+  // Fetch shops strictly on demand when user activates the Shops tab or search query updates
   useEffect(() => {
+    if (activeTab === 'shops') {
+      fetchShops();
+    }
+  }, [activeTab, searchQuery, currentUser]);
+
+  useEffect(() => {
+    if (activeTab !== 'products') return;
     const fetchProducts = async () => {
       if (!hasMore) return;
       try {
+        // Dispatch Progress: Fetch started (20%)
+        window.dispatchEvent(new CustomEvent('app-loading-progress', { detail: { progress: 20 } }));
+
         if (page === 0) setLoading(true);
         else setLoadingMore(true);
 
@@ -47,10 +59,16 @@ const ProductListingPage = () => {
         let url = `${API_URL}/products?status=available&page=${page}&size=10&societyId=${targetSocietyId}`;
 
         let productsResponse = await fetch(url);
+        // Dispatch Progress: Main product list fetched (50%)
+        window.dispatchEvent(new CustomEvent('app-loading-progress', { detail: { progress: 50 } }));
+
         if (!productsResponse.ok) {
           throw new Error('Network response was not ok');
         }
         let productsData = await productsResponse.json();
+        
+        // Dispatch Progress: Initial parse complete (70%)
+        window.dispatchEvent(new CustomEvent('app-loading-progress', { detail: { progress: 70 } }));
         
         // Fallback Trigger: If the user's chosen society has no products, fetch from other societies (societyId=0)
         if (productsData.length === 0 && page === 0 && activeSocietyId) {
@@ -66,60 +84,28 @@ const ProductListingPage = () => {
           setHasMore(false);
         }
 
-        const sellerIds = [...new Set(productsData.map(p => p.userId).filter(id => id))];
+        // Dispatch Progress: Mapping active seller profiles (90%)
+        window.dispatchEvent(new CustomEvent('app-loading-progress', { detail: { progress: 90 } }));
 
-        if (sellerIds.length > 0) {
-          const usersResponse = await fetch(`${process.env.REACT_APP_API_URL}/users?ids=${sellerIds.join(',')}`);
-          if (!usersResponse.ok) {
-            setProducts(prev => [...prev, ...productsData]);
-            return;
-          }
-          const usersData = await usersResponse.json();
-          const usersMap = new Map(usersData.map(user => [user.id, user]));
-
-          const shopFrontsResponse = await fetch(`${process.env.REACT_APP_API_URL}/shop-front/batch?sellerIds=${sellerIds.join(',')}`);
-          let shopFrontsMap = new Map();
-          if (shopFrontsResponse.ok) {
-            const shopFrontsData = await shopFrontsResponse.json();
-            shopFrontsMap = new Map(shopFrontsData.map(sf => [sf.sellerId, sf]));
-          }
-
-          const enrichedSellers = usersData.map(user => {
-            const sf = shopFrontsMap.get(user.id) || {};
-            return {
-              ...user,
-              ...sf,
-              shopName: sf.shopName || user.shopName || user.name,
-              profileImageUrl: user.profileImageUrl || sf.profileImageUrl
-            };
-          });
-          setSellers(prev => {
-            const merged = [...prev, ...enrichedSellers].filter(u => !u.isBlocked);
-            const uniqueMap = new Map(merged.map(item => [item.id, item]));
-            return Array.from(uniqueMap.values());
-          });
-
-          const productsWithSellers = productsData
-            .map(product => ({
-              ...product,
-              user: usersMap.get(Number(product.userId)) || product.seller || (product.userId ? { id: Number(product.userId), name: 'Local Seller' } : null),
-              hideAddToCart: isFallbackMode || !activeSocietyId,
-              isFallback: isFallbackMode
-            }))
-            .filter(product => product.user && !product.user.isBlocked);
-
-          setProducts(prev => [...prev, ...productsWithSellers]);
-        } else {
-          setProducts(prev => [...prev, ...productsData.map(p => ({ 
-            ...p, 
-            user: p.seller || { name: 'Local Seller' },
-            hideAddToCart: isFallbackMode || !activeSocietyId, 
-            isFallback: isFallbackMode 
-          }))]);
-        }
+        setProducts(prev => [...prev, ...productsData.map(product => ({
+          ...product,
+          // Fallback mappings directly resolved on server-side aggregated payload
+          user: {
+            id: product.userId,
+            name: product.sellerName || "Local Seller",
+            shopName: product.shopName,
+            isVerified: product.isVerifiedSeller,
+            profileImageUrl: product.sellerProfileImageUrl
+          },
+          hideAddToCart: isFallbackMode || !activeSocietyId,
+          isFallback: isFallbackMode
+        }))]);
       } catch (err) {
         setError(err.message);
       } finally {
+        // Dispatch Progress: Layout loaded & DOM painted (100%)
+        window.dispatchEvent(new CustomEvent('app-loading-progress', { detail: { progress: 100 } }));
+
         setLoading(false);
         setLoadingMore(false);
       }
@@ -127,6 +113,28 @@ const ProductListingPage = () => {
 
     fetchProducts();
   }, [currentUser, page, isFallbackMode, hasMore]);
+
+  const fetchShops = async () => {
+    setLoadingShops(true);
+    try {
+      const activeSocietyId = currentUser?.buyerSociety?.id || currentUser?.societyId || 0;
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/shop-front/search?societyId=${activeSocietyId}&query=${encodeURIComponent(searchQuery)}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setSellers(data.map(sf => ({
+          ...sf,
+          id: sf.userId,
+          name: sf.payeeName || sf.shopName
+        })));
+      }
+    } catch (err) {
+      console.error("Failed to load shop listings:", err);
+    } finally {
+      setLoadingShops(false);
+    }
+  };
 
   useEffect(() => {
     if (loading || !hasMore) return;
@@ -204,15 +212,7 @@ const ProductListingPage = () => {
   }, [products, searchQuery]);
 
   // Filter shops based on the search query
-  const filteredShops = useMemo(() => {
-    // Let the database handle society boundaries. We only perform text search here.
-    if (!searchQuery) return sellers;
-    const lowerCaseQuery = searchQuery.toLowerCase();
-    return sellers.filter(seller =>
-      (seller.name?.toLowerCase().includes(lowerCaseQuery)) ||
-      (seller.shopName?.toLowerCase().includes(lowerCaseQuery))
-    );
-  }, [sellers, searchQuery]);
+  const filteredShops = useMemo(() => sellers, [sellers]);
 
   if (loading) {
     return (
@@ -362,28 +362,32 @@ const ProductListingPage = () => {
       </div>
 
       {activeTab === 'products' ? (
-        <div className="product-grid">
-          {filteredProducts.map((product) => (
-            <div
-              key={product.id}
-              className={product.isFallback ? "fallback-readonly-wrapper" : ""}
-            >
-              <ProductCard product={product} />
+        <>
+          <div className="product-grid">
+            {filteredProducts.map((product) => (
+              <div
+                key={product.id}
+                className={product.isFallback ? "fallback-readonly-wrapper" : ""}
+              >
+                <ProductCard product={product} />
+              </div>
+            ))}
+          </div>
+          {hasMore && (
+            <div ref={loadMoreRef} className="load-more-trigger" style={{ height: '20px', margin: '20px 0' }}>
+              {loadingMore && <p style={{ textAlign: 'center', color: '#5A189A' }}>Loading more amazing products...</p>}
             </div>
-          ))}
-        </div>
+          )}
+        </>
       ) : (
         <div className="shop-grid">
-          {filteredShops.map((seller) => {
-            const sellerProducts = products.filter(p => Number(p.userId) === seller.id);
-            return <ShopCard key={seller.id} seller={seller} products={sellerProducts} />;
+          {loadingShops ? (
+            <p style={{ textAlign: 'center', gridColumn: '1 / -1', color: '#5A189A', padding: '2rem' }}>Loading stores...</p>
+          ) : filteredShops.length === 0 ? (
+            <p style={{ textAlign: 'center', gridColumn: '1 / -1', color: '#6c757d', padding: '2rem' }}>No shops service your society yet.</p>
+          ) : filteredShops.map((seller) => {
+            return <ShopCard key={seller.id} seller={seller} products={seller.popularProducts} />;
           })}
-        </div>
-      )}
-
-      {hasMore && (
-        <div ref={loadMoreRef} className="load-more-trigger" style={{ height: '20px', margin: '20px 0' }}>
-          {loadingMore && <p style={{ textAlign: 'center', color: '#5A189A' }}>Loading more amazing products...</p>}
         </div>
       )}
     </div>

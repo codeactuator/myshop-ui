@@ -53,6 +53,8 @@ const ProductDetailsPage = () => {
   const [alertModal, setAlertModal] = useState({ isOpen: false, message: '', type: 'info', onConfirm: null });
   const [isMainImageLoading, setIsMainImageLoading] = useState(true);
   const [mainImageError, setMainImageError] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
+  const [sparkles, setSparkles] = useState([]);
   const imageRef = useRef(null);
 
   useEffect(() => {
@@ -69,6 +71,11 @@ const ProductDetailsPage = () => {
     }
     setMainImageError(false);
   }, [selectedImage]);
+
+  // Reset scroll position to top when product changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [productId]);
 
   const showAlert = (message, type = 'info', onConfirm = null) => {
     setAlertModal({ isOpen: true, message, type, onConfirm });
@@ -131,6 +138,26 @@ const ProductDetailsPage = () => {
   const handleAddToCart = () => {
     if (currentUser) {
       addToCart(product);
+
+      // Dispatch a global event so the navigation header can animate the cart icon
+      const event = new CustomEvent('cart-item-added');
+      window.dispatchEvent(event);
+
+      // Trigger "Added!" state transition
+      setIsAdded(true);
+      setTimeout(() => setIsAdded(false), 1500);
+
+      // Generate dynamic sparkle coordinates near the clicked button area
+      const newSparkles = Array.from({ length: 30 }).map((_, i) => ({
+        id: Date.now() + i,
+        left: Math.random() * 100, // Spread across the entire button width
+        top: Math.random() * 60 - 30, // Disperse slightly upwards and downwards
+        delay: Math.random() * 0.5 // Stagger appearance
+      }));
+      setSparkles(newSparkles);
+
+      // Clean up sparkle elements after animation finishes (matches ProductCard 2.5s duration)
+      setTimeout(() => setSparkles([]), 2500);
     } else {
       showAlert('Please log in to add items to your cart.', 'info', () => {
         navigate('/welcome', { state: { addProductAfterLogin: product.id } });
@@ -242,6 +269,8 @@ const ProductDetailsPage = () => {
     <>
     <div className="product-details-container">
       <Link to="/products" className="back-link">&larr; Back to all products</Link>
+      <h1 className="details-name">{product.name}</h1>
+      <p className="details-category">Category: <span>{product.category}</span></p>
       <div className="details-content">
         <div className="details-image-container">
           <style>{`
@@ -250,7 +279,7 @@ const ProductDetailsPage = () => {
               100% { transform: rotate(360deg); }
             }
           `}</style>
-          <div className="details-image-wrapper" style={{ position: 'relative', width: '100%', height: '400px', backgroundColor: '#f8f9fa', borderRadius: '8px', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid #e9ecef' }}>
+          <div className="details-image-wrapper" style={{ position: 'relative', width: '100%', height: '400px', backgroundColor: '#f8f9fa', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid #e9ecef' }}>
             {isMainImageLoading && !mainImageError && (
               <div className="image-loading-placeholder" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8f9fa', zIndex: 2 }}>
                 <div className="spinner" style={{ width: '40px', height: '40px', border: '4px solid #f3f3f3', borderTop: '4px solid #5A189A', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
@@ -297,14 +326,35 @@ const ProductDetailsPage = () => {
           </div>
         </div>
         <div className="details-info-container">
-          <h1 className="details-name">{product.name}</h1>
           <p className="details-price">₹{product.price.toFixed(2)}</p>
-          <p className="details-category">Category: <span>{product.category}</span></p>
-          <div className="details-description">
+          <div className="details-description" style={{ marginTop: '0.5rem', marginBottom: '1.5rem' }}>
             <h3>Description</h3>
             <p>{product.description}</p>
           </div>
-          <div className="details-seller">
+          {showAddToCart ? (
+            <div className="cart-button-container" style={{ position: 'relative', width: '100%', marginTop: '1.5rem' }}>
+              {sparkles.map((s) => (
+                <span
+                  key={s.id}
+                  className="sparkle-particle"
+                  style={{ left: `${s.left}%`, top: `${s.top}px`, animationDelay: `${s.delay}s` }}
+                />
+              ))}
+              <button 
+                className={`btn btn-primary contact-seller-btn add-to-cart-btn ${isAdded ? 'added' : ''}`} 
+                onClick={handleAddToCart}
+                disabled={isAdded}
+                style={{ width: '100%' }}
+              >
+                {isAdded ? 'Added!' : 'Add to Cart'}
+              </button>
+            </div>
+          ) : (
+            <div className="readonly-badge" style={{ padding: '10px', backgroundColor: '#e2e3e5', color: '#383d41', borderRadius: '6px', textAlign: 'center', fontWeight: '500', fontSize: '0.9rem' }}>
+              Not deliverable to your society (Read-Only)
+            </div>
+          )}
+          <div className="details-seller" style={{ marginTop: '2rem' }}>
             <h3>Seller Information</h3>
             <p className="seller-info-name">
               <strong>Sold by:</strong> {product.user?.shopName || product.user?.name || 'N/A'}
@@ -321,15 +371,6 @@ const ProductDetailsPage = () => {
               </button>
             )}
           </div>
-          {showAddToCart ? (
-            <button className="btn btn-primary contact-seller-btn" onClick={handleAddToCart}>
-              Add to Cart
-            </button>
-          ) : (
-            <div className="readonly-badge" style={{ padding: '10px', backgroundColor: '#e2e3e5', color: '#383d41', borderRadius: '6px', textAlign: 'center', fontWeight: '500', fontSize: '0.9rem' }}>
-              Not deliverable to your society (Read-Only)
-            </div>
-          )}
         </div>
       </div>
 
@@ -345,8 +386,8 @@ const ProductDetailsPage = () => {
               <label htmlFor="review-comment">Your Comment</label>
               <textarea
                 id="review-comment"
-                rows="5"
-                style={{ width: '100%', minHeight: '120px', padding: '12px' }}
+                rows="3"
+                style={{ width: '100%', boxSizing: 'border-box', padding: '10px', resize: 'vertical' }}
                 placeholder="Share your experience with this product..."
                 value={newReview.comment}
                 onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}

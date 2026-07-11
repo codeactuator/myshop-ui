@@ -4,12 +4,11 @@ import SafeImage from './SafeImage';
 import './ShopCard.css';
 
 const ShopCard = ({ seller, products = [] }) => {
-  const { id, name, shopName, isVerified, profileImageUrl, bannerImageUrl } = seller;
+  const { id, name, shopName, isVerified, bannerImageUrl, phone } = seller;
   const navigate = useNavigate();
-  const hasImage = profileImageUrl && profileImageUrl.length > 0;
 
-  // Show up to the first 3 products as a gallery preview
-  const previewProducts = products.slice(0, 3);
+  // Render backend aggregated popular items natively
+  const previewProducts = products && products.length > 0 ? products.slice(0, 3) : [];
 
   const handleProductClick = (e, productId) => {
     e.preventDefault();
@@ -21,16 +20,18 @@ const ShopCard = ({ seller, products = [] }) => {
     <Link to={`/shops/${id}`} className="shop-card-link">
       <style>{`
         .shop-card {
-          background: #fff;
-          border: 1px solid #e9ecef;
-          border-radius: 8px;
-          padding: 1.5rem;
-          transition: transform 0.2s, box-shadow 0.2s;
-          display: flex;
-          flex-direction: column;
-          gap: 1.25rem;
-          height: 100%;
-          box-sizing: border-box;
+          background: #fff !important;
+          border: 1px solid #e9ecef !important;
+          border-radius: 8px !important;
+          padding: 1rem !important;
+          transition: transform 0.2s, box-shadow 0.2s !important;
+          display: flex !important;
+          flex-direction: column !important;
+          grid-template-columns: none !important;
+          align-items: stretch !important;
+          gap: 1rem !important;
+          height: 100% !important;
+          box-sizing: border-box !important;
         }
         .shop-card:hover {
           transform: translateY(-2px);
@@ -45,18 +46,23 @@ const ShopCard = ({ seller, products = [] }) => {
           height: 120px; /* Increased height for better visibility */
           overflow: hidden;
           border-radius: 7px;
-          margin-top: 0.5rem; /* Added margin for spacing */
+          margin: 0 -1rem; /* Pull banner edge-to-edge horizontally */
+          border-radius: 0; /* Remove inner border radius so it spans flat against card borders */
+        }
+        .shop-banner-wrapper .shop-card-banner,
+        .shop-banner-wrapper .shop-card-banner img {
+          width: 100% !important;
+          height: 100% !important;
+          object-fit: cover !important;
         }
         .shop-card-banner {
           width: 100%;
           height: 100%;
           object-fit: cover; /* Ensures banner image covers the area */
         }
-        .shop-card .shop-image,
-        .shop-card .shop-avatar {
-          border: 3px solid #fff !important;
-          box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-          background: #fff;
+        .shop-banner-wrapper .shop-card-banner {
+          width: 100%;
+          height: 100%;
         }
         .shop-products-count {
           font-size: 0.85rem;
@@ -113,24 +119,32 @@ const ShopCard = ({ seller, products = [] }) => {
       `}</style>
       <div className="shop-card">
         <div className="shop-main-info">
-          {hasImage ? (
-            <SafeImage src={profileImageUrl} alt={`${shopName || name} storefront`} className="shop-image" fallbackIcon="fa-store" />
-          ) : (
-            <div className="shop-avatar">
-              <span>{(shopName || name).charAt(0)}</span>
-            </div>
-          )}
           <div className="shop-info">
-            <h3 className="shop-name">{shopName || name}</h3>
-            {isVerified && <span className="shop-verified-badge"><i className="fas fa-check-circle"></i> Verified</span>}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <h3 className="shop-name" style={{ margin: 0 }}>{shopName || name}</h3>
+              {isVerified && (
+                <span className="shop-verified-badge" style={{ margin: 0 }}>
+                  <i className="fas fa-check-circle"></i> Verified
+                </span>
+              )}
+            </div>
             {products.length > 0 && (
               <span className="shop-products-count">{products.length} {products.length === 1 ? 'product' : 'products'}</span>
+            )}
+            {phone && (
+              <span style={{ fontSize: '0.85rem', color: '#495057', display: 'block', marginTop: '4px' }}>
+                <i className="fas fa-phone-alt" style={{ marginRight: '5px', color: '#5A189A' }}></i> {phone}
+              </span>
             )}
           </div>
         </div>
 
         <div className="shop-banner-wrapper">
-          <SafeImage src={bannerImageUrl || '/default-banner.jpg'} alt={`${shopName || name} banner`} className="shop-card-banner" fallbackIcon="fa-image" />
+          {bannerImageUrl ? (
+            <SafeImage src={bannerImageUrl} alt={`${shopName || name} banner`} className="shop-card-banner" fallbackIcon="fa-image" />
+          ) : (
+            <SafeImage src={null} alt="No Banner Available" className="shop-card-banner" fallbackIcon="fa-image" />
+          )}
         </div>
 
         {previewProducts.length > 0 && (

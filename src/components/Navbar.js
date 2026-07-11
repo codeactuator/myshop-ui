@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -8,6 +8,21 @@ const Navbar = ({ toggleSideNav }) => {
   const { cartCount } = useCart();
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
+  const [animateCart, setAnimateCart] = useState(false);
+
+  useEffect(() => {
+    const handleCartTrigger = () => {
+      setAnimateCart(true);
+      // Reset the animation class state after the wiggle animation (800ms) finishes
+      const timer = setTimeout(() => setAnimateCart(false), 800);
+      return () => clearTimeout(timer);
+    };
+
+    window.addEventListener('cart-item-added', handleCartTrigger);
+    return () => {
+      window.removeEventListener('cart-item-added', handleCartTrigger);
+    };
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -31,7 +46,7 @@ const Navbar = ({ toggleSideNav }) => {
           {currentUser ? (
             <>
               <li className="nav-item">
-                <Link to="/cart" className="nav-links">
+                <Link to="/cart" className={`nav-links ${animateCart ? 'cart-animate-trigger' : ''}`}>
                   <i className="fas fa-shopping-cart"></i>
                   {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
                 </Link>

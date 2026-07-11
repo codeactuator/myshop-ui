@@ -227,11 +227,6 @@ const ShopConfigPage = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="payeeName">Bank Account Holder Name (Payee Name)</label>
-          <input type="text" id="payeeName" name="payeeName" value={upiSettings.payeeName} onChange={handleInputChange} placeholder="Legal name registered with your bank" required />
-        </div>
-
-        <div className="form-group">
           <label htmlFor="shopTagline">Shop Tagline</label>
           <input type="text" id="shopTagline" name="shopTagline" value={upiSettings.shopTagline} onChange={handleInputChange} placeholder="e.g. Freshly Baked Goodness" />
         </div>
@@ -323,6 +318,11 @@ const ShopConfigPage = () => {
         )}
 
         <h2 style={{ marginTop: '2rem', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>Payment IDs</h2>
+
+        <div className="form-group">
+          <label htmlFor="payeeName">Bank Account Holder Name (Payee Name)</label>
+          <input type="text" id="payeeName" name="payeeName" value={upiSettings.payeeName} onChange={handleInputChange} placeholder="Legal name registered with your bank" required />
+        </div>
 
         <div className="form-group">
           <label htmlFor="gpayId">
