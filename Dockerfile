@@ -19,7 +19,7 @@ RUN printf "server {\n\
     root /usr/share/nginx/html;\n\
     index index.html index.htm;\n\
     location / {\n\
-        try_files \$uri \$uri/ /index.html;\n\
+        try_files \$uri \$uri/ /index.html =404;\n\
     }\n\
     location ~* \\.(?:manifest|appcache|html?|xml|json)$ { expires -1; }\n\
 }\n" > /etc/nginx/conf.d/default.conf
