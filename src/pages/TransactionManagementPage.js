@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useMessage } from '../context/MessageContext';
 import { Navigate, Link, useOutletContext } from 'react-router-dom';
 import './TransactionManagementPage.css';
 
 const TransactionManagementPage = () => {
   const { currentUser } = useAuth();
+  const { showMessage } = useMessage();
   const { orders: allOrders, deliveryPartners, handleManualAssign } = useOutletContext();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -70,9 +72,9 @@ const TransactionManagementPage = () => {
             order.id === orderId ? { ...order, refund: { ...order.refund, status: 'processed' } } : order
           )
         );
-        alert('Refund processed successfully!');
+        showMessage('Success', 'Refund processed successfully!');
       } catch (err) {
-        alert('Failed to process refund.');
+        showMessage('Error', 'Failed to process refund.');
       }
     }
   };

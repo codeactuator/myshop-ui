@@ -1,43 +1,63 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import api from '../api';
 
-const AuthContext = createContext();
-
-export const useAuth = () => useContext(AuthContext);
+const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // On mount, check if user data exists in local storage
   useEffect(() => {
-    const savedUser = localStorage.getItem('hungrynow_user');
-    if (savedUser) {
-      setCurrentUser(JSON.parse(savedUser));
-    }
-    setLoading(false);
+    const checkAuthStatus = async () => {
+      const token = localStorage.getItem('token');
+      const savedUser = localStorage.getItem('hungrynow_user');
+
+      if (savedUser) {
+        setCurrentUser(JSON.parse(savedUser));
+      }
+
+      if (token) {
+        try {
+          const response = await api.get('/auth/me');
+          const freshUser = response.data;
+          setCurrentUser(freshUser);
+          localStorage.setItem('hungrynow_user', JSON.stringify(freshUser));
+        } catch (err) {
+          console.error("Token verification failed:", err);
+          if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+            setCurrentUser(null);
+            localStorage.removeItem('token');
+            localStorage.removeItem('hungrynow_user');
+          }
+        }
+      }
+      setLoading(false);
+    };
+    checkAuthStatus();
   }, []);
 
-  const login = (userData) => {
-    // Only update if the user data has actually changed to prevent unnecessary re-renders
-    // A simple stringify comparison is often sufficient for DTO-like objects
+  const login = (userData, token = null) => {
+    if (token) {
+      localStorage.setItem('token', token);
+    }
     if (JSON.stringify(currentUser) !== JSON.stringify(userData)) {
       setCurrentUser(userData);
       localStorage.setItem('hungrynow_user', JSON.stringify(userData));
-    } else {
-      // console.log("User data is identical, skipping state update.");
     }
   };
 
   const logout = () => {
     setCurrentUser(null);
     localStorage.removeItem('hungrynow_user');
+    localStorage.removeItem('token');
   };
 
   const value = {
     currentUser,
     login,
     logout,
-    isAuthenticated: !!currentUser
+    isAuthenticated: !!currentUser,
+    loading
   };
 
   return (
@@ -45,4 +65,10 @@ export const AuthProvider = ({ children }) => {
       {!loading && children}
     </AuthContext.Provider>
   );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
+  return context;
 };

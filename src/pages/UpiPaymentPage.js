@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useMessage } from '../context/MessageContext';
 import './UpiPaymentPage.css';
 
 const UpiPaymentPage = () => {
   const { orderId } = useParams();
   const { clearCart } = useCart();
   const navigate = useNavigate();
+  const { showMessage } = useMessage();
   const [order, setOrder] = useState(null);
   const [seller, setSeller] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,7 +28,7 @@ const UpiPaymentPage = () => {
           await clearCart();
           navigate(`/orders/${orderId}`);
         } else if (orderData.status?.toUpperCase() === 'CANCELLED') {
-          alert('This payment session has expired or the order was cancelled.');
+          showMessage('Payment Session Expired', 'This payment session has expired or the order was cancelled.');
           navigate('/products');
         }
       }
@@ -126,7 +128,7 @@ const UpiPaymentPage = () => {
       }
     } catch (error) {
       console.error('Payment confirmation error:', error);
-      alert('An error occurred while confirming your payment. Please try again.');
+      showMessage('Error', 'An error occurred while confirming your payment. Please try again.');
     }
   };
 

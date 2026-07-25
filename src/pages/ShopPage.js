@@ -50,7 +50,9 @@ const ShopPage = () => {
         const productsData = await productsResponse.json();
         
         // Manually attach the seller data to each product for the ProductCard component
-        const productsWithSeller = productsData.map(p => ({ ...p, user: sellerData }));
+        const productsWithSeller = productsData
+          .filter(p => p.status === 'available')
+          .map(p => ({ ...p, user: sellerData }));
         setProducts(productsWithSeller);
 
       } catch (err) {

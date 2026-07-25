@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useMessage } from '../context/MessageContext';
 import { Navigate, Link, useOutletContext } from 'react-router-dom';
 import './ProductManagementPage.css';
 
 const ProductManagementPage = () => {
   const { currentUser } = useAuth();
+  const { showMessage } = useMessage();
   const { products: allProducts } = useOutletContext();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,7 +69,7 @@ const ProductManagementPage = () => {
         prevProducts.map(p => (p.id === productId ? { ...p, status: newStatus } : p))
       );
     } catch (err) {
-      alert('Failed to update product status.');
+      showMessage('Error', 'Failed to update product status.');
     }
   };
 

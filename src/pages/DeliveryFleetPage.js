@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useMessage } from '../context/MessageContext';
 import { Navigate, Link, useOutletContext } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -15,6 +16,7 @@ L.Icon.Default.mergeOptions({
 });
 const DeliveryFleetPage = () => {
   const { currentUser } = useAuth();
+  const { showMessage } = useMessage();
   // Use the data already fetched by the AdminDashboardPage
   const { deliveryPartners, setDeliveryPartners, orders, loading: dashboardLoading } = useOutletContext() || {};
   
@@ -39,7 +41,7 @@ const DeliveryFleetPage = () => {
   const handleAddPartner = async (e) => {
     e.preventDefault();
     if (!newPartner.name || !newPartner.phone) {
-      alert('Please fill in all fields.');
+      showMessage('Validation Error', 'Please fill in all fields.');
       return;
     }
 
@@ -66,7 +68,7 @@ const DeliveryFleetPage = () => {
       setDeliveryPartners(updatedFleet);
       setNewPartner({ name: '', phone: '' }); // Reset form
     } catch (err) {
-      alert(err.message);
+      showMessage('Error', err.message);
     }
   };
 
@@ -86,14 +88,14 @@ const DeliveryFleetPage = () => {
       ));
       setDeliveryPartners(partners.map(p => p.id === partnerId ? { ...p, ...updatedPartner } : p));
     } catch (err) {
-      alert(err.message);
+      showMessage('Error', err.message);
     }
   };
 
   const handleUpdatePartner = async (e) => {
     e.preventDefault();
     if (!editingPartner || !editingPartner.name || !editingPartner.phone) {
-      alert('Please fill in all fields.');
+      showMessage('Validation Error', 'Please fill in all fields.');
       return;
     }
 
@@ -109,7 +111,7 @@ const DeliveryFleetPage = () => {
       setDeliveryPartners(partners.map(p => p.id === editingPartner.id ? updatedPartner : p));
       setEditingPartner(null); // Close modal
     } catch (err) {
-      alert(err.message);
+      showMessage('Error', err.message);
     }
   };
 

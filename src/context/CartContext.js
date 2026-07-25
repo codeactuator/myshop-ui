@@ -8,19 +8,29 @@ export const useCart = () => useContext(CartContext);
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(null); // Will hold the entire cart object { id, userId, items, totalAmount }
   const { currentUser } = useAuth();
-  const API_URL = process.env.REACT_APP_API_URL;
+
+  const getHeaders = () => {
+    const headers = { 'Content-Type': 'application/json' };
+    const token = localStorage.getItem('token');
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
+  };
 
   const fetchCart = useCallback(async () => {
     if (currentUser) {
       try {
-        const response = await fetch(`${API_URL}/carts?userId=${currentUser.id}`);
+        const API_URL = process.env.REACT_APP_API_URL;
+        const response = await fetch(`${API_URL}/carts?userId=${currentUser.id}`, {
+          method: 'GET',
+          headers: getHeaders()
+        });
         if (response.ok) {
           const data = await response.json();
           setCart(data);
         } else if (response.status === 404) {
           setCart({ userId: currentUser.id, items: [], totalAmount: 0 }); // Initialize empty cart
-        } else {
-          throw new Error('Failed to fetch cart');
         }
       } catch (error) {
         console.error("Error fetching cart:", error);
@@ -28,7 +38,7 @@ export const CartProvider = ({ children }) => {
     } else {
       setCart(null); // Clear cart on logout
     }
-  }, [currentUser, API_URL]);
+  }, [currentUser]);
 
   useEffect(() => {
     fetchCart();
@@ -38,17 +48,15 @@ export const CartProvider = ({ children }) => {
     if (!currentUser) return;
 
     try {
+      const API_URL = process.env.REACT_APP_API_URL;
       const response = await fetch(`${API_URL}/carts/items?userId=${currentUser.id}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId, quantity }),
+        headers: getHeaders(),
+        body: JSON.stringify({ productId, quantity })
       });
-
       if (response.ok) {
-        const updatedCart = await response.json();
-        setCart(updatedCart);
-      } else {
-        throw new Error('Failed to update cart item.');
+        const data = await response.json();
+        setCart(data);
       }
     } catch (error) {
       console.error("Error syncing cart item:", error);
@@ -56,8 +64,16 @@ export const CartProvider = ({ children }) => {
   };
 
   const addToCart = (product) => {
-    if (!cart) return;
-    const existingItem = cart.items.find(item => item.productId === product.id);
+    if (!currentUser) {
+      console.warn("Add to Cart failed: No authenticated user found.");
+      return;
+    }
+    // If the cart failed to load initially, initialize it dynamically
+    const currentCart = cart || { userId: currentUser.id, items: [], totalAmount: 0 };
+    if (!cart) {
+      setCart(currentCart);
+    }
+    const existingItem = currentCart.items.find(item => item.productId === product.id);
     const quantity = existingItem ? existingItem.quantity + 1 : 1;
     syncCartItem(product.id, quantity);
   };
@@ -69,14 +85,14 @@ export const CartProvider = ({ children }) => {
     const deleteItem = async () => {
       if (!currentUser) return;
       try {
+        const API_URL = process.env.REACT_APP_API_URL;
         const response = await fetch(`${API_URL}/carts/items?userId=${currentUser.id}&productId=${productId}`, {
           method: 'DELETE',
+          headers: getHeaders()
         });
         if (response.ok) {
-          const updatedCart = await response.json();
-          setCart(updatedCart);
-        } else {
-          throw new Error('Failed to remove item from cart.');
+          const data = await response.json();
+          setCart(data);
         }
       } catch (error) {
         console.error("Error removing cart item:", error);
@@ -101,14 +117,14 @@ export const CartProvider = ({ children }) => {
   const clearCart = async () => {
     if (!currentUser || !cart) return;
     try {
+      const API_URL = process.env.REACT_APP_API_URL;
       const response = await fetch(`${API_URL}/carts?userId=${currentUser.id}`, {
         method: 'DELETE',
+        headers: getHeaders()
       });
       if (response.ok) {
-        // A successful DELETE often returns no content. Reset the cart on the client side.
+        // Reset the cart on the client side upon successful deletion
         setCart({ userId: currentUser.id, items: [], totalAmount: 0 });
-      } else {
-        throw new Error('Failed to clear cart on server.');
       }
     } catch (error) {
       console.error("Error clearing cart:", error);

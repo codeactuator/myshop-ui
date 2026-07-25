@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useMessage } from '../context/MessageContext';
 import './SocietyManagementPage.css';
 
 const SocietyManagementPage = () => {
     const [societies, setSocieties] = useState([]);
+    const { showMessage } = useMessage();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [newSocietyName, setNewSocietyName] = useState('');
@@ -31,7 +33,7 @@ const SocietyManagementPage = () => {
     const handleCreateSociety = async (e) => {
         e.preventDefault();
         if (!newSocietyName) {
-            alert('Society name is required.');
+            showMessage('Required Field', 'Society name is required.');
             return;
         }
 

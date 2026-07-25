@@ -87,19 +87,24 @@ const ProductListingPage = () => {
         // Dispatch Progress: Mapping active seller profiles (90%)
         window.dispatchEvent(new CustomEvent('app-loading-progress', { detail: { progress: 90 } }));
 
-        setProducts(prev => [...prev, ...productsData.map(product => ({
-          ...product,
-          // Fallback mappings directly resolved on server-side aggregated payload
-          user: {
-            id: product.userId,
-            name: product.sellerName || "Local Seller",
-            shopName: product.shopName,
-            isVerified: product.isVerifiedSeller,
-            profileImageUrl: product.sellerProfileImageUrl
-          },
-          hideAddToCart: isFallbackMode || !activeSocietyId,
-          isFallback: isFallbackMode
-        }))]);
+        const activeProducts = productsData
+          .filter(product => !product.isBlockedSeller && product.status === 'available') // Filter out products from sellers that are blocked/disabled by admin, or disabled products
+          .map(product => ({
+            ...product,
+            // Fallback mappings directly resolved on server-side aggregated payload
+            user: {
+              id: product.userId,
+              name: product.sellerName || "Local Seller",
+              shopName: product.shopName,
+              isVerified: product.isVerifiedSeller,
+              profileImageUrl: product.sellerProfileImageUrl,
+              isBlocked: product.isBlockedSeller
+            },
+            hideAddToCart: isFallbackMode || !activeSocietyId,
+            isFallback: isFallbackMode
+          }));
+
+        setProducts(prev => [...prev, ...activeProducts]);
       } catch (err) {
         setError(err.message);
       } finally {

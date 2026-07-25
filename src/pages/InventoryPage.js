@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useMessage } from '../context/MessageContext';
 import { Link, useNavigate } from 'react-router-dom';
 import SafeImage from '../components/SafeImage';
 import './InventoryPage.css';
 
 const InventoryPage = () => {
   const { currentUser } = useAuth();
+  const { showMessage } = useMessage();
   const [myProducts, setMyProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -47,7 +49,7 @@ const InventoryPage = () => {
       );
     } catch (err) {
       console.error('Status update error:', err);
-      alert('Failed to update product status.');
+      showMessage('Error', 'Failed to update product status.');
     }
   };
 

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useMessage } from '../context/MessageContext';
 import './ProfilePage.css';
 
 const ProfilePage = () => {
   const { currentUser, login } = useAuth();
+  const { showMessage } = useMessage();
   const [name, setName] = useState(currentUser?.name || '');
   const [email, setEmail] = useState(currentUser?.email || '');
   const [apartmentNumber, setApartmentNumber] = useState(currentUser?.apartmentNumber || '');
@@ -50,7 +52,7 @@ const ProfilePage = () => {
   const handleBecomeSeller = async (e) => {
     e.preventDefault();
     if (!shopName) {
-      alert('Please enter a shop name.');
+      showMessage('Shop Name Required', 'Please enter a shop name.');
       return;
     }
     if (window.confirm('Are you sure you want to become a seller? This will grant you access to the seller dashboard.')) {
@@ -64,13 +66,13 @@ const ProfilePage = () => {
         if (response.ok) {
           const updatedUser = { ...currentUser, userType: 'seller', shopName: shopName };
           login(updatedUser);
-          alert('Congratulations! You are now a seller.');
+          showMessage('Congratulations!', 'You are now a seller.');
         } else {
           throw new Error('Failed to update your account.');
         }
       } catch (error) {
         console.error('Error becoming a seller:', error);
-        alert('An error occurred. Please try again.');
+        showMessage('Error', 'An error occurred. Please try again.');
       }
     }
   };
@@ -78,11 +80,11 @@ const ProfilePage = () => {
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     if (!name.trim()) {
-      alert('Name cannot be empty.');
+      showMessage('Validation Error', 'Name cannot be empty.');
       return;
     }
     if (!email.trim()) {
-      alert('Email cannot be empty.');
+      showMessage('Validation Error', 'Email cannot be empty.');
       return;
     }
 
@@ -103,13 +105,13 @@ const ProfilePage = () => {
       if (response.ok) {
         const updatedUser = await response.json();
         login(updatedUser);
-        alert('Profile updated successfully!');
+        showMessage('Success', 'Profile updated successfully!');
       } else {
         throw new Error('Failed to update profile.');
       }
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert('An error occurred while saving your profile. Please try again.');
+      showMessage('Error', 'An error occurred while saving your profile. Please try again.');
     }
   };
 

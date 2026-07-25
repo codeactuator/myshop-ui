@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useMessage } from '../context/MessageContext';
 import { Navigate } from 'react-router-dom';
 import './UserManagementPage.css';
 
 const UserManagementPage = () => {
   const { currentUser } = useAuth();
+  const { showMessage } = useMessage();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -42,10 +44,10 @@ const UserManagementPage = () => {
           user.id === userId ? { ...user, userType: newRole } : user
         )
       );
-      alert('User role updated successfully!');
+      showMessage('Success', 'User role updated successfully!');
     } catch (err) {
       console.error('Role update error:', err);
-      alert('Failed to update user role.');
+      showMessage('Error', 'Failed to update user role.');
     }
   };
 
@@ -66,7 +68,7 @@ const UserManagementPage = () => {
       );
     } catch (err) {
       console.error('Verification update error:', err);
-      alert('Failed to update verification status.');
+      showMessage('Error', 'Failed to update verification status.');
     }
   };
 
@@ -87,7 +89,7 @@ const UserManagementPage = () => {
       );
     } catch (err) {
       console.error('Block status update error:', err);
-      alert('Failed to update block status.');
+      showMessage('Error', 'Failed to update block status.');
     }
   };
 
