@@ -37,6 +37,7 @@ import { AuthProvider } from './context/AuthContext';
 import { MessageProvider } from './context/MessageContext';
 import { CartProvider } from './context/CartContext';
 import MainLayout from './components/MainLayout';
+import ProfileGate from './components/ProfileGate';
 import { useNavigate } from 'react-router-dom';
 
 function App() {
@@ -69,26 +70,30 @@ function App() {
 
               {/* Routes with the main navbar */}
               <Route element={<MainLayout />}>
-                <Route path="/products" element={<ProductListingPage />} />
-                <Route path="/products/:productId" element={<ProductDetailsPage />} />
-                <Route path="/cart" element={<CartPage />} />
-                <Route path="/checkout" element={<CheckoutPage />} />
-                <Route path="/order-success" element={<OrderSuccessPage />} />
-              <Route path="/my-orders" element={<MyOrdersPage />} />
-              <Route path="/seller/products/:productId" element={<SellerProductDetailsPage />} />
-              <Route path="/seller/orders/:orderId" element={<SellerOrderDetailsPage />} />
-              <Route path="/orders/:orderId" element={<OrderTrackingPage />} />
-              <Route path="/delivery/dashboard" element={<DeliveryPartnerDashboardPage />} />
-              <Route path="/delivery/orders/:orderId" element={<DeliveryOrderTrackingPage />} />
-              <Route path="/seller/dashboard" element={<SellerDashboardPage />} />
-              <Route path="/seller/inventory" element={<InventoryPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/seller/edit-product/:productId" element={<EditProductPage />} />
-              <Route path="/seller/add-product" element={<AddProductPage />} />
-              <Route path="/seller/shop-config" element={<ShopConfigPage />} />
+                {/* Keep ProfilePage accessible without ProfileGate to avoid redirect loops */}
+                <Route path="/profile" element={<ProfilePage />} />
 
-              <Route path="/shops/:sellerId" element={<ShopPage />} />
-              <Route path="/payment/upi/:orderId" element={<UpiPaymentPage />} />
+                {/* Profile Gated Routes */}
+                <Route element={<ProfileGate />}>
+                  <Route path="/products" element={<ProductListingPage />} />
+                  <Route path="/products/:productId" element={<ProductDetailsPage />} />
+                  <Route path="/cart" element={<CartPage />} />
+                  <Route path="/checkout" element={<CheckoutPage />} />
+                  <Route path="/order-success" element={<OrderSuccessPage />} />
+                  <Route path="/my-orders" element={<MyOrdersPage />} />
+                  <Route path="/seller/products/:productId" element={<SellerProductDetailsPage />} />
+                  <Route path="/seller/orders/:orderId" element={<SellerOrderDetailsPage />} />
+                  <Route path="/orders/:orderId" element={<OrderTrackingPage />} />
+                  <Route path="/delivery/dashboard" element={<DeliveryPartnerDashboardPage />} />
+                  <Route path="/delivery/orders/:orderId" element={<DeliveryOrderTrackingPage />} />
+                  <Route path="/seller/dashboard" element={<SellerDashboardPage />} />
+                  <Route path="/seller/inventory" element={<InventoryPage />} />
+                  <Route path="/seller/edit-product/:productId" element={<EditProductPage />} />
+                  <Route path="/seller/add-product" element={<AddProductPage />} />
+                  <Route path="/seller/shop-config" element={<ShopConfigPage />} />
+                  <Route path="/shops/:sellerId" element={<ShopPage />} />
+                  <Route path="/payment/upi/:orderId" element={<UpiPaymentPage />} />
+                </Route>
               </Route>
 
               {/* Admin Routes (outside of MainLayout) */}

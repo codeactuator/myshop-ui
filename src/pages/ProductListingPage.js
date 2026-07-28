@@ -23,10 +23,10 @@ const ProductListingPage = () => {
   const { currentUser } = useAuth();
 
   useEffect(() => {
-    setProducts([]);
-    setPage(0);
-    setHasMore(true);
-    setIsFallbackMode(false);
+    setProducts([]); // Clear products on user change or initial mount
+    setPage(0); // Reset page to 0
+    setHasMore(true); // Assume more products initially
+    setIsFallbackMode(false); // Reset fallback mode
   }, [currentUser]);
 
   // Fetch shops strictly on demand when user activates the Shops tab or search query updates
@@ -38,8 +38,11 @@ const ProductListingPage = () => {
 
   useEffect(() => {
     if (activeTab !== 'products') return;
+    let ignore = false;
     const fetchProducts = async () => {
-      if (!hasMore) return;
+      // If no more products and not the initial load (page 0), then stop fetching
+      if (!hasMore && page > 0) return;
+
       try {
         // Dispatch Progress: Fetch started (20%)
         window.dispatchEvent(new CustomEvent('app-loading-progress', { detail: { progress: 20 } }));
@@ -67,16 +70,23 @@ const ProductListingPage = () => {
         }
         let productsData = await productsResponse.json();
         
+        if (ignore) return;
+        
         // Dispatch Progress: Initial parse complete (70%)
         window.dispatchEvent(new CustomEvent('app-loading-progress', { detail: { progress: 70 } }));
         
         // Fallback Trigger: If the user's chosen society has no products, fetch from other societies (societyId=0)
         if (productsData.length === 0 && page === 0 && activeSocietyId) {
-          setIsFallbackMode(true);
-          const fallbackUrl = `${API_URL}/products?status=available&page=0&size=10&societyId=0`;
-          const fallbackResponse = await fetch(fallbackUrl);
-          if (fallbackResponse.ok) {
-            productsData = await fallbackResponse.json();
+          // If not already in fallback mode, set it and return to trigger a re-fetch
+          // with the new isFallbackMode state. This prevents duplicate appends.
+          if (!isFallbackMode) {
+            setIsFallbackMode(true);
+            setPage(0); // Reset page to 0 for the fallback fetch
+            setHasMore(true); // Reset hasMore for fallback mode
+            return; // Exit current fetch, new one will be triggered by state change
+          } else {
+            // If already in fallback mode and still no products, then no more products
+            setHasMore(false);
           }
         }
         
@@ -104,20 +114,34 @@ const ProductListingPage = () => {
             isFallback: isFallbackMode
           }));
 
-        setProducts(prev => [...prev, ...activeProducts]);
+        if (ignore) return;
+
+        if (page === 0) {
+          setProducts(activeProducts);
+        } else {
+          setProducts(prev => {
+            const existingIds = new Set(prev.map(p => p.id));
+            const uniqueNewProducts = activeProducts.filter(p => !existingIds.has(p.id));
+            return [...prev, ...uniqueNewProducts];
+          });
+        }
       } catch (err) {
-        setError(err.message);
+        if (!ignore) setError(err.message);
       } finally {
         // Dispatch Progress: Layout loaded & DOM painted (100%)
-        window.dispatchEvent(new CustomEvent('app-loading-progress', { detail: { progress: 100 } }));
-
-        setLoading(false);
-        setLoadingMore(false);
+        if (!ignore) {
+          window.dispatchEvent(new CustomEvent('app-loading-progress', { detail: { progress: 100 } }));
+          setLoading(false);
+          setLoadingMore(false);
+        }
       }
     };
 
     fetchProducts();
-  }, [currentUser, page, isFallbackMode, hasMore]);
+    return () => {
+      ignore = true;
+    };
+  }, [currentUser, page, isFallbackMode, hasMore, activeTab]);
 
   const fetchShops = async () => {
     setLoadingShops(true);
@@ -290,32 +314,6 @@ const ProductListingPage = () => {
           }
         }
       `}</style>
-
-      {/* 1. Call to Action Banner if user has not selected their society */}
-      {(!currentUser?.buyerSociety?.id && !currentUser?.societyId) && (
-        <div className="society-warning-banner" style={{
-          backgroundColor: '#FFF3CD',
-          color: '#856404',
-          padding: '12px 16px',
-          borderRadius: '8px',
-          marginBottom: '1rem',
-          border: '1px solid #FFEBAA',
-          fontSize: '0.95rem',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <span>Please select your residential society to view delivery-supported products near you.</span>
-          <Link to="/profile" style={{
-            color: '#5A189A',
-            fontWeight: 'bold',
-            textDecoration: 'underline',
-            marginLeft: '8px'
-          }}>
-            Go to Profile
-          </Link>
-        </div>
-      )}
 
       <div className="search-bar-container" ref={searchContainerRef}>
         <svg xmlns="http://www.w3.org/2000/svg" className="search-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

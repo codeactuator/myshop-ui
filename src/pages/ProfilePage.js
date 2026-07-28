@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useMessage } from '../context/MessageContext';
+import { useLocation } from 'react-router-dom';
 import './ProfilePage.css';
 
 const ProfilePage = () => {
@@ -14,6 +15,8 @@ const ProfilePage = () => {
   const [selectedSocietyId, setSelectedSocietyId] = useState(currentUser?.buyerSociety?.id || '');
   const [isLoadingSocieties, setIsLoadingSocieties] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const location = useLocation();
+  const [alertMessage, setAlertMessage] = useState('');
 
   useEffect(() => {
     const fetchSocieties = async () => {
@@ -44,6 +47,16 @@ const ProfilePage = () => {
       setSelectedSocietyId(Number(currentUser.buyerSociety.id));
     }
   }, [currentUser?.buyerSociety, currentUser]);
+
+  useEffect(() => {
+    // Detect if redirected from ProfileGate
+    if (location.state?.showWarning && location.state?.message) {
+      setAlertMessage(location.state.message);
+      
+      // Clean up the window history state so refreshing doesn't keep showing the alert
+      window.history.replaceState({}, document.title);
+    }
+  }, [location, currentUser]);
 
   if (!currentUser) {
     return <div className="page-status">Please log in to view your profile.</div>;
@@ -81,6 +94,14 @@ const ProfilePage = () => {
     e.preventDefault();
     if (!name.trim()) {
       showMessage('Validation Error', 'Name cannot be empty.');
+      return;
+    }
+    if (!selectedSocietyId) {
+      showMessage('Validation Error', 'Please select your residential society.');
+      return;
+    }
+    if (!apartmentNumber.trim()) {
+      showMessage('Validation Error', 'Apartment/Flat Number cannot be empty.');
       return;
     }
     if (!email.trim()) {
@@ -131,6 +152,27 @@ const ProfilePage = () => {
     <div className="profile-container">
       <h1>My Profile</h1>
 
+      {/* Bold, high-visibility Warning Alert */}
+      {alertMessage && (
+        <div 
+          className="mb-6 p-4 rounded-lg bg-amber-50 border-2 border-amber-500 text-amber-900 shadow-md animate-bounce-short"
+          style={{
+            border: '2px solid #f59e0b',
+            backgroundColor: '#fef3c7',
+            padding: '16px',
+            borderRadius: '8px',
+            marginBottom: '24px',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+          }}
+        >
+          <div className="flex items-start gap-3">
+            <span style={{ fontSize: '1.5rem' }}>⚠️</span>
+            <h4 style={{ fontWeight: '800', fontSize: '1.1rem', margin: '0 0 4px 0' }} className="text-amber-950">Action Required</h4>
+            <p style={{ fontWeight: '600', margin: 0, fontSize: '0.95rem', lineHeight: '1.4' }}>{alertMessage}</p>
+          </div>
+        </div>
+      )}
+
       <form onSubmit={handleUpdateProfile} className="profile-edit-form">
         <div className="form-group mb-3">
           <label><strong>Phone Number (Registered):</strong></label>
@@ -156,42 +198,17 @@ const ProfilePage = () => {
           />
         </div>
 
-        <div className="form-group mb-3">
-          <label htmlFor="profile-email"><strong>Email:</strong></label>
-          <input
-            id="profile-email"
-            type="email"
-            className="form-control"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="form-group mb-3">
-          <label htmlFor="profile-apartment"><strong>Apartment Number:</strong></label>
-          <input
-            id="profile-apartment"
-            type="text"
-            className="form-control"
-            value={apartmentNumber}
-            onChange={(e) => setApartmentNumber(e.target.value)}
-          />
-        </div>
-
-        {currentUser.serviceSocieties && currentUser.serviceSocieties.length > 0 && (
-          <p><strong>Current Home Address:</strong> {currentUser.buyerSociety?.name || 'Not set'}</p>
-        )}
-
         <div className="society-selection-section">
         <h3>Select Your Society</h3>
-        <div className="society-search-wrapper" style={{ marginBottom: '1rem' }}>
+        <div className="society-search-wrapper" style={{ marginBottom: '1rem', position: 'relative' }}>
+          <i className="fas fa-search society-search-icon" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#888' }}></i>
           <input
             type="text"
             placeholder="Search societies by name or location description..."
             className="form-control society-search-input"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ paddingLeft: '35px', width: '100%', boxSizing: 'border-box' }}
           />
         </div>
 
@@ -227,6 +244,34 @@ const ProfilePage = () => {
           </div>
         )}
       </div>
+
+        {currentUser.serviceSocieties && currentUser.serviceSocieties.length > 0 && (
+          <p><strong>Current Home Address:</strong> {currentUser.buyerSociety?.name || 'Not set'}</p>
+        )}
+
+        <div className="form-group mb-3">
+          <label htmlFor="profile-apartment"><strong>Apartment Number:</strong></label>
+          <input
+            id="profile-apartment"
+            type="text"
+            className="form-control"
+            value={apartmentNumber}
+            onChange={(e) => setApartmentNumber(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="form-group mb-3">
+          <label htmlFor="profile-email"><strong>Email:</strong></label>
+          <input
+            id="profile-email"
+            type="email"
+            className="form-control"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
 
         <button type="submit" className="btn btn-primary mt-3" style={{ width: '100%' }}>
           Save Changes

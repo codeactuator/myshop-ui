@@ -12,7 +12,6 @@ const WelcomeScreen = () => {
   const [step, setStep] = useState('phone'); // Steps: 'phone', 'signup', 'otp'
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
-  const [userData, setUserData] = useState({ name: '', email: '' });
   const [isExistingUser, setIsExistingUser] = useState(false);
 
   const API_URL = process.env.REACT_APP_API_URL;
@@ -31,8 +30,8 @@ const WelcomeScreen = () => {
         setIsExistingUser(true); // User exists, go to OTP for Login
         setStep('otp');
       } else if (response.status === 404) {
-        setIsExistingUser(false); // User doesn't exist, go to Signup
-        setStep('signup');
+        setIsExistingUser(false); // User doesn't exist, go straight to OTP for Signup
+        setStep('otp');
       } else {
         showMessage('Server Error', 'Server is temporarily busy. Please try again later.');
       }
@@ -42,16 +41,6 @@ const WelcomeScreen = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Step 2 (Optional): Collect registration details if user is new
-  const handleSignupSubmit = (e) => {
-    e.preventDefault();
-    if (!userData.name || !userData.email) {
-      showMessage('Incomplete Data', 'Please fill out all fields.');
-      return;
-    }
-    setStep('otp');
   };
 
   // Step 3: Verify OTP and finalize Login/Signup
@@ -83,8 +72,8 @@ const WelcomeScreen = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             phone,
-            name: userData.name,
-            email: userData.email,
+            name: '', // Name will be filled out on the /profile page
+            email: '',
             userType: 'BUYER',
           }),
         });
@@ -97,7 +86,7 @@ const WelcomeScreen = () => {
           const landingPage = newUser.userType?.toUpperCase() === 'DELIVERY_PARTNER' ? '/delivery/dashboard' : '/products';
 
           login(newUser);
-          showMessage('Success', `Account created successfully for ${newUser.name}!`, () => {
+          showMessage('Success', `Account created successfully for ${newUser.phone}!`, () => {
             navigate(landingPage);
           });
         } else {
@@ -122,44 +111,13 @@ const WelcomeScreen = () => {
           <input
             className="phone-input"
             type="tel"
-            placeholder="e.g. 8264481868"
+            placeholder="e.g. 9876543210"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
           />
           <button className="continue-button" onClick={handleContinue} disabled={loading}>
             {loading ? 'Checking...' : 'Continue'}
           </button>
-        </div>
-      )}
-
-      {step === 'signup' && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Create Account</h3>
-            <p>Tell us a bit about yourself to join the community.</p>
-            <form onSubmit={handleSignupSubmit}>
-              <input
-                className="phone-input"
-                type="text"
-                placeholder="Full Name"
-                value={userData.name}
-                onChange={(e) => setUserData({ ...userData, name: e.target.value })}
-                required
-              />
-              <input
-                className="phone-input"
-                type="email"
-                placeholder="Email Address"
-                value={userData.email}
-                onChange={(e) => setUserData({ ...userData, email: e.target.value })}
-                required
-              />
-              <div className="modal-actions">
-                <button type="button" className="cancel-button" onClick={() => setStep('phone')}>Back</button>
-                <button type="submit" className="signup-button primary-purple">Go to OTP</button>
-              </div>
-            </form>
-          </div>
         </div>
       )}
 
@@ -178,7 +136,7 @@ const WelcomeScreen = () => {
               onChange={(e) => setOtp(e.target.value)}
             />
             <div className="modal-actions">
-              <button className="cancel-button" onClick={() => setStep(isExistingUser ? 'phone' : 'signup')}>Back</button>
+              <button className="cancel-button" onClick={() => setStep('phone')}>Back</button>
               <button className="signup-button primary-purple" onClick={handleVerifyOtp} disabled={loading}>
                 {loading ? 'Verifying...' : 'Verify & Continue'}
               </button>

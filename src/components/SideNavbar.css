@@ -122,6 +122,14 @@
   margin-left: -1rem; /* Prevent layout shift */
 }
 
+/* Override the collapse rule specifically for the user initial avatar text */
+.side-navbar.collapsed .user-avatar span {
+  opacity: 1;
+  visibility: visible;
+  width: auto;
+  margin-left: 0;
+}
+
 /* On smaller screens, fully hide the navbar when collapsed */
 @media (max-width: 768px) {
   .side-navbar.collapsed {
